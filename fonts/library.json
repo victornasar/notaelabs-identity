@@ -156,7 +156,8 @@
       },
       "character": "Quiet, open grotesk; a workhorse with a little warmth",
       "why": "A credible text face to sit under an expressive display face, without being Inter",
-      "status": "approved"
+      "status": "rejected",
+      "decision": "A common AI pick when told not to use Inter; reads as template"
     },
     {
       "id": "familjen-grotesk",
@@ -200,7 +201,8 @@
       "character": "Neo-grotesk with a width axis, precise and slightly condensed",
       "why": "The width axis gives a brand a compressed display voice and a normal text voice from one family",
       "caution": "Its sibling Instrument Serif is excluded as a cliche; don't pair them",
-      "status": "approved"
+      "status": "rejected",
+      "decision": "Framer and AI template staple, alongside its excluded serif sibling"
     },
     {
       "id": "bricolage-grotesque",
@@ -220,7 +222,8 @@
       "character": "Quirky, ink-trapped grotesk with French-grotesque roots; loud at display sizes",
       "why": "Optical size axis means it can be wild at 120px and sensible at 14px",
       "caution": "Getting popular; already used in the Okonkwo fixture",
-      "status": "approved"
+      "status": "rejected",
+      "decision": "The go-to 'quirky' grotesk in AI-generated landing pages"
     },
     {
       "id": "host-grotesk",
@@ -498,7 +501,8 @@
       },
       "character": "Grotesk with sharp, slightly flared details and strong heavy weights",
       "why": "Has edge at display sizes without being a novelty face",
-      "status": "approved"
+      "status": "rejected",
+      "decision": "Framer and AI template staple"
     },
     {
       "id": "anybody",
@@ -518,7 +522,8 @@
       },
       "character": "Extreme width axis from ultra-condensed to ultra-expanded",
       "why": "Width as an expressive or motion device; good for systems where type stretches",
-      "status": "approved"
+      "status": "rejected",
+      "decision": "Novelty width face with a web3 landing-page feel"
     },
     {
       "id": "spline-sans",
@@ -739,7 +744,8 @@
       "character": "Soft 'old style' display serif with softness and wonk axes",
       "why": "The axes allow built-in imperfection, the OpenAI-style 'engineered imperfection' idea",
       "caution": "Heading toward overuse in tasteful-startup land; use the axes or don't use it",
-      "status": "approved"
+      "status": "rejected",
+      "decision": "The default 'warm serif' AI tools reach for"
     },
     {
       "id": "hedvig-letters-serif",
@@ -1035,7 +1041,8 @@
       },
       "character": "Wide, squarish mono with width and weight axes; works as display type",
       "why": "A mono that can carry headlines, for dev-tool brands where code is the identity",
-      "status": "approved"
+      "status": "rejected",
+      "decision": "Trend-cycle display mono on AI and crypto landing pages"
     },
     {
       "id": "spline-sans-mono",
@@ -1140,7 +1147,8 @@
       "character": "Pixel mono, retro-futurist and low resolution",
       "why": "The research's Mistral pattern: low resolution as a deliberate premium choice that also works at small sizes",
       "caution": "One weight only; a strong flavour",
-      "status": "approved"
+      "status": "rejected",
+      "decision": "Trend-cycle pixel mono on indie and AI dev sites"
     }
   ]
 }
