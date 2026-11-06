@@ -17,6 +17,12 @@ export default defineStrategy({
   category: {
     name: "Architectural lighting design",
     competitors: ["Speirs Major", "Arup Lighting", "L’Observatoire International"],
+    // From the brief's round 2, read from each site's text; not seen.
+    identities: [
+      { name: "Speirs Major", identity: "The name as plain capitals, “light architecture” as a lowercase descriptor; a sparse, project-led site." },
+      { name: "Arup Lighting", identity: "A service line inside Arup’s corporate brand and red logo; full-width project photography, night scenes included." },
+      { name: "L’Observatoire International", identity: "A wordmark with a symbol and the line “Lighting the World”; offices listed by city." },
+    ],
     conventions: [
       { id: "color-change", convention: "Facades that cycle through colors, with dynamic RGB light as the selling point", seenIn: [], verdict: "reject", why: "“Spectacular” is a never; the studio’s light stays put and stays warm." },
       { id: "dark-and-glow", convention: "Black websites and portfolios with glowing night photographs of lit buildings", seenIn: [], verdict: "reject", why: "“Gloomy” is a never; it treats darkness as a backdrop, not as designed." },

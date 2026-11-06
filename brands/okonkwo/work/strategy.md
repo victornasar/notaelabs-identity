@@ -27,7 +27,15 @@ This idea answers all three "nevers". It isn't spectacular, because a pool is mo
 
 ## Category
 
-**Architectural lighting design.** Competitors from the brief: Speirs Major, Arup Lighting, L'Observatoire International. Their identities are not described, so no claims are made about them below. The conventions are the category's, taken from the brief's "never" answers, and none is attributed to a firm.
+**Architectural lighting design.** Competitors from the brief: Speirs Major, Arup Lighting, L'Observatoire International. Their identities, from brief round 2 (read from their sites' text, not seen):
+
+| Competitor | Identity |
+|---|---|
+| Speirs Major | The name as plain capitals, "light architecture" as a lowercase descriptor; a sparse, project-led site |
+| Arup Lighting | A service line inside Arup's corporate brand and red logo; full-width project photography, night scenes included |
+| L'Observatoire International | A wordmark with a symbol and the line "Lighting the World"; offices listed by city |
+
+The conventions are the category's, taken from the brief's "never" answers, and none is attributed to a firm.
 
 | id | Convention | Verdict | Why |
 |---|---|---|---|

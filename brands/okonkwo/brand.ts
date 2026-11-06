@@ -11,6 +11,15 @@ export default defineBrand({
   positioning:
     "We design the light in buildings people remember at night: lobbies, stairwells, bridges, and the long walk home.",
   story: {
+    mission:
+      "We light buildings and streets for the people who use them after dark, with as much light as the place needs and no more.",
+    vision: "A city where the walk home at night is as good as the walk in daylight.",
+    values: [
+      { value: "Measured", means: "Every lux level and color temperature has a reason we can say out loud." },
+      { value: "Darkness is designed", means: "We decide where light doesn’t go as carefully as where it does." },
+      { value: "Warm first", means: "Warm white and sodium tones before anything cooler, and never color for its own sake." },
+      { value: "There at switch-on", means: "We commission what we design, on site, the night it’s turned on." },
+    ],
     audience:
       "Architects and developers who already have the building and need the hours after sunset to be as considered as the hours before. Planning committees and the public see the work afterward, mostly at night and in photographs.",
     personality: ["Warm", "Exacting", "Nocturnal", "Generous"],
@@ -34,11 +43,23 @@ export default defineBrand({
         do: "The stair glows at 2700 K so nobody squints on the way down.",
         dont: "Our innovative lighting solutions transform spaces.",
       },
+      {
+        do: "The bridge is lit from the handrail, so the river stays dark and the stars stay out.",
+        dont: "A stunning illuminated landmark for the city.",
+      },
+      {
+        do: "We’ll be on site the night it’s switched on.",
+        dont: "Full project lifecycle support.",
+      },
     ],
     rewrites: [
       {
         before: "Okonkwo-Marchetti delivers cutting-edge illumination for premium developments.",
         after: "We light buildings for the people who use them after dark.",
+      },
+      {
+        before: "Our award-winning team delivers bespoke lighting experiences.",
+        after: "Six of us, all lighting designers. We’ve lit 40 buildings and 3 bridges.",
       },
     ],
   },
@@ -65,6 +86,18 @@ export default defineBrand({
     ],
     clearSpace: { ratio: 0.5, basis: "half the cap height" },
     minimumSize: { screen: "Wordmark 16 px tall, lamp 16 px", print: "Wordmark 5 mm tall" },
+    on: [
+      { ground: "Night", ink: "Stone" },
+      { ground: "Night", ink: "Sodium" },
+      { ground: "Sodium", ink: "Night" },
+      { ground: "Stone", ink: "Night" },
+    ],
+    misuse: [
+      "Never replace the beam with a typed hyphen.",
+      "Never set “Architectural Lighting Studio” on the wordmark’s line; it sits below or beside, in the label style.",
+      "Never put the marks in Stone on Sodium (2.45:1).",
+      "Never set the marks over a photograph’s light; place them on a Night or Sodium field cut into the image.",
+    ],
   },
   colors: [
     {
