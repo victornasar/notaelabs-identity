@@ -33,7 +33,7 @@ brands/<slug>/
 - **`fonts.ts`** loads two local fonts with `next/font/local`, using `--brand-display` and `--brand-text` as their variables. Give each font constant a name unique to the brand, such as `acmeDisplay`, then export them as `display` and `text`. Next names the font family after the constant, and dev loads every brand at once.
 - **Marks** are drawn in one color. The shell recolors them, so you do not need reversed versions.
 
-`brands/notae` and `brands/okonkwo` are the reference brands. Okonkwo-Marchetti is invented. It has a long name, no symbol, and five colors, to catch anything the shell assumes.
+`brands/okonkwo` is the reference brand. Okonkwo-Marchetti Architectural Lighting Studio is invented: it exists to test the generator end to end (its `work/` folder holds a complete run) and to catch anything the shell assumes, such as a very long name.
 
 ## Generate a brand
 

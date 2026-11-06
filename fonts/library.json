@@ -540,7 +540,7 @@
       },
       "character": "Engineered grotesk with squared curves; corporate-technical",
       "why": "A complete system with a matching mono; reliable for technical text",
-      "caution": "Strongly associated with IBM and widely used in dev tooling. Currently Notae's text face, which doesn't earn it a place",
+      "caution": "Strongly associated with IBM and widely used in dev tooling. Was Notae Edition 1's text face, which didn't earn it a place",
       "status": "rejected",
       "decision": "Reads as IBM and as default dev tooling"
     },
@@ -895,7 +895,7 @@
       },
       "character": "Transitional serif with optical sizes; sober, literate",
       "why": "A dependable reading face",
-      "caution": "Currently Notae's display face, which doesn't earn it a place; reads a bit academic",
+      "caution": "Was Notae Edition 1's display face, which didn't earn it a place; reads a bit academic",
       "status": "rejected",
       "decision": "Sober to the point of academic; Newsreader and Literata cover this ground with more warmth"
     },
@@ -917,7 +917,7 @@
       },
       "character": "Book serif designed for Google Play Books; sturdy on screens",
       "why": "Comfortable long reading; good for docs-heavy brands",
-      "caution": "Currently the base of Notae's wordmark",
+      "caution": "Was the base of Notae Edition 1's wordmark",
       "status": "approved",
       "license": "OFL-1.1",
       "designer": "Latin by Veronika Burian and Jose Scaglione. Greek by Irene Vlachou. Cyrillic by Vera Evstafieva.",
