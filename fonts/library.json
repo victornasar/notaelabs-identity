@@ -1,5 +1,9 @@
 {
   "about": "Curated typefaces the brand generator may use. Every family is OFL or Apache, fetched from its source with its license file, so it can ship in client downloads. `character`, `why` and `caution` are editorial judgments, not facts. Run `pnpm fonts fetch` to download and verify, `pnpm fonts specimen` to review.",
+  "google": {
+    "repo": "google/fonts",
+    "commit": "24ddc1f324cac5d9f5aedca126d298f56e3f1640"
+  },
   "rules": {
     "licenses": [
       "OFL-1.1",
@@ -135,7 +139,22 @@
       },
       "character": "Newspaper grotesk with a slightly squarish, editorial voice",
       "why": "Made for a media group, so it carries authority without looking corporate",
-      "status": "approved"
+      "status": "approved",
+      "license": "OFL-1.1",
+      "designer": "Bakken & Baeck AS, Henrik Kongsvoll",
+      "weights": [
+        400,
+        900
+      ],
+      "axes": [
+        "wght"
+      ],
+      "italic": true,
+      "sha256": {
+        "SchibstedGrotesk[wght].ttf": "6ceeadf6be8e1fd7687011c7fa38ed0edd1abe967a0b73d97caec183552e823d",
+        "SchibstedGrotesk-Italic[wght].ttf": "b49fedb6f3a2ff9b43e13351888641505dc8e5f300941e597eecbc3f52ba357b",
+        "OFL.txt": "3b4f3063b6ac7c1e403e2c4a5e8ef3a58190ff83ed7b15af66511858699139ce"
+      }
     },
     {
       "id": "hanken-grotesk",
@@ -178,7 +197,22 @@
       },
       "character": "Agency grotesk with idiosyncratic details at large sizes",
       "why": "Personality shows in headlines and disappears in text",
-      "status": "approved"
+      "status": "approved",
+      "license": "OFL-1.1",
+      "designer": "Anders Wikstroem, Jonas Baeckman, Matilda Gysing, Kristian Moeller",
+      "weights": [
+        400,
+        700
+      ],
+      "axes": [
+        "wght"
+      ],
+      "italic": true,
+      "sha256": {
+        "FamiljenGrotesk[wght].ttf": "2d25fc41321a04561fab20a90fc8bc9ed4d1c0743fe8ba76cc51cd3632138b80",
+        "FamiljenGrotesk-Italic[wght].ttf": "278047492643756c75533d2acb90e0644abfe5df7bc6b99f21cf72a750580634",
+        "OFL.txt": "9708dd560d1f8aa1f006461aa447a31fda7b9aff662d152837654a388e0eb2ee"
+      }
     },
     {
       "id": "instrument-sans",
@@ -245,7 +279,22 @@
       },
       "character": "Contemporary grotesk with a touch of geometric softness",
       "why": "Recent and not yet over-seen; good for clean software brands that need one family",
-      "status": "approved"
+      "status": "approved",
+      "license": "OFL-1.1",
+      "designer": "Doğukan Karapınar",
+      "weights": [
+        300,
+        800
+      ],
+      "axes": [
+        "wght"
+      ],
+      "italic": true,
+      "sha256": {
+        "HostGrotesk[wght].ttf": "74c77b8e850d58dd3d8b22e39111a73bef3450de9fb57018ef99119f2d484f5d",
+        "HostGrotesk-Italic[wght].ttf": "8e16d5b25106332b4330ab02f59bfeb7bb40ba0c060c3053f4c08d4ca8ae4d22",
+        "OFL.txt": "f04ad0873907546e160c7a79b1e42bd3cd380c7e5ee4c1b3c11f43faca1675e7"
+      }
     },
     {
       "id": "funnel-display",
@@ -264,7 +313,21 @@
       },
       "character": "Display grotesk with tapered joins that pinch where strokes meet",
       "why": "A built-in signature detail, useful as the starting point for a modified wordmark",
-      "status": "approved"
+      "status": "approved",
+      "license": "OFL-1.1",
+      "designer": "NORD ID, Kristian Moeller",
+      "weights": [
+        300,
+        800
+      ],
+      "axes": [
+        "wght"
+      ],
+      "italic": false,
+      "sha256": {
+        "FunnelDisplay[wght].ttf": "b4151c9c4b7b07eb74320096b4ff4156cca8821f5adfab34af9fd9a2d6c1179d",
+        "OFL.txt": "a32303f6ea3542927121212a9e4f3fe3548741e6d448d9dc6f29e97cf50102e6"
+      }
     },
     {
       "id": "archivo",
@@ -286,7 +349,23 @@
       },
       "character": "American-gothic grotesk with a wide width range, from condensed to expanded",
       "why": "Very wide range in one family; the expanded widths have real presence",
-      "status": "approved"
+      "status": "approved",
+      "license": "OFL-1.1",
+      "designer": "Hector Gatti",
+      "weights": [
+        100,
+        900
+      ],
+      "axes": [
+        "wght",
+        "wdth"
+      ],
+      "italic": true,
+      "sha256": {
+        "Archivo[wdth,wght].ttf": "0e094a7d3c7c4c25cf1310c4b30014f1dae9332220b1c2c88f4fa996f0b05053",
+        "Archivo-Italic[wdth,wght].ttf": "305d13b4eb80e62f7d517f78d7c045250d977552a420f2dbed906f314e761305",
+        "OFL.txt": "108b4e57c9c796d3d38d0428ca7ee39de47ad93187302718d9b2d8864b9b716b"
+      }
     },
     {
       "id": "public-sans",
@@ -330,7 +409,22 @@
       },
       "character": "Grotesk built for low-vision legibility; distinct letter shapes with a slightly odd charm",
       "why": "Accessibility as a brand value is a real, defensible concept for health and civic clients",
-      "status": "approved"
+      "status": "approved",
+      "license": "OFL-1.1",
+      "designer": "Elliott Scott, Megan Eiswerth, Linus Boman, Theodore Petrosky, Letters from Sweden",
+      "weights": [
+        200,
+        800
+      ],
+      "axes": [
+        "wght"
+      ],
+      "italic": true,
+      "sha256": {
+        "AtkinsonHyperlegibleNext[wght].ttf": "5a455d1cfa099b601ab70751bb9673e8fe1854dc4500c80e1a220d0d75e31745",
+        "AtkinsonHyperlegibleNext-Italic[wght].ttf": "ce9cffed32742ad2d9238c561a93220385e5934cdc02b8eb4097a50efa957dc6",
+        "OFL.txt": "aca6a428580965d2297d1b718042dd427c2a9443ece3b0d02d758e161e0c4030"
+      }
     },
     {
       "id": "hedvig-letters-sans",
@@ -373,7 +467,22 @@
       },
       "character": "Sturdy grotesk whose heavy weights look like posters",
       "why": "The black weight is a genuine display voice",
-      "status": "approved"
+      "status": "approved",
+      "license": "OFL-1.1",
+      "designer": "Hector Gatti",
+      "weights": [
+        100,
+        900
+      ],
+      "axes": [
+        "wght"
+      ],
+      "italic": true,
+      "sha256": {
+        "Chivo[wght].ttf": "801674cbeff749011a0186b2c932dc9158187a8ca4ca6598db2a1f5c7c4342d1",
+        "Chivo-Italic[wght].ttf": "502339e1cda77e24b5cd46a1a875e4c5e6f20ea019c248f57f23423527030ff3",
+        "OFL.txt": "c9b69fa18c372df2b187b49efc57b1ea643b86a938e5af32f6b5a7af1017c891"
+      }
     },
     {
       "id": "commissioner",
@@ -393,7 +502,24 @@
       },
       "character": "Low-contrast sans with flare and volume axes that morph it toward flared serif",
       "why": "One file covers clean sans through flared display; rare range",
-      "status": "approved"
+      "status": "approved",
+      "license": "OFL-1.1",
+      "designer": "Kostas Bartsokas",
+      "weights": [
+        100,
+        900
+      ],
+      "axes": [
+        "wght",
+        "slnt",
+        "FLAR",
+        "VOLM"
+      ],
+      "italic": false,
+      "sha256": {
+        "Commissioner[FLAR,VOLM,slnt,wght].ttf": "db01279a6eb8676ee62675a4d7e5edbfe5f08fbc109358e2f49760b70c0447d3",
+        "OFL.txt": "4a7d88c77b4bc39ff84f2e058ba8f015636c50ce33588a86d9da97defe519933"
+      }
     },
     {
       "id": "ibm-plex-sans",
@@ -459,7 +585,22 @@
       },
       "character": "Revival of Franklin Gothic, the classic American newspaper gothic",
       "why": "American heritage in one face; heavy weights feel like headlines",
-      "status": "approved"
+      "status": "approved",
+      "license": "OFL-1.1",
+      "designer": "Pablo Impallari, Rodrigo Fuenzalida, Nhung Nguyen",
+      "weights": [
+        100,
+        900
+      ],
+      "axes": [
+        "wght"
+      ],
+      "italic": true,
+      "sha256": {
+        "LibreFranklin[wght].ttf": "2329f394b10ed1c71107df20fddc11e2bb1b68c1ecbb385f975b36fd64a971f8",
+        "LibreFranklin-Italic[wght].ttf": "b8d2f40203bd4d90fe3e805953d9b79d62a6486db756d984b0d8ef4435b367ba",
+        "OFL.txt": "2710268527181a27b8e938617551bae29e714e6525247be6679bf897a9942a60"
+      }
     },
     {
       "id": "overused-grotesk",
@@ -480,7 +621,21 @@
       "character": "Independent take on the classic premium grotesk look (Söhne/Neue Haas territory)",
       "why": "Closest free approach to the premium retail grotesks the research found at the top tier",
       "caution": "Alpha release (v0.5); roman only, no italics",
-      "status": "approved"
+      "status": "approved",
+      "license": "OFL-1.1",
+      "designer": "RandomMaerks",
+      "weights": [
+        300,
+        900
+      ],
+      "axes": [
+        "wght"
+      ],
+      "italic": false,
+      "sha256": {
+        "OverusedGrotesk[wght].ttf": "79380fb7cb394f936234e0f21107d72d0a3a355962fd7ef4d02fbc29b2a2176e",
+        "OFL.txt": "a043ec355e8c3d018a265cbacd8e61d736a16a9eb3cd034b7b442b6be549495d"
+      }
     },
     {
       "id": "epilogue",
@@ -566,7 +721,25 @@
       },
       "character": "One file from linear sans to casual brush-like, proportional to mono",
       "why": "The casual and mono axes can carry a dev-tool brand's personality inside one family",
-      "status": "approved"
+      "status": "approved",
+      "license": "OFL-1.1",
+      "designer": null,
+      "weights": [
+        300,
+        1000
+      ],
+      "axes": [
+        "MONO",
+        "CASL",
+        "wght",
+        "slnt",
+        "CRSV"
+      ],
+      "italic": false,
+      "sha256": {
+        "Recursive[CASL,CRSV,MONO,slnt,wght].ttf": "653221ca467f4732fe6856ac493f6c409e9f56a7674abe36b2364acc89796f7c",
+        "OFL.txt": "f9f539cf7549bd417159dbdb9c400943a5b60a7366c2c6fbde9f095173d82479"
+      }
     },
     {
       "id": "big-shoulders",
@@ -585,7 +758,22 @@
       },
       "character": "Condensed industrial gothic inspired by Chicago",
       "why": "Strong American civic and industrial character; tall headlines in narrow space",
-      "status": "approved"
+      "status": "approved",
+      "license": "OFL-1.1",
+      "designer": "Patric King",
+      "weights": [
+        100,
+        900
+      ],
+      "axes": [
+        "wght",
+        "opsz"
+      ],
+      "italic": false,
+      "sha256": {
+        "BigShoulders[opsz,wght].ttf": "4b4b24aa6f799aa73cdcd5b6fa840cbcbbb38b81fa9fa82c25126a4530c1ba44",
+        "OFL.txt": "fbc746aabf0eb1847dfd92e2efc4596d79fa897d60b8e64062a22f585508fb3f"
+      }
     },
     {
       "id": "gloock",
@@ -605,7 +793,19 @@
       "character": "High-contrast display serif with dense, dramatic letter shapes",
       "why": "A serif with weight and drama, not the thin 'luxury' look",
       "caution": "One weight only",
-      "status": "approved"
+      "status": "approved",
+      "license": "OFL-1.1",
+      "designer": "Duarte Pinto",
+      "weights": [
+        400,
+        400
+      ],
+      "axes": [],
+      "italic": false,
+      "sha256": {
+        "Gloock-Regular.ttf": "c3a67e0212f7da01764796ae721cb9bab3e122d142354f97cf9c63fb763e6d77",
+        "OFL.txt": "321e28d45a430e017d9d1d6a47ef1fd261aad354723b014cf1933a765036c311"
+      }
     },
     {
       "id": "young-serif",
@@ -625,7 +825,19 @@
       "character": "Heavy old-style serif with soft, chunky shapes",
       "why": "In the same warm, unfashionable spirit as Mailchimp's Cooper",
       "caution": "One weight only",
-      "status": "approved"
+      "status": "approved",
+      "license": "OFL-1.1",
+      "designer": "Bastien Sozeau",
+      "weights": [
+        400,
+        400
+      ],
+      "axes": [],
+      "italic": false,
+      "sha256": {
+        "YoungSerif-Regular.ttf": "42bb2602364b28569fdce5eeb6ab3d81cf8090ba81b211f1229ed69f33155523",
+        "OFL.txt": "737d8d343b674c6894f373de71a044b6782c130f2aebf180933d63ddf7a3dc19"
+      }
     },
     {
       "id": "newsreader",
@@ -646,7 +858,23 @@
       },
       "character": "Editorial serif from Production Type with a real optical size axis",
       "why": "The closest free approach to Tiempos-style editorial warmth",
-      "status": "approved"
+      "status": "approved",
+      "license": "OFL-1.1",
+      "designer": "Hugues Gentile",
+      "weights": [
+        200,
+        800
+      ],
+      "axes": [
+        "wght",
+        "opsz"
+      ],
+      "italic": true,
+      "sha256": {
+        "Newsreader[opsz,wght].ttf": "8a08d13f8a6c0d51be379a60af84f945f65369a67e509ee3c3bdcc421254d7c1",
+        "Newsreader-Italic[opsz,wght].ttf": "796668611f80b64d5adf182fde3b6f29ed83b4e7cbec7b96937e84ac01364792",
+        "OFL.txt": "fdfad38143ec470553cae82a1e45320bdd1b9ec70415d37bd0171051d8a4ded8"
+      }
     },
     {
       "id": "source-serif-4",
@@ -690,7 +918,23 @@
       "character": "Book serif designed for Google Play Books; sturdy on screens",
       "why": "Comfortable long reading; good for docs-heavy brands",
       "caution": "Currently the base of Notae's wordmark",
-      "status": "approved"
+      "status": "approved",
+      "license": "OFL-1.1",
+      "designer": "Latin by Veronika Burian and Jose Scaglione. Greek by Irene Vlachou. Cyrillic by Vera Evstafieva.",
+      "weights": [
+        200,
+        900
+      ],
+      "axes": [
+        "opsz",
+        "wght"
+      ],
+      "italic": true,
+      "sha256": {
+        "Literata[opsz,wght].ttf": "b41138c9373112f32abb589cc22e8674b06ed4048b0c513be922bdd26f274440",
+        "Literata-Italic[opsz,wght].ttf": "d483dfaeba9cbf4ce71d32a52ee65df82f7e35b15fff8d1011cdb242d1fcd465",
+        "OFL.txt": "8742963604cd89dc81437811a850018fc03b2bfad686d7422c8235967c87614e"
+      }
     },
     {
       "id": "spectral",
@@ -723,7 +967,32 @@
       },
       "character": "Sharp, narrow screen-first serif from Production Type",
       "why": "Crisp and cool, a serif that feels technical",
-      "status": "approved"
+      "status": "approved",
+      "license": "OFL-1.1",
+      "designer": "Jean-Baptiste Levee",
+      "weights": [
+        200,
+        800
+      ],
+      "axes": [],
+      "italic": true,
+      "sha256": {
+        "Spectral-ExtraLight.ttf": "5d852db897fd7ad5ce640a6e88f1cd70eac75777c541d02d86749af8d4797ff1",
+        "Spectral-ExtraLightItalic.ttf": "492e823b5d8d67d2f18fe06938d84e8decee24b1790d4c6ebdade3cbd1b83b44",
+        "Spectral-Light.ttf": "a2a530303d326473b69ab7863b879e9203ec747e51d5fa7c7b19e0e975e00740",
+        "Spectral-LightItalic.ttf": "4cb424aeb1d6b822e9ce6213789afeabd403c6765fc7339e184c27ae4d6a6b01",
+        "Spectral-Regular.ttf": "c89021dc20720c8d0dcf40b0b2f6e00c13665fa8041717f581396f51b8c78f5d",
+        "Spectral-Italic.ttf": "7ec97244259db4008c4b1224c7914e5371c797c0044af9d85c2d761ba0e5f787",
+        "Spectral-Medium.ttf": "f385bc588599c879112272711d4acecc126674009d747a27284f59e93a240e83",
+        "Spectral-MediumItalic.ttf": "82388c41e76d6417ce9947418fa2cda1ed99f24d4ff295b2f05572178127663f",
+        "Spectral-SemiBold.ttf": "5f86915a744832ecf6e4a17ab04bea091b9fa992ef5164ff65ae34c1da2fe94b",
+        "Spectral-SemiBoldItalic.ttf": "46ad3a9f93b98dc2dbdeee265e76eb846c5be912aa8f09f42e3692706c6f563b",
+        "Spectral-Bold.ttf": "70ddb1ec6ae3b0b8d0c79231f670de786978f19baeba2130757526e407aebf9b",
+        "Spectral-BoldItalic.ttf": "709fa4f2da9be216fd52125db2d6caa4f90150f48de1a453c9ecf91117ab49b6",
+        "Spectral-ExtraBold.ttf": "af3f8513db8d047ebecb1682b5e04dfc12ec7e6b51b71654d4d348f12a5e6b5a",
+        "Spectral-ExtraBoldItalic.ttf": "680ba360e376759b54f33154a89e3c75842d4cf8faa498a717c3e1a65a93305a",
+        "OFL.txt": "501d6ceca8e552630fe3aa9442b9a818565680a1a2f79f3fb8c13d6f309a9e98"
+      }
     },
     {
       "id": "fraunces",
@@ -766,7 +1035,21 @@
       "character": "Warm, slightly quirky serif from an insurance brand",
       "why": "Friendly serif for consumer fintech and insurance clients",
       "caution": "One weight only (optical size axis)",
-      "status": "approved"
+      "status": "approved",
+      "license": "OFL-1.1",
+      "designer": "Alexander Örn & Tor Weibull",
+      "weights": [
+        400,
+        400
+      ],
+      "axes": [
+        "opsz"
+      ],
+      "italic": false,
+      "sha256": {
+        "HedvigLettersSerif[opsz].ttf": "10eb164574c5858855e2708bb12a628a385e021be5dd9ff2f586c4ff73b8ce5c",
+        "OFL.txt": "c0de2f095d2e43a90ddd7e18705b41e49e3536669cd2b7ed57bfeac5a2a988a9"
+      }
     },
     {
       "id": "zilla-slab",
@@ -796,7 +1079,28 @@
       "character": "Contemporary slab with angular details",
       "why": "A slab is a rare, technical-but-warm choice",
       "caution": "Mozilla's brand face; reads as Mozilla to people who know it",
-      "status": "approved"
+      "status": "approved",
+      "license": "OFL-1.1",
+      "designer": "Typotheque.com",
+      "weights": [
+        300,
+        700
+      ],
+      "axes": [],
+      "italic": true,
+      "sha256": {
+        "ZillaSlab-Light.ttf": "4c3dfcd4a5bb71ee28b6c2ec8e8bfec720f619bc00e12a13a88f0f233af7f851",
+        "ZillaSlab-LightItalic.ttf": "899c8f381f7b82a78fd5ac458405b6c212ad25bc11447f235aa097f3faf34b9e",
+        "ZillaSlab-Regular.ttf": "41a4626844da9216b031308d4423045c765fe4231d99862d85d7d74509d37703",
+        "ZillaSlab-Italic.ttf": "ff0cd7a2f0db59d017d51b4ed9003f58bf21ae218ab2a965aa3bc1dd894c152b",
+        "ZillaSlab-Medium.ttf": "d344b0f60cd5fb2d34c4168d2811ba684163e5665e20cccbcfb6ac822d84a500",
+        "ZillaSlab-MediumItalic.ttf": "de6be2985329891035a3b3863a325a82a918a2018650c3b43fa5c4ae14815f58",
+        "ZillaSlab-SemiBold.ttf": "aafcb295b88d520357db1ecf9a1c3167055e87e9ddf5f63e560cbd139ec2805e",
+        "ZillaSlab-SemiBoldItalic.ttf": "23815b73da57186d64adc71cdab4cd2bbd9be21f71efdce60d9676638f070e2f",
+        "ZillaSlab-Bold.ttf": "4ec3a04a4eef37074b42ef542e4d874e13646668cfe65256e0bf100441cf8719",
+        "ZillaSlab-BoldItalic.ttf": "7951036c92de71e3c88ea01abe031d5bdaddf4639022a3e1cb92322f2e88d2cf",
+        "OFL.txt": "240b385d3ec8c8d5c1d4af2bbba6ac72bac0309a80c1a8ff112c168643cc6811"
+      }
     },
     {
       "id": "besley",
@@ -817,7 +1121,22 @@
       },
       "character": "Clarendon-style serif with bracketed, chunky serifs",
       "why": "Victorian-American printing character; confident, rare in software",
-      "status": "approved"
+      "status": "approved",
+      "license": "OFL-1.1",
+      "designer": "Owen Earl",
+      "weights": [
+        400,
+        900
+      ],
+      "axes": [
+        "wght"
+      ],
+      "italic": true,
+      "sha256": {
+        "Besley[wght].ttf": "71f352d8859c787631a0978161d48497a72caa69dcae6996d6712a564df86c1e",
+        "Besley-Italic[wght].ttf": "de502a1ab6b06a63982dce8c9e58b3eee8aada175e78d5a4dc0a7b3721f26562",
+        "OFL.txt": "e8d81ba3b06080b764626d4385f319344e102ddf2c08bb4209412ac22d695f69"
+      }
     },
     {
       "id": "brygada-1918",
@@ -838,7 +1157,22 @@
       },
       "character": "Revival of a 1918 Polish typeface with sharp, idiosyncratic details",
       "why": "Historic character that nobody else in software is using",
-      "status": "approved"
+      "status": "approved",
+      "license": "OFL-1.1",
+      "designer": "Mateusz Machalski | Borys Kosmynka | Przemek Hoffer",
+      "weights": [
+        400,
+        700
+      ],
+      "axes": [
+        "wght"
+      ],
+      "italic": true,
+      "sha256": {
+        "Brygada1918[wght].ttf": "93a23e7c6de5e2c54410116abceed294a05b71aa03af52fbaa92c2cc79003d4d",
+        "Brygada1918-Italic[wght].ttf": "c694f075a9240c47c72a2298acf9c14f79abdf7bae824eca96b78099dbed93c5",
+        "OFL.txt": "733ac89b598ee093fe094927a8e66a988423a61b745c62233a2b0d6e2a159e58"
+      }
     },
     {
       "id": "petrona",
@@ -859,7 +1193,22 @@
       },
       "character": "Calligraphic serif with a large weight range, from thin to black",
       "why": "The black weight is a distinctive display voice for a serif",
-      "status": "approved"
+      "status": "approved",
+      "license": "OFL-1.1",
+      "designer": "Ringo R. Seeber",
+      "weights": [
+        100,
+        900
+      ],
+      "axes": [
+        "wght"
+      ],
+      "italic": true,
+      "sha256": {
+        "Petrona[wght].ttf": "0ede77fbf726541cf93ece7b721a7b069f004cb413ab205f74963560015ab075",
+        "Petrona-Italic[wght].ttf": "f4ad599093d29a668e2f945e027b47baee8476647d92bc8c23a89b0f86c08078",
+        "OFL.txt": "a889ff77b75be8bcd1456ff147eb9dac647f3eb217fad50fb4877496884f6dcb"
+      }
     },
     {
       "id": "libre-caslon-text",
@@ -879,7 +1228,22 @@
       },
       "character": "Caslon for screens; the typeface of the US founding documents",
       "why": "Deep American heritage; serious and old-world for legal and finance clients",
-      "status": "approved"
+      "status": "approved",
+      "license": "OFL-1.1",
+      "designer": "Pablo Impallari, Rodrigo Fuenzalida, Katja Schimmel",
+      "weights": [
+        400,
+        700
+      ],
+      "axes": [
+        "wght"
+      ],
+      "italic": true,
+      "sha256": {
+        "LibreCaslonText[wght].ttf": "c11809dbfd5445886293d89b32bfc2584075c80e77750cf1c284113e36b8b3f4",
+        "LibreCaslonText-Italic[wght].ttf": "60ca1a3aade61c8c381800ca85b9b2f0fb341d89ebe065e12cd6ec2ee2e53e54",
+        "OFL.txt": "a294245c822c5aa9fd9a9f3189418e99415428be5fecadf797793d5d8f6a3ad3"
+      }
     },
     {
       "id": "libre-caslon-display",
@@ -943,7 +1307,23 @@
       },
       "character": "Compact, sturdy serif with sharp wedge serifs and optical sizes",
       "why": "Energetic and space-efficient; good for dense product copy",
-      "status": "approved"
+      "status": "approved",
+      "license": "OFL-1.1",
+      "designer": "Juan Pablo del Peral",
+      "weights": [
+        100,
+        900
+      ],
+      "axes": [
+        "wght",
+        "opsz"
+      ],
+      "italic": true,
+      "sha256": {
+        "Piazzolla[opsz,wght].ttf": "b6b6451daba93a4b71f88ca8e37a66c3fd2b4e57ec54a407cddf6ae65b62c7b7",
+        "Piazzolla-Italic[opsz,wght].ttf": "ffeb38d0c9b332f6ef685352bfbae5e65775ccdc2ae142f49ac8ed2d7d215268",
+        "OFL.txt": "eb54463ef24368895c812c9117e677a59bd2379f80da85515e19b473f310e4ed"
+      }
     },
     {
       "id": "alegreya",
@@ -1021,7 +1401,20 @@
       "character": "Mono with the shapes of a classic grotesk (Helvetica-derived)",
       "why": "Studio Lin's FRAGMENT identity from the research; a mono that sits well next to grotesks",
       "caution": "One weight only",
-      "status": "approved"
+      "status": "approved",
+      "license": "OFL-1.1",
+      "designer": "Wei Huang based on Nimbus Sans by URW Studio, based on Helvetica by Max Miedinger.",
+      "weights": [
+        400,
+        400
+      ],
+      "axes": [],
+      "italic": true,
+      "sha256": {
+        "FragmentMono-Regular.ttf": "0fe011f425873c2e0fc73a189e394e340ad48d2b9a99a576bdeec75cee000460",
+        "FragmentMono-Italic.ttf": "c9dd3c7b24c11ba05ab1a6ec3a659c823f0e14fb26c14df0e93e82ebb60f3a25",
+        "OFL.txt": "ef14426248ca0404eae1ae65e61802b1627b5ec33aab117fb36edf401a81636e"
+      }
     },
     {
       "id": "martian-mono",
@@ -1104,7 +1497,22 @@
       },
       "character": "Typewriter-flavoured mono with a slightly retro bite",
       "why": "Analog character for brands using the physical-world metaphors the research found in AI brands",
-      "status": "approved"
+      "status": "approved",
+      "license": "OFL-1.1",
+      "designer": "Ryoichi Tsunekawa",
+      "weights": [
+        400,
+        700
+      ],
+      "axes": [
+        "wght"
+      ],
+      "italic": true,
+      "sha256": {
+        "SometypeMono[wght].ttf": "4095fd328c988392fb00ab867134e69beff0fc16de66ecdd9e7e232c16f16f25",
+        "SometypeMono-Italic[wght].ttf": "c1f25acdc7125e74e3f5bce7bda0d5053553c7a574513ecd2247ca30e5170bb3",
+        "OFL.txt": "495a16e8214dd38dec1b569224d3a740c8f646336877794c492638e3172e8e9c"
+      }
     },
     {
       "id": "commit-mono",
@@ -1126,7 +1534,22 @@
       },
       "character": "Neutral, carefully spaced coding mono with smart kerning",
       "why": "Designed to disappear in code; a good default that isn't JetBrains Mono",
-      "status": "approved"
+      "status": "approved",
+      "license": "OFL-1.1",
+      "designer": "Eigil Nikolajsen",
+      "weights": [
+        400,
+        700
+      ],
+      "axes": [],
+      "italic": true,
+      "sha256": {
+        "CommitMono-400-Regular.ttf": "7430751f8621b4027df29dbc54d466fca9d75eb4e7a99c7f227625249ad4fb76",
+        "CommitMono-400-Italic.ttf": "10f37afc91cfdc6fd92c98010504df0a32e996633fa9e5bbdbd20843ba5f1659",
+        "CommitMono-700-Regular.ttf": "c299efc092cf4d25a4fd1ee3283eb2539324a3a67757216b543e586f727bb8a3",
+        "CommitMono-700-Italic.ttf": "41d65996e306639dc02e5db31d2fb2b416c754f87ffc066c531dcc96a7c61c0d",
+        "OFL.txt": "2e2dc937707819086e7631d02e6183fbe52316a89da0a611d9b09d3be7d4bd72"
+      }
     },
     {
       "id": "departure-mono",
