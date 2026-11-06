@@ -1,0 +1,274 @@
+.section {
+  padding-bottom: clamp(72px, 10vw, 160px);
+}
+
+/* Proportion: one full-bleed bar, each band as wide as its share of a page. */
+.proportion {
+  margin: 0;
+}
+
+.bar {
+  display: flex;
+  height: clamp(280px, 50vh, 540px);
+  border-block: 1px solid var(--hairline);
+}
+
+.band {
+  flex-basis: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(14px, 1.4vw, 22px);
+  container-type: inline-size;
+}
+
+/* A band too narrow to hold its name stays pure color. */
+@container (max-width: 96px) {
+  .bandName,
+  .bandShare {
+    display: none;
+  }
+}
+
+.bandName {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: clamp(1.25rem, 0.8rem + 1.4vw, 2.25rem);
+  line-height: 1;
+  letter-spacing: -0.025em;
+}
+
+.bandShare {
+  opacity: 0.75;
+}
+
+.caption {
+  padding-top: 14px;
+  row-gap: 6px;
+  color: var(--quiet);
+}
+
+.caption > :first-child {
+  grid-column: 1 / 5;
+}
+
+.captionList {
+  grid-column: 5 / -1;
+  justify-self: end;
+  text-align: right;
+}
+
+/* Specs: every color as its own full-bleed field. */
+.cards {
+  margin: clamp(72px, 10vw, 140px) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  padding-block: clamp(24px, 3vw, 44px);
+  min-height: clamp(280px, 30vw, 420px);
+  row-gap: 32px;
+}
+
+.card[data-ground] {
+  box-shadow:
+    inset 0 1px 0 var(--hairline),
+    inset 0 -1px 0 var(--hairline);
+}
+
+.cardHead {
+  grid-column: 1 / 7;
+  display: flex;
+  flex-direction: column;
+}
+
+.role {
+  opacity: 0.75;
+}
+
+.cardName {
+  margin-top: auto;
+  padding-top: clamp(40px, 6vw, 96px);
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: clamp(3rem, 1.5rem + 5vw, 7rem);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  margin-left: -0.04em;
+  overflow-wrap: anywhere;
+}
+
+.use {
+  margin-top: 16px;
+  max-width: 32ch;
+  text-wrap: pretty;
+}
+
+.values {
+  grid-column: 8 / -1;
+  align-self: end;
+  border-top: 1px solid color-mix(in oklch, currentColor 28%, transparent);
+}
+
+.value {
+  display: grid;
+  grid-template-columns: 6.5em minmax(0, 1fr);
+  align-items: baseline;
+  width: calc(100% + 16px);
+  margin-inline: -8px;
+  padding: 11px 8px;
+  text-align: left;
+  border-bottom: 1px solid color-mix(in oklch, currentColor 28%, transparent);
+  transition: background-color 140ms ease;
+}
+
+@media (hover: hover) {
+  .value:hover {
+    background: color-mix(in oklch, currentColor 8%, transparent);
+  }
+}
+
+.value:active {
+  background: color-mix(in oklch, currentColor 14%, transparent);
+}
+
+.valueLabel {
+  display: grid;
+  opacity: 0.75;
+}
+
+/* "Hex" and "Copied" share one cell and trade places. */
+.swap {
+  grid-area: 1 / 1;
+  transition:
+    opacity 160ms ease,
+    transform 160ms var(--ease-out);
+}
+
+.swap[data-hidden] {
+  opacity: 0;
+  transform: translateY(4px);
+}
+
+.valueText {
+  font-family: var(--mono);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+/* Contrast */
+.contrastHead {
+  padding-top: clamp(72px, 10vw, 140px);
+  padding-bottom: clamp(28px, 3vw, 44px);
+  row-gap: 16px;
+}
+
+.contrastLabel {
+  grid-column: 1 / 4;
+  color: var(--quiet);
+  padding-top: 0.6em;
+}
+
+.contrastTitle {
+  grid-column: 4 / -1;
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: clamp(2.25rem, 1.4rem + 3vw, 4.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+}
+
+.contrastIntro {
+  grid-column: 4 / span 6;
+  max-width: 44ch;
+  color: var(--quiet);
+}
+
+.pairs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
+  gap: 28px var(--column-gap);
+  margin: 0;
+  padding: 0 var(--gutter);
+  list-style: none;
+}
+
+.sample {
+  aspect-ratio: 4 / 3;
+  display: flex;
+  align-items: flex-end;
+  padding: 14px 16px;
+}
+
+.sample[data-ground] {
+  box-shadow: inset 0 0 0 1px var(--hairline);
+}
+
+.sampleGlyphs {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: clamp(2.75rem, 2rem + 2vw, 4rem);
+  line-height: 0.8;
+  letter-spacing: -0.03em;
+}
+
+.pairName {
+  margin-top: 12px;
+  font-size: 0.9375rem;
+}
+
+.pairRatio {
+  margin-top: 4px;
+  color: var(--quiet);
+}
+
+.never {
+  margin-top: clamp(40px, 5vw, 64px);
+  padding-top: 20px;
+  border-top: 1px solid var(--hairline);
+  margin-inline: var(--gutter);
+  padding-inline: 0;
+  row-gap: 8px;
+}
+
+.neverLabel {
+  grid-column: 1 / 4;
+  color: var(--quiet);
+  padding-top: 0.2em;
+}
+
+.neverList {
+  grid-column: 4 / span 7;
+  color: var(--quiet);
+}
+
+.neverRatio {
+  font-size: 0.6875rem;
+}
+
+@media (max-width: 720px) {
+  .caption > :first-child,
+  .captionList,
+  .cardHead,
+  .values,
+  .contrastLabel,
+  .contrastTitle,
+  .contrastIntro,
+  .neverLabel,
+  .neverList {
+    grid-column: 1 / -1;
+  }
+  .captionList {
+    justify-self: start;
+    text-align: left;
+  }
+  .bar {
+    height: clamp(220px, 40vh, 320px);
+  }
+  .pairs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

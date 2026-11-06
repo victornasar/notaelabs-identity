@@ -1,0 +1,40 @@
+.header {
+  padding-top: clamp(56px, 10vw, 140px);
+  padding-bottom: clamp(32px, 5vw, 72px);
+  row-gap: clamp(20px, 2.5vw, 32px);
+}
+
+.number {
+  grid-column: 1 / 4;
+  color: var(--quiet);
+  padding-top: 0.9em;
+}
+
+.title {
+  grid-column: 4 / -1;
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: clamp(3.5rem, 1.5rem + 8vw, 10rem);
+  line-height: 0.88;
+  letter-spacing: -0.045em;
+  margin-left: -0.05em;
+}
+
+.intro {
+  grid-column: 4 / span 6;
+  font-size: clamp(1.125rem, 1rem + 0.4vw, 1.3125rem);
+  line-height: 1.45;
+  max-width: 36ch;
+  text-wrap: pretty;
+}
+
+@media (max-width: 720px) {
+  .number,
+  .title,
+  .intro {
+    grid-column: 1 / -1;
+  }
+  .number {
+    padding-top: 0;
+  }
+}

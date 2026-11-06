@@ -4,11 +4,12 @@
   "private": true,
   "packageManager": "pnpm@12.16.1",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "node scripts/brands.mjs && next dev",
+    "build": "node scripts/brands.mjs --production && next build",
     "start": "next start",
     "lint": "eslint",
-    "marks": "node scripts/build-marks.mjs"
+    "marks": "node scripts/build-marks.mjs",
+    "brands": "node scripts/brands.mjs"
   },
   "dependencies": {
     "next": "16.4.5",
