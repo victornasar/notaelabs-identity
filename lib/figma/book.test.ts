@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 import okonkwo from "@/brands/okonkwo/brand";
 import type { Brand } from "../brand/schema";
 import { buildBundle, type BundleFiles } from "./bundle";
-import { column, foundationsPlan, layout, missingFonts, nearFonts, shareWidths } from "./foundations";
+import { bookPlan, column, layout, missingFonts, nearFonts, shareWidths } from "./book";
 
 const brand = structuredClone(okonkwo) as Brand;
 const files: BundleFiles = {
@@ -16,7 +16,7 @@ const files: BundleFiles = {
   ],
 };
 const bundle = buildBundle(brand, files);
-const plan = foundationsPlan(bundle);
+const plan = bookPlan(bundle);
 
 describe("missingFonts", () => {
   it("lists only the family and style Figma doesn't have", () => {
@@ -46,7 +46,7 @@ describe("shareWidths", () => {
   });
 });
 
-describe("foundationsPlan", () => {
+describe("bookPlan", () => {
   it("loads each font once", () => {
     assert.deepEqual(plan.fonts.map((f) => `${f.family} ${f.style}`), ["Big Shoulders ExtraBold", "Chivo Regular", "Chivo Medium"]);
   });
@@ -61,7 +61,7 @@ describe("foundationsPlan", () => {
   });
 
   it("sizes swatch cards by share, largest first, within the frame's margins", () => {
-    const { cards } = plan.color;
+    const { cards } = plan.palette;
     assert.deepEqual(cards.map((c) => c.name), ["Night", "Sodium", "Stone"]);
     const used = cards.reduce((sum, c) => sum + c.width, 0) + layout.gap * (cards.length - 1);
     assert.ok(used <= column && used > column - cards.length);
@@ -69,28 +69,35 @@ describe("foundationsPlan", () => {
   });
 
   it("labels each swatch in its most legible color, and outlines the board's own", () => {
-    const sodium = plan.color.cards.find((c) => c.name === "Sodium");
+    const sodium = plan.palette.cards.find((c) => c.name === "Sodium");
     assert.equal(sodium?.ink, "Night");
     assert.equal(sodium?.role, "Accent · 28%");
     assert.deepEqual(sodium?.pills.map((p) => p.label), ["Hex", "RGB", "OKLCH", "CMYK", "Pantone"]);
-    assert.deepEqual(plan.color.cards.filter((c) => c.edge).map((c) => c.name), ["Night"]);
+    assert.deepEqual(plan.palette.cards.filter((c) => c.edge).map((c) => c.name), ["Night"]);
   });
 
   it("leads the faces with an accent card set in the face's heaviest weight", () => {
-    const [display, text] = plan.type.faces;
+    const [display, text] = plan.faces;
     assert.deepEqual([display?.glyphs, display?.family, display?.fill, display?.ink], ["AG", "BIG SHOULDERS", "Sodium", "Night"]);
     assert.deepEqual(text?.font, { family: "Chivo", style: "Medium" });
     assert.equal(text?.fill, null);
   });
 
-  it("puts each part on its own landscape frame, titled as the page titles it", () => {
-    assert.deepEqual(plan.slides.map((s) => s.name), ["Color", "Typefaces", "Type scale"]);
-    const [color, faces] = plan.slides;
-    assert.equal(color?.head.eyebrow, "02 · Color");
-    assert.equal(color?.head.title, "Three colors. Night carries the page.");
-    assert.equal(faces?.head.title, "Big Shoulders & Chivo");
-    assert.deepEqual(color?.footer, [bundle.name, "Foundations · Color"]);
-    assert.equal(plan.type.scale[0]?.sample, "Okonkwo");
+  it("opens each section on a divider, then its frames, numbered in reading order", () => {
+    const names = plan.sections.map((s) => [s.divider.name, ...s.frames.map((f) => f.name)]);
+    assert.deepEqual(names, [
+      ["02 Color", "02.1 Color · Palette"],
+      ["03 Type", "03.1 Type · Typefaces", "03.2 Type · Scale"],
+    ]);
+    assert.deepEqual(plan.sections.flatMap((s) => s.frames.map((f) => f.page)), ["02", "04", "05"]);
+    assert.equal(plan.sections[0]?.frames[0]?.eyebrow, "02 · Color · Palette");
+    assert.deepEqual(plan.display, { font: { family: "Big Shoulders", style: "ExtraBold" }, upper: true });
+  });
+
+  it("keeps frames to labels and values, with one line on print", () => {
+    assert.equal(plan.palette.note, "CMYK and Pantone are approximate. Proof before print.");
+    assert.equal(plan.scale[0]?.sample, "Okonkwo");
+    assert.ok(!("use" in plan.palette.cards[0]!));
   });
 
   it("keeps OpenType features in the style's description, since Figma styles can't hold them", () => {

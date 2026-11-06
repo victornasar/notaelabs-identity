@@ -1,18 +1,21 @@
 /**
- * What the plugin builds for the Foundations page, worked out from the bundle
+ * What the plugin builds on the Brand book page, worked out from the bundle
  * without touching Figma, so it can be tested: the fonts to load, the color
- * variables, the text styles, and the cards that show them. The cards follow
- * the web page's Color and Type sections, so the file and the page match.
- * `figma-plugin/src/code.ts` only carries this out.
+ * variables, the text styles, and the book's frames. Each section is a row:
+ * a divider that names it, then the landscape frames that show it. Frames
+ * carry labels and values only; the explanations live in the variable and
+ * style descriptions and on the web page. `figma-plugin/src/code.ts` only
+ * carries this out.
  */
 import { bestOn } from "../brand/color";
 import type { BundleFont, BundleTextStyle, FigmaBundle, FontName } from "./bundle";
 
 /** The variable collection every brand color lives in. */
 export const collectionName = "Colors";
-export const pageName = "Foundations";
+/** The one page the plugin manages; it never touches another. */
+export const pageName = "Brand book";
 
-/** Each part of the identity is a landscape frame, as agency guidelines are: 1920 × 1080. */
+/** Landscape frames, as agency guidelines are: 1920 × 1080, `spacing` apart on the canvas. */
 export const layout = { width: 1920, height: 1080, pad: 96, gap: 16, radius: 32, minSwatch: 320, spacing: 160 };
 /** The width inside a frame's margins. */
 export const column = layout.width - layout.pad * 2;
@@ -22,17 +25,14 @@ export type Paint = { color: string; opacity?: number };
 
 export type StyleSpec = Pick<BundleTextStyle, "name" | "font" | "fontSize" | "lineHeight" | "letterSpacing" | "textCase" | "description">;
 
-export type SectionHead = { eyebrow: string; title: string; intro: string };
-
 export type SwatchCard = {
   color: string;
   ink: string;
   width: number;
-  /** Outlined, because it is the board's own color. */
+  /** Outlined, because it is the frame's own color. */
   edge: boolean;
   role: string;
   name: string;
-  use: string;
   pills: { label: string; value: string }[];
 };
 
@@ -40,7 +40,6 @@ export type FaceCard = {
   kind: string;
   glyphs: string;
   family: string;
-  role: string;
   weights: string;
   /** The face's heaviest weight, which sets its glyphs and name. */
   font: FontName;
@@ -49,12 +48,17 @@ export type FaceCard = {
   ink: string;
 };
 
-export type ScaleRow = { id: string; spec: string; use: string; style: string; sample: string };
+export type ScaleRow = { id: string; spec: string; style: string; sample: string };
 
-/** One landscape frame: its heading, what it shows, and the footer's two ends. */
-export type Slide = { name: string; kind: "color" | "faces" | "scale"; head: SectionHead; footer: [string, string] };
+/** A frame that only names its section: "02" and "COLOR". */
+export type Divider = { name: string; number: string; title: string };
 
-export type FoundationsPlan = {
+/** A landscape frame showing one part of a section. `page` is its place in the book. */
+export type ContentFrame = { name: string; kind: "palette" | "faces" | "scale"; eyebrow: string; page: string };
+
+export type BookSection = { divider: Divider; frames: ContentFrame[] };
+
+export type BookPlan = {
   fonts: FontName[];
   variables: { name: string; rgb: { r: number; g: number; b: number }; description: string }[];
   textStyles: StyleSpec[];
@@ -62,12 +66,16 @@ export type FoundationsPlan = {
   ground: string;
   ink: string;
   accent: string;
-  /** Text style names, by the job they do on the page. */
+  /** Text style names, by the job they do in the book. */
   text: { heading: string; body: string; small: string; label: string };
-  color: SectionHead & { cards: SwatchCard[]; note?: string };
-  type: { faces: FaceCard[]; scale: ScaleRow[] };
-  /** The frames, left to right. */
-  slides: Slide[];
+  /** Dividers set their names in the display face's heaviest weight. */
+  display: { font: FontName; upper: boolean };
+  brand: string;
+  palette: { cards: SwatchCard[]; note?: string };
+  faces: FaceCard[];
+  scale: ScaleRow[];
+  /** In reading order: one row on the canvas each. */
+  sections: BookSection[];
 };
 
 const sameFont = (a: FontName, b: FontName) => a.family === b.family && a.style === b.style;
@@ -106,7 +114,7 @@ export function shareWidths(shares: number[], total: number, gap: number, min: n
   }
 }
 
-export function foundationsPlan(bundle: FigmaBundle): FoundationsPlan {
+export function bookPlan(bundle: FigmaBundle): BookPlan {
   const { colors, textStyles, fonts, frames } = bundle;
   const byRole = (role: string) => colors.find((c) => c.role === role);
   const ground = byRole("ground") ?? colors[0]!;
@@ -124,19 +132,41 @@ export function foundationsPlan(bundle: FigmaBundle): FoundationsPlan {
   const body = textStyles.find((t) => t.id === "body") ?? plain[plain.length - 1] ?? label;
   const small = plain.find((t) => t !== body && t.fontSize < body.fontSize) ?? body;
 
-  const head = (id: string, fallback: string) => {
-    const frame = frames.find((f) => f.id === id);
-    return { eyebrow: [frame?.number, frame?.label ?? fallback].filter(Boolean).join(" · "), title: frame?.title ?? fallback };
-  };
+  const heaviest = (face: string) => fonts.filter((f) => f.face === face).sort((a, b) => b.weight - a.weight)[0];
+  const upper = (face: string) => textStyles.filter((t) => t.face === face).every((t) => t.textCase === "UPPER");
+  const display = heaviest("display") ?? fonts[0]!;
 
   // Cards run largest share first, as the page does.
   const ordered = [...colors].sort((a, b) => b.proportion - a.proportion);
   const widths = shareWidths(ordered.map((c) => c.proportion), column, layout.gap, layout.minSwatch);
-  const colorHead = { ...head("color", "Color"), intro: "Each card is as wide as the color’s share of a typical page." };
-  const typeHead = { ...head("type", "Type"), intro: bundle.type.fit };
-  const slide = (name: string, kind: Slide["kind"], h: SectionHead): Slide => ({ name, kind, head: h, footer: [bundle.name, `${pageName} · ${name}`] });
 
-  const heaviest = (face: string) => fonts.filter((f) => f.face === face).sort((a, b) => b.weight - a.weight)[0];
+  // Sections in the bundle's order, each with the frames that show it. Pages count dividers too.
+  const parts: Record<string, [ContentFrame["kind"], string][]> = {
+    color: [["palette", "Palette"]],
+    type: [
+      ["faces", "Typefaces"],
+      ["scale", "Scale"],
+    ],
+  };
+  let page = 0;
+  const sections = frames
+    .filter((f) => parts[f.id])
+    .map((f): BookSection => {
+      const divider = { name: `${f.number} ${f.label}`, number: f.number, title: f.label };
+      page += 1;
+      return {
+        divider,
+        frames: parts[f.id]!.map(([kind, part], i) => {
+          page += 1;
+          return {
+            name: `${f.number}.${i + 1} ${f.label} · ${part}`,
+            kind,
+            eyebrow: `${f.number} · ${f.label} · ${part}`,
+            page: String(page).padStart(2, "0"),
+          };
+        }),
+      };
+    });
 
   return {
     fonts: fonts.filter((f, i, all) => all.findIndex((g) => sameFont(f, g)) === i).map(({ family, style }) => ({ family, style })),
@@ -154,8 +184,9 @@ export function foundationsPlan(bundle: FigmaBundle): FoundationsPlan {
     ink: ink.name,
     accent: accent.name,
     text: { heading: heading.name, body: body.name, small: small.name, label: label.name },
-    color: {
-      ...colorHead,
+    display: { font: { family: display.family, style: display.style }, upper: upper("display") },
+    brand: bundle.name,
+    palette: {
       cards: ordered.map((c, i) => ({
         color: c.name,
         ink: nameOf(bestOn(c.hex, hexes)),
@@ -163,35 +194,28 @@ export function foundationsPlan(bundle: FigmaBundle): FoundationsPlan {
         edge: c.name === ground.name,
         role: `${c.roleName} · ${c.proportion}%`,
         name: c.name,
-        use: c.use,
         pills: c.values,
       })),
-      ...(bundle.printNote ? { note: bundle.printNote } : {}),
+      // The full caveat is in each variable's description; the frame keeps one line.
+      ...(bundle.printNote ? { note: "CMYK and Pantone are approximate. Proof before print." } : {}),
     },
-    type: {
-      faces: bundle.type.faces.flatMap((face, i) => {
-        const font = heaviest(face.face);
-        if (!font) return [];
-        const upper = textStyles.filter((t) => t.face === face.face).every((t) => t.textCase === "UPPER");
-        return [
-          {
-            kind: face.kind,
-            glyphs: upper ? "AG" : "Ag",
-            family: upper ? face.family.toUpperCase() : face.family,
-            role: face.role,
-            weights: `Weights ${face.weights.join(", ")}`,
-            font: { family: font.family, style: font.style },
-            fill: i === 0 ? accent.name : null,
-            ink: i === 0 ? ground.name : ink.name,
-          },
-        ];
-      }),
-      scale: textStyles.map((t) => ({ id: t.id, spec: t.spec, use: t.use, style: t.name, sample: t.sample })),
-    },
-    slides: [
-      slide("Color", "color", colorHead),
-      slide("Typefaces", "faces", typeHead),
-      slide("Type scale", "scale", { eyebrow: typeHead.eyebrow, title: "The scale", intro: "" }),
-    ],
+    faces: bundle.type.faces.flatMap((face, i) => {
+      const font = heaviest(face.face);
+      if (!font) return [];
+      const caps = upper(face.face);
+      return [
+        {
+          kind: face.kind,
+          glyphs: caps ? "AG" : "Ag",
+          family: caps ? face.family.toUpperCase() : face.family,
+          weights: `Weights ${face.weights.join(", ")}`,
+          font: { family: font.family, style: font.style },
+          fill: i === 0 ? accent.name : null,
+          ink: i === 0 ? ground.name : ink.name,
+        },
+      ];
+    }),
+    scale: textStyles.map((t) => ({ id: t.id, spec: t.spec, style: t.name, sample: t.sample })),
+    sections,
   };
 }
