@@ -12,7 +12,8 @@
     "brands": "node scripts/brands.mjs",
     "fonts": "node scripts/fonts.mjs",
     "render-marks": "node scripts/render-marks.mjs",
-    "check-route": "node --no-warnings --import ./scripts/lib/ts-paths.mjs scripts/check-route.ts"
+    "check-route": "node --no-warnings --import ./scripts/lib/ts-paths.mjs scripts/check-route.ts",
+    "oklch": "node --no-warnings --import ./scripts/lib/ts-paths.mjs scripts/oklch.ts"
   },
   "dependencies": {
     "next": "16.4.5",
