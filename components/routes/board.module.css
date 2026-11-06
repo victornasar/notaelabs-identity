@@ -1,0 +1,338 @@
+.header {
+  padding: 32px clamp(16px, 3vw, 40px) 24px;
+  display: grid;
+  gap: 16px;
+  max-width: 1600px;
+}
+
+.idea {
+  font-size: clamp(22px, 2.4vw, 32px);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  max-width: 34ch;
+  text-wrap: balance;
+}
+
+.strategy {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 8px 32px;
+  margin: 0;
+}
+
+.strategy div {
+  display: grid;
+  gap: 4px;
+  align-content: start;
+}
+
+.strategy dd {
+  font-size: 13px;
+}
+
+.strategy code {
+  margin-right: 4px;
+}
+
+/* One column per route; rows line up across routes through subgrid. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--count), minmax(320px, 1fr));
+  grid-template-rows: repeat(8, auto);
+  gap: 12px clamp(12px, 1.6vw, 24px);
+  padding: 0 clamp(16px, 3vw, 40px) 64px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 16px;
+}
+
+@media (max-width: 720px) {
+  .grid {
+    grid-template-columns: repeat(var(--count), calc(100vw - 48px));
+  }
+}
+
+.column {
+  grid-row: 1 / span 8;
+  display: grid;
+  grid-template-rows: subgrid;
+  min-width: 0;
+  scroll-snap-align: start;
+}
+
+.column[data-picked] .head h2::after {
+  content: " ●";
+}
+
+.head {
+  display: grid;
+  gap: 6px;
+  align-content: start;
+  padding: 4px 0 8px;
+}
+
+.head h2 {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.head p:last-child {
+  color: var(--quiet);
+  max-width: 48ch;
+}
+
+.cell {
+  background: var(--panel);
+  border-radius: 6px;
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  min-width: 0;
+}
+
+.sentBack {
+  grid-row: span 7;
+  box-shadow: inset 0 0 0 1px #c9452e;
+}
+
+.sentBack ul {
+  list-style: disc;
+  padding-left: 18px;
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+}
+
+/* Marks */
+
+.marks {
+  border-radius: 4px;
+  padding: 16px;
+  display: grid;
+  gap: 16px;
+}
+
+.marks .label {
+  color: inherit;
+  opacity: 0.6;
+}
+
+.sizes {
+  display: flex;
+  align-items: end;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.sizes figure {
+  display: grid;
+  gap: 6px;
+  max-width: 100%;
+}
+
+.sizes .mark {
+  height: var(--h);
+}
+
+.mark {
+  display: block;
+  max-width: 100%;
+}
+
+.mark svg {
+  display: block;
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+}
+
+.lockup {
+  display: grid;
+  gap: 6px;
+}
+
+.lockup .mark {
+  height: 72px;
+}
+
+/* Palette */
+
+.bar {
+  display: flex;
+  height: 40px;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.08);
+}
+
+.swatches {
+  display: grid;
+  gap: 10px;
+}
+
+.swatches li {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.chip {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.1);
+}
+
+.pair {
+  display: block;
+}
+
+/* Type */
+
+.steps {
+  display: grid;
+  gap: 14px;
+}
+
+.steps li {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.steps li p:last-child {
+  overflow-wrap: anywhere;
+}
+
+.rules {
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--quiet);
+}
+
+/* App tile */
+
+.tiles {
+  display: flex;
+  align-items: end;
+  gap: 16px;
+}
+
+.tile {
+  border-radius: 22.37%;
+  display: grid;
+  place-items: center;
+  padding: 20%;
+}
+
+.tile .mark {
+  width: 100%;
+  height: 100%;
+}
+
+.tile .mark svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Website hero: a 1280px-wide page, scaled to the column. */
+
+.hero {
+  container-type: inline-size;
+  aspect-ratio: 16 / 10;
+  border-radius: 4px;
+  padding: 4cqi 5cqi;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2.4cqi;
+  overflow: hidden;
+}
+
+.heroBar {
+  height: 2.2cqi;
+  margin-bottom: auto;
+}
+
+.heroBar .mark {
+  height: 100%;
+}
+
+.hero p {
+  text-wrap: balance;
+}
+
+.action {
+  padding: 1cqi 1.8cqi;
+  border-radius: 0.4cqi;
+  margin-top: 1cqi;
+}
+
+/* Business card: 85 × 55 mm, type in proportion. */
+
+.card {
+  container-type: inline-size;
+  aspect-ratio: 85 / 55;
+  border-radius: 3px;
+  padding: 7cqi;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-size: 4cqi;
+  line-height: 1.35;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
+}
+
+.cardMark {
+  height: 9cqi;
+}
+
+.cardMark .mark {
+  height: 100%;
+}
+
+/* Score */
+
+.scores {
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.scores th,
+.scores td {
+  text-align: left;
+  vertical-align: top;
+  padding: 6px 8px 6px 0;
+  border-top: 1px solid var(--line);
+}
+
+.scores th {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.scores td:nth-child(2) {
+  white-space: nowrap;
+}
+
+.scores td:last-child {
+  color: var(--quiet);
+}
+
+.dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-right: 3px;
+  box-shadow: inset 0 0 0 1px var(--text);
+}
+
+.dot[data-on] {
+  background: var(--text);
+}
