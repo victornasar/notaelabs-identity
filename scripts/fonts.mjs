@@ -1,7 +1,7 @@
 /**
  * Manages the curated font library described by fonts/library.json.
  *
- *   node scripts/fonts.mjs fetch      download every family into fonts/files/<id>/ and verify it
+ *   node scripts/fonts.mjs fetch      download every non-rejected family into fonts/files/<id>/ and verify it
  *   node scripts/fonts.mjs specimen   write fonts/files/specimen.html for review
  *
  * Files come only from the source named in library.json, and a family fails unless its
@@ -18,6 +18,8 @@ import { parse } from "opentype.js/dist/opentype.mjs";
 const libraryPath = new URL("../fonts/library.json", import.meta.url);
 const filesDir = fileURLToPath(new URL("../fonts/files/", import.meta.url));
 const library = JSON.parse(readFileSync(libraryPath, "utf8"));
+// Rejected families stay in library.json so they are not proposed again, but are never downloaded.
+const families = library.families.filter((family) => family.status !== "rejected");
 
 const LICENSES = [
   { id: "OFL-1.1", test: /SIL Open Font License,? Version 1\.1|SIL OPEN FONT LICENSE Version 1\.1/i },
@@ -112,7 +114,7 @@ function inspect(family) {
 
 async function fetchAll() {
   let failed = 0;
-  for (const family of library.families) {
+  for (const family of families) {
     try {
       await fetchFamily(family);
       const info = inspect(family);
@@ -145,7 +147,7 @@ function fontFaces(family, info) {
 function specimen() {
   const rows = [];
   const faces = [];
-  for (const family of library.families) {
+  for (const family of families) {
     if (!existsSync(join(filesDir, family.id))) {
       console.error(`skip ${family.id}: not fetched`);
       continue;
@@ -183,7 +185,7 @@ function specimen() {
 </article>`);
   }
 
-  const categories = [...new Set(library.families.map((family) => family.category))];
+  const categories = [...new Set(families.map((family) => family.category))];
   const html = `<!doctype html>
 <html lang="en">
 <head>
@@ -228,7 +230,7 @@ main{max-width:1200px;margin:0 auto;padding:0 16px 80px}
 </head>
 <body>
 <div class="bar">
-  <h1>Font library review · ${library.families.length} candidates</h1>
+  <h1>Font library review · ${families.length} families</h1>
   <span class="count" id="count"></span>
   <span role="group" aria-label="Filter">
     <button type="button" data-filter="all" aria-pressed="true">all</button>
