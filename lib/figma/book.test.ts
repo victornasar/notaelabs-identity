@@ -101,12 +101,12 @@ describe("bookPlan", () => {
       ["Cover", "01.1 Introduction · Overview", "01.2 Introduction · What we refuse", "01.3 Introduction · The idea"],
       ["02 Logo", "02.1 Logo · Logo mark", "02.2 Logo · On Stone", "02.3 Logo · On Sodium", "02.4 Logo · On Night", "02.5 Logo · Misuse"],
       ["03 Color", "03.1 Color · Palette", "03.2 Color · Pairs"],
-      ["04 Typography", "04.1 Typography · Typefaces", "04.2 Typography · Scale"],
+      ["04 Typography", "04.1 Typography · Typefaces", "04.2 Typography · Scale", "04.3 Typography · In use"],
       ["05 Visual Language", "05.1 Visual Language · Pool row"],
     ]);
     assert.deepEqual(
       plan.sections.flatMap((s) => s.frames.map((f) => f.page)),
-      ["02", "03", "04", "06", "07", "08", "09", "10", "12", "13", "15", "16", "18"],
+      ["02", "03", "04", "06", "07", "08", "09", "10", "12", "13", "15", "16", "17", "19"],
     );
     assert.equal(plan.sections[2]?.frames[0]?.eyebrow, "03 · Color · Palette");
     assert.deepEqual(plan.display, { font: { family: "Big Shoulders", style: "ExtraBold" }, upper: true });
@@ -175,6 +175,19 @@ describe("bookPlan", () => {
     assert.equal(plan.palette.note, "CMYK and Pantone are approximate. Proof before print.");
     assert.equal(plan.scale[0]?.sample, "Okonkwo");
     assert.ok(!("use" in plan.palette.cards[0]!));
+  });
+
+  it("sets the scale in use with copy the brand wrote for a real surface", () => {
+    assert.deepEqual(plan.inUse, {
+      label: "Lighting by Okonkwo-Marchetti",
+      headline: "The bridge is lit from the handrail, so the river stays dark.",
+      body: brand.story!.mission,
+      figure: "Switch-on March 2027",
+    });
+    const bare = structuredClone(brand);
+    delete bare.device;
+    bare.notApplicable = { ...bare.notApplicable, imagery: "No device." };
+    assert.equal(bookPlan(buildBundle(bare, files)).inUse.headline, brand.positioning);
   });
 
   it("keeps OpenType features in the style's description, since Figma styles can't hold them", () => {

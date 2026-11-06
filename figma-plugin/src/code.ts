@@ -278,6 +278,36 @@ async function drawPage(plan: BookPlan, variables: Map<string, Variable>, styles
     if (plan.palette.note) add(area, await text(plan.palette.note, role.small, quiet(ink), { stretch: true }));
   };
 
+  const inUse = async (area: FrameNode, { ink }: ContentFrame) => {
+    // One sheet of real copy, each line tagged with its style, closed by a rule and the symbol.
+    const sheet = grow(add(area, box("Sheet", "VERTICAL", { stretch: true, radius: layout.radius, stroke: hairline(ink) })));
+    sheet.paddingLeft = sheet.paddingRight = sheet.paddingTop = sheet.paddingBottom = 64;
+    sheet.primaryAxisAlignItems = "SPACE_BETWEEN";
+    const copy = add(sheet, box("Copy", "VERTICAL", { gap: 40, stretch: true }));
+    const { label, headline, body, figure } = plan.inUse;
+    const lines: [string, string, string, number?][] = [
+      [role.label, label, accent],
+      [role.heading, headline, ink, 1200],
+      [role.body, body, ink, 760],
+      ...(figure ? [[role.small, figure, ink] as [string, string, string]] : []),
+    ];
+    for (const [style, words, color, width] of lines) {
+      const line = add(copy, box(style, "HORIZONTAL", { gap: 48, stretch: true }));
+      add(line, await text(style, role.label, quiet(ink), { width: 200 }));
+      add(line, await text(words, style, { color }, width ? { width } : {}));
+    }
+    const foot = add(sheet, box("Foot", "VERTICAL", { gap: 32, stretch: true }));
+    const rule = figma.createRectangle();
+    rule.name = "Rule";
+    rule.resize(column - 128, 2);
+    rule.fills = [paint({ color: accent })];
+    add(foot, rule).layoutAlign = "STRETCH";
+    const sign = add(foot, box("Sign-off", "HORIZONTAL", { gap: 20 }));
+    sign.counterAxisAlignItems = "CENTER";
+    add(sign, vector(plan.logo.symbol.name, plan.logo.symbol.svg, accent, { height: 40 }));
+    add(sign, await text(plan.brand, role.label, { color: ink }));
+  };
+
   const pairs = async (area: FrameNode, { ground: own }: ContentFrame) => {
     // A card per approved pairing: the ground, the color on it, and how far apart they are.
     const row = grow(add(area, box("Pairs", "HORIZONTAL", { gap: layout.gap, stretch: true })));
@@ -530,7 +560,7 @@ async function drawPage(plan: BookPlan, variables: Map<string, Variable>, styles
     await caption(area, graphic, ink);
   };
 
-  const draw = { overview, refuses, idea, palette, pairs, faces, scale, symbol, lockup, misuse, device };
+  const draw = { overview, refuses, idea, palette, pairs, faces, scale, inUse, symbol, lockup, misuse, device };
 
   /** The edition over the cover's mark, in place of the first section's divider. */
   const cover = async (name: string, row: number) => {

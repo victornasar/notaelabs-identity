@@ -52,6 +52,9 @@ export type FaceCard = {
   ink: string;
 };
 
+/** The scale set as one sheet of real copy: a label, a headline, a paragraph and a figure. */
+export type InUse = { label: string; headline: string; body: string; figure?: string };
+
 export type ScaleRow = { id: string; spec: string; style: string; sample: string };
 
 /** A frame that only names its section: "02" and "COLOR". The cover opens the first section instead. */
@@ -64,7 +67,7 @@ export type Divider = { name: string; number: string; title: string; cover: bool
  */
 export type ContentFrame = {
   name: string;
-  kind: "overview" | "refuses" | "idea" | "palette" | "pairs" | "faces" | "scale" | "symbol" | "lockup" | "misuse" | "device";
+  kind: "overview" | "refuses" | "idea" | "palette" | "pairs" | "faces" | "scale" | "inUse" | "symbol" | "lockup" | "misuse" | "device";
   eyebrow: string;
   page: string;
   ground: string;
@@ -110,6 +113,7 @@ export type BookPlan = {
   palette: { cards: SwatchCard[]; note?: string; pairs: PairCard[] };
   faces: FaceCard[];
   scale: ScaleRow[];
+  inUse: InUse;
   /** The symbol alone, then the lockup, which each `lockup` frame sets on its own ground. */
   logo: { symbol: Showcase; lockup: string; misuse: MisuseCard[] };
   device?: Showcase;
@@ -151,6 +155,19 @@ export function shareWidths(shares: number[], total: number, gap: number, min: n
     if (under === -1) return widths.map(Math.floor);
     floored.add(under);
   }
+}
+
+/**
+ * The sheet's copy: the first application with a headline, which is real copy the brand
+ * wrote for a real surface, else the positioning. Its lines become the label and the figure.
+ */
+function inUse(bundle: FigmaBundle): InUse {
+  const words = (value: string | string[] | undefined) => (Array.isArray(value) ? value : value ? [value] : []);
+  const app = bundle.device?.applications.find((a) => typeof a.copy.headline === "string");
+  const body = bundle.intro.mission ?? bundle.intro.positioning;
+  if (!app) return { label: bundle.name, headline: bundle.intro.positioning, body };
+  const [label = bundle.name, figure] = words(app.copy.lines);
+  return { label, headline: app.copy.headline as string, body, ...(figure ? { figure } : {}) };
 }
 
 export function bookPlan(bundle: FigmaBundle): BookPlan {
@@ -233,6 +250,7 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
       parts: [
         { kind: "faces", part: "Typefaces" },
         { kind: "scale", part: "Scale" },
+        { kind: "inUse", part: "In use" },
       ],
     },
     {
@@ -323,6 +341,7 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
       ];
     }),
     scale: textStyles.map((t) => ({ id: t.id, spec: t.spec, style: t.name, sample: t.sample })),
+    inUse: inUse(bundle),
     logo: {
       symbol: { svg: symbol.svg, name: symbol.name, caption: symbol.meaning ?? symbol.use, ink: symbolInk },
       lockup: coverSvg,
