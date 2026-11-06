@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { CSSProperties } from "react";
 import { DevSwitcher } from "@/components/shell/dev-switcher";
 import { getBrand, slugs } from "@/lib/brand/active";
+import { textTransform } from "@/lib/brand/type";
 import { shell } from "@/lib/fonts/shell";
 import "../shell.css";
 
@@ -17,12 +18,17 @@ export async function generateMetadata({ params }: LayoutProps<"/[brand]">): Pro
 export default async function BrandLayout({ children, params }: LayoutProps<"/[brand]">) {
   const { brand, fonts, byRole } = getBrand((await params).brand);
   const ink = byRole("ink")!;
+  // The shell's headings follow the brand's largest display step: its weight, case and tracking.
+  const display = brand.type.scale.steps.find((s) => s.face === "display");
 
   const vars = {
     "--ground": byRole("ground")!.hex,
     "--ink": ink.hex,
     "--accent": (byRole("accent") ?? ink).hex,
     "--support": (byRole("support") ?? ink).hex,
+    "--display-weight": display?.weight ?? brand.type.display.weights[0],
+    "--display-case": textTransform(display?.case ?? "as-written"),
+    "--display-tracking": `${display?.tracking ?? 0}em`,
   } as CSSProperties;
 
   return (

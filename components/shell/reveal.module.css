@@ -37,9 +37,11 @@
 .positioning {
   grid-column: 1 / span 6;
   font-family: var(--display);
+  font-weight: var(--display-weight);
+  text-transform: var(--display-case);
   font-size: clamp(1.375rem, 1rem + 1.3vw, 2.25rem);
   line-height: 1.15;
-  letter-spacing: -0.015em;
+  letter-spacing: var(--display-tracking);
   text-wrap: balance;
   max-width: 24ch;
   animation: settle 700ms var(--ease-out) 450ms both;

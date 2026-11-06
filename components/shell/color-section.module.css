@@ -33,10 +33,11 @@
 
 .bandName {
   font-family: var(--display);
-  font-weight: 500;
+  font-weight: var(--display-weight);
+  text-transform: var(--display-case);
   font-size: clamp(1.25rem, 0.8rem + 1.4vw, 2.25rem);
   line-height: 1;
-  letter-spacing: -0.025em;
+  letter-spacing: var(--display-tracking);
 }
 
 .bandShare {
@@ -92,11 +93,11 @@
   margin-top: auto;
   padding-top: clamp(40px, 6vw, 96px);
   font-family: var(--display);
-  font-weight: 500;
+  font-weight: var(--display-weight);
+  text-transform: var(--display-case);
   font-size: clamp(3rem, 1.5rem + 5vw, 7rem);
   line-height: 0.9;
-  letter-spacing: -0.04em;
-  margin-left: -0.04em;
+  letter-spacing: var(--display-tracking);
   overflow-wrap: anywhere;
 }
 
@@ -175,10 +176,11 @@
 .contrastTitle {
   grid-column: 4 / -1;
   font-family: var(--display);
-  font-weight: 500;
+  font-weight: var(--display-weight);
+  text-transform: var(--display-case);
   font-size: clamp(2.25rem, 1.4rem + 3vw, 4.5rem);
   line-height: 0.95;
-  letter-spacing: -0.035em;
+  letter-spacing: var(--display-tracking);
 }
 
 .contrastIntro {
@@ -209,10 +211,11 @@
 
 .sampleGlyphs {
   font-family: var(--display);
-  font-weight: 500;
+  font-weight: var(--display-weight);
+  text-transform: var(--display-case);
   font-size: clamp(2.75rem, 2rem + 2vw, 4rem);
   line-height: 0.8;
-  letter-spacing: -0.03em;
+  letter-spacing: var(--display-tracking);
 }
 
 .pairName {

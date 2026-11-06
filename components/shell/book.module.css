@@ -1,0 +1,110 @@
+/*
+ * Shared parts of the book's sections: a subsection head, and rows that pair a
+ * shell label with the brand's content.
+ */
+
+.section {
+  padding-bottom: clamp(72px, 10vw, 160px);
+}
+
+.subhead {
+  padding-top: clamp(72px, 10vw, 140px);
+  padding-bottom: clamp(28px, 3vw, 44px);
+  row-gap: 16px;
+}
+
+.subLabel {
+  grid-column: 1 / 4;
+  color: var(--quiet);
+  padding-top: 0.6em;
+}
+
+.subTitle {
+  grid-column: 4 / -1;
+  font-family: var(--display);
+  font-weight: var(--display-weight);
+  text-transform: var(--display-case);
+  font-size: clamp(2.25rem, 1.4rem + 3vw, 4.5rem);
+  line-height: 0.95;
+  letter-spacing: var(--display-tracking);
+  text-wrap: balance;
+}
+
+.subIntro {
+  grid-column: 4 / span 6;
+  max-width: 44ch;
+  color: var(--quiet);
+  text-wrap: pretty;
+}
+
+.rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  padding-block: clamp(18px, 2vw, 28px);
+  border-top: 1px solid var(--hairline);
+  margin-inline: var(--gutter);
+  padding-inline: 0;
+  row-gap: 8px;
+}
+
+.row:last-child {
+  border-bottom: 1px solid var(--hairline);
+}
+
+.rowLabel {
+  grid-column: 1 / 4;
+  color: var(--quiet);
+  padding-top: 0.3em;
+}
+
+.rowBody {
+  grid-column: 4 / span 7;
+  max-width: 60ch;
+  text-wrap: pretty;
+}
+
+.rowAside {
+  grid-column: 11 / -1;
+  justify-self: end;
+  color: var(--quiet);
+  padding-top: 0.3em;
+}
+
+.quiet {
+  color: var(--quiet);
+}
+
+/* A verdict such as Keep or Reject: a small outlined chip in the shell voice. */
+.tag {
+  display: inline-block;
+  padding: 3px 7px 2px;
+  border: 1px solid currentColor;
+}
+
+.tag[data-strong] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--ground);
+}
+
+@media (max-width: 720px) {
+  .subLabel,
+  .subTitle,
+  .subIntro,
+  .rowLabel,
+  .rowBody {
+    grid-column: 1 / -1;
+  }
+  .subLabel {
+    padding-top: 0;
+  }
+  .rowAside {
+    grid-column: 1 / -1;
+    justify-self: start;
+    padding-top: 0;
+  }
+}

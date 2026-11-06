@@ -1,0 +1,97 @@
+.faces {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.face {
+  padding-block: clamp(32px, 4vw, 56px);
+  border-top: 1px solid var(--hairline);
+  margin-inline: var(--gutter);
+  padding-inline: 0;
+  row-gap: 32px;
+}
+
+.faceHead {
+  grid-column: 1 / 5;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.faceName {
+  font-size: clamp(2.5rem, 1.5rem + 3.5vw, 5rem);
+  font-weight: inherit;
+  line-height: 0.95;
+  overflow-wrap: anywhere;
+}
+
+.role {
+  max-width: 30ch;
+  font-family: var(--text);
+  font-weight: 400;
+  color: var(--quiet);
+  text-wrap: pretty;
+}
+
+.glyphs {
+  grid-column: 5 / -1;
+  font-size: clamp(1.75rem, 1rem + 2.4vw, 3.25rem);
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.weights {
+  grid-column: 5 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 40px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.weights li {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.weightSample {
+  font-size: 1.5rem;
+}
+
+/* Scale: each step set live, with its settings beside it. */
+.step {
+  row-gap: 14px;
+}
+
+.spec {
+  grid-column: 4 / -1;
+  padding-top: 0.3em;
+}
+
+.sample {
+  grid-column: 1 / -1;
+  font-size: var(--size);
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.use {
+  grid-column: 4 / -1;
+  font-size: 0.9375rem;
+}
+
+@media (max-width: 720px) {
+  .faceHead,
+  .glyphs,
+  .weights,
+  .spec,
+  .use {
+    grid-column: 1 / -1;
+  }
+  .sample {
+    font-size: var(--mobile-size);
+  }
+}
