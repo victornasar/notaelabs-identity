@@ -40,6 +40,7 @@ export type BundleColor = {
 
 export type BundleTextStyle = {
   id: string;
+  face: TypeStyle["face"];
   /** Also the Figma text style's name. */
   name: string;
   font: FontName;
@@ -177,6 +178,7 @@ export function buildBundle(brand: Brand, files: BundleFiles): FigmaBundle {
     const mobile = step.mobileSize ? ` ${step.mobileSize} px at phone width.` : "";
     return {
       id: step.id,
+      face: step.face,
       name: capitalize(step.id),
       // A missing font is reported by `bundleProblems`, not thrown, so every gap is listed at once.
       font: font ? { family: font.family, style: font.style } : { family: "", style: "" },

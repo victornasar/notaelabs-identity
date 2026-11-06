@@ -49,3 +49,4 @@ next-env.d.ts
 
 # pnpm export-figma: rebuilt from brand.ts, so never committed
 /brands/*/figma/
+/figma-plugin/dist/
