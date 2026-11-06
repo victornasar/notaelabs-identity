@@ -1,5 +1,5 @@
 ---
-picked:
+picked: b
 ---
 # Okonkwo-Marchetti: route scores
 
@@ -58,3 +58,5 @@ Route B scores highest (15 of 21), then A (11) and C (9). The criterion where ea
 - **C:** type. Carry the step into the letters rather than only the hyphen.
 
 ## Approval
+
+2026-11-05, the user (playing the client): "Lets go B". Route B picked with no changes.
