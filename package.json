@@ -9,6 +9,7 @@
     "build": "node --no-warnings --import ./scripts/lib/ts-paths.ts scripts/brands.ts --production && next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "node --no-warnings --import ./scripts/lib/ts-paths.ts --test \"lib/**/*.test.ts\" \"scripts/**/*.test.ts\"",
     "check": "node --no-warnings --import ./scripts/lib/ts-paths.ts scripts/check.ts",
     "brands": "node --no-warnings --import ./scripts/lib/ts-paths.ts scripts/brands.ts",
     "fonts": "node --no-warnings --import ./scripts/lib/ts-paths.ts scripts/fonts.ts",

@@ -7,6 +7,7 @@ export default defineBrand({
   ...strategy,
   slug: "okonkwo",
   name: "Okonkwo-Marchetti Architectural Lighting Studio",
+  domain: "okonkwo-marchetti.com",
   edition: "Brand guidelines · Edition 2 · November 2026",
   positioning:
     "We design the light in buildings people remember at night: lobbies, stairwells, bridges, and the long walk home.",
@@ -228,5 +229,12 @@ export default defineBrand({
       cites: ["concept.primitives.cone", "concept.primitives.cut-off"],
     },
   },
-  reveal: { mark: "primary", compactMark: "symbol.svg", ground: "Sodium", ink: "Night" },
+  cover: { mark: "lockup.svg" },
+  page: {
+    titles: {
+      marks: "Drawn once. Used as drawn.",
+      color: "Three colors. Night carries the page.",
+      imagery: "The walk home, at work.",
+    },
+  },
 });

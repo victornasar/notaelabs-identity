@@ -4,12 +4,15 @@ import type { ActiveBrand } from "@/lib/brand/active";
 import { bestOn, contrast, toOklch, toRgbString, wcagLevel } from "@/lib/brand/color";
 import { minimumContrast, type BrandColor, type Face, type TypeStyle } from "@/lib/brand/schema";
 import { aspect } from "@/lib/brand/svg";
+import type { PageSection } from "@/lib/brand/sections";
 import { describeStep, textTransform } from "@/lib/brand/type";
 import { CopyChip } from "./copy-chip";
+import { Heading } from "./heading";
 import { stripOf } from "./imagery";
 import styles from "./guide.module.css";
 
 type Props = { active: ActiveBrand };
+type SectionProps = Props & { section: PageSection };
 
 const ROLE_NAMES: Record<BrandColor["role"], string> = {
   ground: "Ground",
@@ -24,32 +27,10 @@ const FACE_FAMILY: Record<TypeStyle["face"], string> = {
   mono: "var(--brand-mono, var(--mono))",
 };
 
-function Heading({
-  id,
-  eyebrow,
-  title,
-  children,
-}: {
-  id: string;
-  eyebrow: string;
-  title: string;
-  children?: React.ReactNode;
-}) {
-  return (
-    <header className={styles.heading}>
-      <p className={styles.eyebrow}>{eyebrow}</p>
-      <h2 id={`${id}-title`} className={styles.title}>
-        {title}
-      </h2>
-      {children ? <p className={styles.lede}>{children}</p> : null}
-    </header>
-  );
-}
-
-/** The cover: the lamp and the wordmark together, as large as the screen allows. */
+/** The cover: the brand's cover mark, as large as the screen allows. */
 export function Hero({ active }: Props) {
-  const { brand, svg } = active;
-  const lockup = brand.marks.alternates?.[0] ?? brand.marks.primary;
+  const { brand, svg, mark } = active;
+  const lockup = mark(brand.cover.mark);
 
   return (
     <section id="top" className={styles.hero} aria-label={`${brand.name}, brand guidelines`}>
@@ -107,7 +88,7 @@ export function Band({ active }: Props) {
 }
 
 /** Every mark as a card, the grounds they sit on, and how the wordmark was drawn. */
-export function Marks({ active }: Props) {
+export function Marks({ active, section }: SectionProps) {
   const { brand, svg, byRole, color } = active;
   const { marks, type } = brand;
   const ground = byRole("ground")!;
@@ -128,7 +109,7 @@ export function Marks({ active }: Props) {
 
   return (
     <section id="marks" className={styles.section} aria-labelledby="marks-title">
-      <Heading id="marks" eyebrow="01 · Marks" title="Drawn once. Used as drawn.">
+      <Heading section={section} title={brand.page?.titles?.marks ?? "Marks"}>
         {marks.primary.use}
       </Heading>
 
@@ -248,7 +229,7 @@ export function Marks({ active }: Props) {
 }
 
 /** The palette as cards as wide as their share of a page, every value one click from the clipboard. */
-export function Colors({ active }: Props) {
+export function Colors({ active, section }: SectionProps) {
   const { colors } = active.brand;
   const hexes = colors.map((c) => c.hex);
   const ground = colors.find((c) => c.role === "ground")!;
@@ -261,7 +242,7 @@ export function Colors({ active }: Props) {
 
   return (
     <section id="color" className={styles.section} aria-labelledby="color-title">
-      <Heading id="color" eyebrow="02 · Color" title={`${colors.length} colors. One carries the page.`}>
+      <Heading section={section} title={active.brand.page?.titles?.color ?? `${colors.length} colors`}>
         Each card is as wide as the color’s share of a typical page.
       </Heading>
 
@@ -329,7 +310,7 @@ export function Colors({ active }: Props) {
 }
 
 /** Each face as a specimen card, why they fit, then the scale set in the brand's own words. */
-export function Type({ active }: Props) {
+export function Type({ active, section }: SectionProps) {
   const { brand, byRole } = active;
   const { type } = brand;
   const accent = byRole("accent") ?? byRole("ink")!;
@@ -346,7 +327,7 @@ export function Type({ active }: Props) {
 
   return (
     <section id="type" className={styles.section} aria-labelledby="type-title">
-      <Heading id="type" eyebrow="03 · Typography" title={faces.map(([, f]) => f.family).join(" & ")}>
+      <Heading section={section} title={brand.page?.titles?.type ?? faces.map(([, f]) => f.family).join(" & ")}>
         {type.fit}
       </Heading>
 
@@ -424,13 +405,13 @@ export function Type({ active }: Props) {
 }
 
 /** How the brand writes: three lines it would write, and the ones it wouldn't. */
-export function Voice({ active }: Props) {
-  const { voice } = active.brand;
+export function Voice({ active, section }: SectionProps) {
+  const { voice, page } = active.brand;
   if (!voice) return null;
 
   return (
     <section id="voice" className={styles.section} aria-labelledby="voice-title">
-      <Heading id="voice" eyebrow="05 · Voice" title="Write this, not that.">
+      <Heading section={section} title={page?.titles?.voice ?? "Write this, not that."}>
         {voice.traits?.map((t) => `${t.trait}: ${t.means.charAt(0).toLowerCase()}${t.means.slice(1)}`).join(" ")}
       </Heading>
 

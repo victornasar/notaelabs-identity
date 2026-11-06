@@ -48,7 +48,7 @@ The generator runs from chat. In Claude Code, type `/brand <slug>`; in Cursor, a
 
 ## Checks
 
-`pnpm check` is the one gate, and CI runs the same command on every push and pull request. It runs route types, TypeScript, ESLint, `check-route` for every route, `check-brand` for every brand, and a production build per brand, and it stops at the first failure.
+`pnpm check` is the one gate, and CI runs the same command on every push and pull request. It runs route types, TypeScript, ESLint, the unit tests (`pnpm test`, Node's own runner), `check-route` for every route, `check-brand` for every brand, and a production build per brand, and it stops at the first failure.
 
 ## How it works
 

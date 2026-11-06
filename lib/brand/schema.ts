@@ -10,6 +10,7 @@
  */
 
 import { contrast } from "./color";
+import type { OptionalSectionId, SectionId } from "./sections";
 
 // --- Decision layer ---------------------------------------------------------
 
@@ -268,24 +269,11 @@ export type Application = {
   copy: Record<string, string | string[]>;
 };
 
-/**
- * The sections of a brand book, in presentation order. A photo mockup joins
- * once the mockup library exists.
- */
-export const parts = [
-  "intro",
-  "wordmark",
-  "logo-mark",
-  "graphic-device",
-  "colors",
-  "typography",
-  "closing",
-] as const;
-export type Part = (typeof parts)[number];
-
 export type Brand = Strategy & {
   slug: string;
   name: string;
+  /** The brand's web address, such as "okonkwo-marchetti.com", for drawn screens. */
+  domain?: string;
   /** Who the guidelines were prepared for, and when. */
   edition: string;
   positioning: string;
@@ -317,16 +305,17 @@ export type Brand = Strategy & {
   colorModes?: ColorMode[];
   type: TypeSystem;
   device?: GraphicDevice;
-  /** Parts of the book this brand doesn't need, each with the reason. */
-  notApplicable?: Partial<Record<Part, string>>;
-  reveal: {
-    /** Which mark opens the site. */
-    mark: "primary" | "symbol" | string;
-    /** A squarer mark for phones, when the opening mark is very wide. */
-    compactMark?: string;
-    /** Color names for the opening field and the mark on it. */
-    ground: string;
-    ink: string;
+  /** Optional sections this brand leaves out, each with the reason. */
+  notApplicable?: Partial<Record<OptionalSectionId, string>>;
+  /** The page's cover. */
+  cover: {
+    /** The mark it opens on: "primary", "symbol", or a mark file such as "lockup.svg". */
+    mark: string;
+  };
+  /** The page's own words, in the brand's voice. Plain defaults stand in for any left out. */
+  page?: {
+    /** One headline per section. */
+    titles?: Partial<Record<SectionId, string>>;
   };
 };
 
@@ -486,11 +475,14 @@ function bookProblems(brand: Brand): string[] {
 export function defineBrand<const B extends Brand>(brand: B): B {
   defineStrategy(brand);
   const found = [...problems(brand.slug, brand, brand), ...bookProblems(brand)];
-  for (const key of ["ground", "ink"] as const) {
-    if (!brand.colors.some((color) => color.name === brand.reveal[key])) {
-      found.push(`${brand.slug}: reveal.${key} "${brand.reveal[key]}" is not a color.`);
-    }
-  }
+  const { mark } = brand.cover;
+  const marks = [
+    "primary",
+    ...(brand.marks.symbol ? ["symbol", brand.marks.symbol.file] : []),
+    brand.marks.primary.file,
+    ...(brand.marks.alternates ?? []).map((m) => m.file),
+  ];
+  if (!marks.includes(mark)) found.push(`${brand.slug}: cover.mark "${mark}" is not one of the brand's marks (${marks.join(", ")}).`);
   if (found.length) throw new Error(found.join("\n"));
   return brand;
 }
