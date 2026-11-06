@@ -12,8 +12,10 @@ import type { BundleFont, BundleTextStyle, FigmaBundle, FontName } from "./bundl
 export const collectionName = "Colors";
 export const pageName = "Foundations";
 
-/** The board matches the page at desktop width: a 1200 px column, 12 px between cards. */
-export const layout = { width: 1440, column: 1200, gap: 12, radius: 28, section: 200, swatchHeight: 600, minSwatch: 280 };
+/** Each part of the identity is a landscape frame, as agency guidelines are: 1920 × 1080. */
+export const layout = { width: 1920, height: 1080, pad: 96, gap: 16, radius: 32, minSwatch: 320, spacing: 160 };
+/** The width inside a frame's margins. */
+export const column = layout.width - layout.pad * 2;
 
 /** A fill: a color variable by name, at an opacity for quiet text and hairlines. */
 export type Paint = { color: string; opacity?: number };
@@ -49,6 +51,9 @@ export type FaceCard = {
 
 export type ScaleRow = { id: string; spec: string; use: string; style: string; sample: string };
 
+/** One landscape frame: its heading, what it shows, and the footer's two ends. */
+export type Slide = { name: string; kind: "color" | "faces" | "scale"; head: SectionHead; footer: [string, string] };
+
 export type FoundationsPlan = {
   fonts: FontName[];
   variables: { name: string; rgb: { r: number; g: number; b: number }; description: string }[];
@@ -60,7 +65,9 @@ export type FoundationsPlan = {
   /** Text style names, by the job they do on the page. */
   text: { heading: string; body: string; small: string; label: string };
   color: SectionHead & { cards: SwatchCard[]; note?: string };
-  type: SectionHead & { faces: FaceCard[]; scale: ScaleRow[] };
+  type: { faces: FaceCard[]; scale: ScaleRow[] };
+  /** The frames, left to right. */
+  slides: Slide[];
 };
 
 const sameFont = (a: FontName, b: FontName) => a.family === b.family && a.style === b.style;
@@ -124,7 +131,10 @@ export function foundationsPlan(bundle: FigmaBundle): FoundationsPlan {
 
   // Cards run largest share first, as the page does.
   const ordered = [...colors].sort((a, b) => b.proportion - a.proportion);
-  const widths = shareWidths(ordered.map((c) => c.proportion), layout.column, layout.gap, layout.minSwatch);
+  const widths = shareWidths(ordered.map((c) => c.proportion), column, layout.gap, layout.minSwatch);
+  const colorHead = { ...head("color", "Color"), intro: "Each card is as wide as the color’s share of a typical page." };
+  const typeHead = { ...head("type", "Type"), intro: bundle.type.fit };
+  const slide = (name: string, kind: Slide["kind"], h: SectionHead): Slide => ({ name, kind, head: h, footer: [bundle.name, `${pageName} · ${name}`] });
 
   const heaviest = (face: string) => fonts.filter((f) => f.face === face).sort((a, b) => b.weight - a.weight)[0];
 
@@ -145,8 +155,7 @@ export function foundationsPlan(bundle: FigmaBundle): FoundationsPlan {
     accent: accent.name,
     text: { heading: heading.name, body: body.name, small: small.name, label: label.name },
     color: {
-      ...head("color", "Color"),
-      intro: "Each card is as wide as the color’s share of a typical page.",
+      ...colorHead,
       cards: ordered.map((c, i) => ({
         color: c.name,
         ink: nameOf(bestOn(c.hex, hexes)),
@@ -160,8 +169,6 @@ export function foundationsPlan(bundle: FigmaBundle): FoundationsPlan {
       ...(bundle.printNote ? { note: bundle.printNote } : {}),
     },
     type: {
-      ...head("type", "Type"),
-      intro: bundle.type.fit,
       faces: bundle.type.faces.flatMap((face, i) => {
         const font = heaviest(face.face);
         if (!font) return [];
@@ -181,5 +188,10 @@ export function foundationsPlan(bundle: FigmaBundle): FoundationsPlan {
       }),
       scale: textStyles.map((t) => ({ id: t.id, spec: t.spec, use: t.use, style: t.name, sample: t.sample })),
     },
+    slides: [
+      slide("Color", "color", colorHead),
+      slide("Typefaces", "faces", typeHead),
+      slide("Type scale", "scale", { eyebrow: typeHead.eyebrow, title: "The scale", intro: "" }),
+    ],
   };
 }

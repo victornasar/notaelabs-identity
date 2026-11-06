@@ -7,6 +7,7 @@
 import { bundleFormat, type FigmaBundle } from "../../lib/figma/bundle";
 import {
   collectionName,
+  column,
   foundationsPlan,
   layout,
   missingFonts,
@@ -14,7 +15,7 @@ import {
   pageName,
   type FoundationsPlan,
   type Paint,
-  type SectionHead,
+  type Slide,
 } from "../../lib/figma/foundations";
 
 figma.showUI(__html__, { width: 360, height: 320, themeColors: true });
@@ -178,110 +179,142 @@ async function drawPage(plan: FoundationsPlan, variables: Map<string, Variable>,
   for (const child of [...page.children]) child.remove();
   await figma.setCurrentPageAsync(page);
 
-  const board = box(pageName, "VERTICAL", { gap: layout.section, width: layout.width, fill: { color: ground } });
-  board.paddingLeft = board.paddingRight = (layout.width - layout.column) / 2;
-  board.paddingTop = board.paddingBottom = 160;
-  page.appendChild(board);
-
-  /** A section's eyebrow and headline on the left, its intro on the right, as on the page. */
-  const section = async (name: string, head: SectionHead) => {
-    const frame = add(board, box(name, "VERTICAL", { gap: 48, width: layout.column }));
-    const top = add(frame, box("Heading", "HORIZONTAL", { width: layout.column }));
-    top.primaryAxisAlignItems = "SPACE_BETWEEN";
-    top.counterAxisAlignItems = "MAX";
-    const left = add(top, box("Title", "VERTICAL", { gap: 20, width: 720 }));
-    add(left, await text(head.eyebrow, role.label, { color: accent }, { stretch: true }));
-    add(left, await text(head.title, role.heading, { color: ink }, { stretch: true }));
-    if (head.intro) add(top, await text(head.intro, role.body, quiet(ink), { width: 400 }));
+  /** Makes a child fill the rest of its vertical parent's height. */
+  const grow = (frame: FrameNode) => {
+    frame.layoutGrow = 1;
+    if (frame.layoutMode === "HORIZONTAL") frame.counterAxisSizingMode = "FIXED";
+    else frame.primaryAxisSizingMode = "FIXED";
     return frame;
   };
 
-  const subtitle = async (parent: FrameNode, title: string) => {
-    const frame = add(parent, box(title, "VERTICAL", { stretch: true }));
-    frame.paddingTop = 48;
-    add(frame, await text(title, role.heading, { color: ink }, { stretch: true }));
+  /** Makes a card in a horizontal row as tall as the row. */
+  const fullHeight = (frame: FrameNode) => {
+    frame.layoutAlign = "STRETCH";
+    frame.primaryAxisSizingMode = "FIXED";
+    return frame;
   };
 
-  // Color: cards as wide as each color's share, every notation as a pill.
-  const color = await section("Color", plan.color);
-  const row = add(color, box("Swatches", "HORIZONTAL", { gap: layout.gap }));
-  for (const card of plan.color.cards) {
-    const frame = add(
-      row,
-      box(card.name, "VERTICAL", {
-        pad: 32,
-        width: card.width,
-        height: layout.swatchHeight,
-        radius: layout.radius,
-        fill: { color: card.color },
-        ...(card.edge ? { stroke: hairline(card.ink) } : {}),
-      }),
-    );
-    frame.primaryAxisAlignItems = "SPACE_BETWEEN";
-    const top = add(frame, box("About", "VERTICAL", { gap: 14, stretch: true }));
-    add(top, await text(card.role, role.label, quiet(card.ink), { stretch: true }));
-    add(top, await text(card.name, role.heading, { color: card.ink }, { stretch: true }));
-    add(top, await text(card.use, role.body, { color: card.ink }, { stretch: true }));
-    const pills = add(frame, box("Values", "HORIZONTAL", { gap: 6, stretch: true }));
-    pills.layoutWrap = "WRAP";
-    pills.counterAxisSpacing = 6;
-    pills.primaryAxisSizingMode = "FIXED";
-    for (const pill of card.pills) {
-      const chip = add(pills, box(pill.label, "HORIZONTAL", { gap: 8, radius: 999, stroke: hairline(card.ink) }));
-      chip.paddingLeft = chip.paddingRight = 12;
-      chip.paddingTop = chip.paddingBottom = 6;
-      chip.counterAxisAlignItems = "CENTER";
-      add(chip, await text(pill.label, role.label, quiet(card.ink)));
-      add(chip, await text(pill.value, role.small, { color: card.ink }));
+  /**
+   * A landscape frame: the eyebrow and headline on the left, the intro on the
+   * right, the content filling the middle, and a footer naming the brand and
+   * the frame. Returns the content area.
+   */
+  const slide = async ({ name, head, footer }: Slide, index: number) => {
+    const frame = box(name, "VERTICAL", { gap: 56, pad: layout.pad, width: layout.width, height: layout.height, fill: { color: ground } });
+    frame.clipsContent = true;
+    frame.x = index * (layout.width + layout.spacing);
+    page.appendChild(frame);
+
+    const top = add(frame, box("Heading", "HORIZONTAL", { width: column }));
+    top.primaryAxisAlignItems = "SPACE_BETWEEN";
+    top.counterAxisAlignItems = "MAX";
+    const left = add(top, box("Title", "VERTICAL", { gap: 20, width: 1040 }));
+    add(left, await text(head.eyebrow, role.label, { color: accent }, { stretch: true }));
+    add(left, await text(head.title, role.heading, { color: ink }, { stretch: true }));
+    if (head.intro) add(top, await text(head.intro, role.body, quiet(ink), { width: 520 }));
+
+    const content = grow(add(frame, box("Content", "VERTICAL", { gap: 24, stretch: true })));
+
+    const foot = add(frame, box("Footer", "HORIZONTAL", { stretch: true }));
+    foot.primaryAxisAlignItems = "SPACE_BETWEEN";
+    for (const words of footer) add(foot, await text(words, role.label, quiet(ink)));
+    return content;
+  };
+
+  const frames: FrameNode[] = [];
+  for (const [index, spec] of plan.slides.entries()) {
+    const content = await slide(spec, index);
+    frames.push(content.parent as FrameNode);
+
+    if (spec.kind === "color") {
+      // Cards as wide as each color's share, every notation as a pill.
+      const row = grow(add(content, box("Swatches", "HORIZONTAL", { gap: layout.gap, stretch: true })));
+      for (const card of plan.color.cards) {
+        const frame = fullHeight(
+          add(
+            row,
+            box(card.name, "VERTICAL", {
+              pad: 36,
+              width: card.width,
+              radius: layout.radius,
+              fill: { color: card.color },
+              ...(card.edge ? { stroke: hairline(card.ink) } : {}),
+            }),
+          ),
+        );
+        frame.primaryAxisAlignItems = "SPACE_BETWEEN";
+        const about = add(frame, box("About", "VERTICAL", { gap: 14, stretch: true }));
+        add(about, await text(card.role, role.label, quiet(card.ink), { stretch: true }));
+        add(about, await text(card.name, role.heading, { color: card.ink }, { stretch: true }));
+        add(about, await text(card.use, role.body, { color: card.ink }, { stretch: true }));
+        const pills = add(frame, box("Values", "HORIZONTAL", { gap: 6, stretch: true }));
+        pills.layoutWrap = "WRAP";
+        pills.counterAxisSpacing = 6;
+        for (const pill of card.pills) {
+          const chip = add(pills, box(pill.label, "HORIZONTAL", { gap: 8, radius: 999, stroke: hairline(card.ink) }));
+          chip.paddingLeft = chip.paddingRight = 12;
+          chip.paddingTop = chip.paddingBottom = 6;
+          chip.counterAxisAlignItems = "CENTER";
+          add(chip, await text(pill.label, role.label, quiet(card.ink)));
+          add(chip, await text(pill.value, role.small, { color: card.ink }));
+        }
+      }
+      if (plan.color.note) add(content, await text(plan.color.note, role.small, quiet(ink), { width: 760 }));
+    }
+
+    if (spec.kind === "faces") {
+      // A card per face, led by the accent.
+      const row = grow(add(content, box("Faces", "HORIZONTAL", { gap: layout.gap, stretch: true })));
+      const width = Math.floor((column - layout.gap * (plan.type.faces.length - 1)) / plan.type.faces.length);
+      for (const face of plan.type.faces) {
+        const card = fullHeight(
+          add(
+            row,
+            box(face.kind, "VERTICAL", {
+              pad: 44,
+              width,
+              radius: layout.radius,
+              ...(face.fill ? { fill: { color: face.fill } } : { stroke: hairline(face.ink) }),
+            }),
+          ),
+        );
+        card.primaryAxisAlignItems = "SPACE_BETWEEN";
+        add(card, await text(face.kind, role.label, quiet(face.ink), { stretch: true }));
+        add(card, glyphs(face.glyphs, face.font, 260, { color: face.ink }));
+        const about = add(card, box("About", "VERTICAL", { gap: 10, stretch: true }));
+        add(about, glyphs(face.family, face.font, 44, { color: face.ink }));
+        add(about, await text(face.role, role.body, { color: face.ink }, { stretch: true }));
+        add(about, await text(face.weights, role.label, quiet(face.ink), { stretch: true }));
+      }
+    }
+
+    if (spec.kind === "scale") {
+      // The scale as rows in one outlined card: settings left, the sample filling the rest.
+      const card = grow(add(content, box("Scale", "VERTICAL", { stretch: true, radius: layout.radius, stroke: hairline(ink) })));
+      card.paddingLeft = card.paddingRight = 44;
+      card.paddingTop = card.paddingBottom = 12;
+      card.primaryAxisAlignItems = "SPACE_BETWEEN";
+      for (const [i, step] of plan.type.scale.entries()) {
+        if (i > 0) {
+          const rule = figma.createRectangle();
+          rule.name = "Rule";
+          rule.resize(column - 88, 1);
+          rule.fills = [paint(hairline(ink))];
+          add(card, rule).layoutAlign = "STRETCH";
+        }
+        const line = add(card, box(step.style, "HORIZONTAL", { gap: 48, stretch: true }));
+        line.paddingTop = line.paddingBottom = 20;
+        line.counterAxisAlignItems = "CENTER";
+        const meta = add(line, box("Settings", "VERTICAL", { gap: 6, width: 340 }));
+        add(meta, await text(step.id, role.label, { color: accent }, { stretch: true }));
+        add(meta, await text(step.spec, role.small, quiet(ink), { stretch: true }));
+        add(meta, await text(step.use, role.small, quiet(ink), { stretch: true }));
+        const sample = add(line, await text(step.sample, step.style, { color: ink }));
+        sample.layoutGrow = 1;
+        sample.textAutoResize = "HEIGHT";
+      }
     }
   }
-  if (plan.color.note) add(color, await text(plan.color.note, role.small, quiet(ink), { width: 640 }));
 
-  // Type: a card per face, then the scale as rows in one outlined card.
-  const type = await section("Type", plan.type);
-  const faces = add(type, box("Faces", "HORIZONTAL", { gap: layout.gap, width: layout.column }));
-  const faceWidth = Math.floor((layout.column - layout.gap * (plan.type.faces.length - 1)) / plan.type.faces.length);
-  for (const face of plan.type.faces) {
-    const card = add(
-      faces,
-      box(face.kind, "VERTICAL", {
-        pad: 40,
-        width: faceWidth,
-        height: 580,
-        radius: layout.radius,
-        ...(face.fill ? { fill: { color: face.fill } } : { stroke: hairline(face.ink) }),
-      }),
-    );
-    card.primaryAxisAlignItems = "SPACE_BETWEEN";
-    add(card, await text(face.kind, role.label, quiet(face.ink), { stretch: true }));
-    add(card, glyphs(face.glyphs, face.font, 240, { color: face.ink }));
-    const about = add(card, box("About", "VERTICAL", { gap: 10, stretch: true }));
-    add(about, glyphs(face.family, face.font, 40, { color: face.ink }));
-    add(about, await text(face.role, role.body, { color: face.ink }, { stretch: true }));
-    add(about, await text(face.weights, role.label, quiet(face.ink), { stretch: true }));
-  }
-
-  await subtitle(type, "The scale");
-  const scale = add(type, box("Scale", "VERTICAL", { pad: 40, width: layout.column, radius: layout.radius, stroke: hairline(ink) }));
-  for (const [i, step] of plan.type.scale.entries()) {
-    if (i > 0) {
-      const rule = figma.createRectangle();
-      rule.name = "Rule";
-      rule.resize(layout.column - 80, 1);
-      rule.fills = [paint(hairline(ink))];
-      rule.layoutAlign = "STRETCH";
-      add(scale, rule);
-    }
-    const line = add(scale, box(step.style, "HORIZONTAL", { gap: 40, stretch: true }));
-    line.paddingTop = line.paddingBottom = 28;
-    const meta = add(line, box("Settings", "VERTICAL", { gap: 6, width: 280 }));
-    add(meta, await text(step.id, role.label, { color: accent }, { stretch: true }));
-    add(meta, await text(step.spec, role.small, quiet(ink), { stretch: true }));
-    add(meta, await text(step.use, role.small, quiet(ink), { stretch: true }));
-    const sample = add(line, await text(step.sample, step.style, { color: ink }));
-    sample.layoutGrow = 1;
-    sample.textAutoResize = "HEIGHT";
-  }
-
-  figma.viewport.scrollAndZoomIntoView([board]);
+  figma.viewport.scrollAndZoomIntoView(frames);
 }

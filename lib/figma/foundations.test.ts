@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 import okonkwo from "@/brands/okonkwo/brand";
 import type { Brand } from "../brand/schema";
 import { buildBundle, type BundleFiles } from "./bundle";
-import { foundationsPlan, layout, missingFonts, nearFonts, shareWidths } from "./foundations";
+import { column, foundationsPlan, layout, missingFonts, nearFonts, shareWidths } from "./foundations";
 
 const brand = structuredClone(okonkwo) as Brand;
 const files: BundleFiles = {
@@ -60,11 +60,11 @@ describe("foundationsPlan", () => {
     assert.deepEqual(plan.text, { heading: "Title", body: "Body", small: "Figure", label: "Label" });
   });
 
-  it("sizes swatch cards by share, largest first, within the column", () => {
+  it("sizes swatch cards by share, largest first, within the frame's margins", () => {
     const { cards } = plan.color;
     assert.deepEqual(cards.map((c) => c.name), ["Night", "Sodium", "Stone"]);
     const used = cards.reduce((sum, c) => sum + c.width, 0) + layout.gap * (cards.length - 1);
-    assert.ok(used <= layout.column && used > layout.column - cards.length);
+    assert.ok(used <= column && used > column - cards.length);
     assert.ok(cards.every((c) => c.width >= layout.minSwatch));
   });
 
@@ -83,9 +83,13 @@ describe("foundationsPlan", () => {
     assert.equal(text?.fill, null);
   });
 
-  it("titles sections as the page does", () => {
-    assert.equal(plan.color.eyebrow, "02 · Color");
-    assert.equal(plan.color.title, "Three colors. Night carries the page.");
+  it("puts each part on its own landscape frame, titled as the page titles it", () => {
+    assert.deepEqual(plan.slides.map((s) => s.name), ["Color", "Typefaces", "Type scale"]);
+    const [color, faces] = plan.slides;
+    assert.equal(color?.head.eyebrow, "02 · Color");
+    assert.equal(color?.head.title, "Three colors. Night carries the page.");
+    assert.equal(faces?.head.title, "Big Shoulders & Chivo");
+    assert.deepEqual(color?.footer, [bundle.name, "Foundations · Color"]);
     assert.equal(plan.type.scale[0]?.sample, "Okonkwo");
   });
 
