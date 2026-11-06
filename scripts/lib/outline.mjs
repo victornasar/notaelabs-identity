@@ -30,7 +30,14 @@ export function setText(font, text, { size = 1000, tracking = 0, kerning = true,
   const scale = size / font.unitsPerEm;
   // opentype.js takes features as { liga: true }; only Latin ones are applied.
   const options = { ...font.defaultRenderOptions, kerning, features: { liga: true, rlig: true, ...features } };
-  const glyphs = font.stringToGlyphs(text, options);
+  let glyphs;
+  try {
+    glyphs = font.stringToGlyphs(text, options);
+  } catch {
+    // opentype.js can't read some fonts' substitution tables. A wordmark needs no
+    // shaping, so map each character to its glyph; kerning still applies below.
+    glyphs = [...text].map((char) => font.charToGlyph(char));
+  }
   let x = 0;
   const out = glyphs.map((glyph, i) => {
     const path = glyph.getPath(x, 0, size, options, font);
