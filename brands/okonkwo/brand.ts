@@ -168,6 +168,12 @@ export default defineBrand({
       "The row runs off both edges, so it reads as a street that continues.",
       "Type sits in the dark above the row, never across a pool’s edge.",
     ],
+    misuse: [
+      { rule: "Never closer than the interval.", show: "crowded" },
+      { rule: "Never scattered.", show: "scattered" },
+      { rule: "Never as a glow.", show: "glow" },
+      { rule: "Never stopped short of the edges.", show: "contained" },
+    ],
     applications: [
       {
         kind: "signage",

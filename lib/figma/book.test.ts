@@ -8,7 +8,7 @@ import { bookPlan, column, layout, missingFonts, nearFonts, shareWidths } from "
 const brand = structuredClone(okonkwo) as Brand;
 const files: BundleFiles = {
   marks: {},
-  graphics: {},
+  graphics: { "pool-row.svg": '<svg viewBox="0 0 2400 900"><ellipse cx="0" cy="450" rx="150" ry="50"/></svg>' },
   fonts: [
     { face: "display", weight: 800, family: "Big Shoulders", style: "ExtraBold", file: "a.ttf" },
     { face: "text", weight: 400, family: "Chivo", style: "Regular", file: "b.ttf" },
@@ -102,11 +102,11 @@ describe("bookPlan", () => {
       ["02 Logo", "02.1 Logo · Logo mark", "02.2 Logo · On Stone", "02.3 Logo · On Sodium", "02.4 Logo · On Night", "02.5 Logo · Misuse"],
       ["03 Color", "03.1 Color · Palette", "03.2 Color · Pairs"],
       ["04 Typography", "04.1 Typography · Typefaces", "04.2 Typography · Scale", "04.3 Typography · In use"],
-      ["05 Visual Language", "05.1 Visual Language · Pool row"],
+      ["05 Visual Language", "05.1 Visual Language · Pool row", "05.2 Visual Language · Rules"],
     ]);
     assert.deepEqual(
       plan.sections.flatMap((s) => s.frames.map((f) => f.page)),
-      ["02", "03", "04", "06", "07", "08", "09", "10", "12", "13", "15", "16", "17", "19"],
+      ["02", "03", "04", "06", "07", "08", "09", "10", "12", "13", "15", "16", "17", "19", "20"],
     );
     assert.equal(plan.sections[2]?.frames[0]?.eyebrow, "03 · Color · Palette");
     assert.deepEqual(plan.display, { font: { family: "Big Shoulders", style: "ExtraBold" }, upper: true });
@@ -188,6 +188,15 @@ describe("bookPlan", () => {
     delete bare.device;
     bare.notApplicable = { ...bare.notApplicable, imagery: "No device." };
     assert.equal(bookPlan(buildBundle(bare, files)).inUse.headline, brand.positioning);
+  });
+
+  it("shows the device the right way, then each way the brand says never to draw it", () => {
+    assert.deepEqual(plan.device?.misuse.map((m) => m.show), ["crowded", "scattered", "glow", "contained"]);
+    assert.match(plan.device?.strip ?? "", /viewBox="0 300 2400 300"/);
+    const plain = structuredClone(brand);
+    delete plain.device!.misuse;
+    const kinds = bookPlan(buildBundle(plain, files)).sections.flatMap((s) => s.frames.map((f) => f.kind));
+    assert.ok(kinds.includes("device") && !kinds.includes("rhythm"));
   });
 
   it("keeps OpenType features in the style's description, since Figma styles can't hold them", () => {
