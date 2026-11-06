@@ -7,6 +7,13 @@
   overflow: hidden;
 }
 
+/* The wordmark alone, wide, between the gutters. */
+.hero {
+  aspect-ratio: 21 / 9;
+  margin-inline: var(--gutter);
+  padding: 12% 14%;
+}
+
 .tile[data-edge] {
   box-shadow: inset 0 0 0 1px var(--hairline);
 }

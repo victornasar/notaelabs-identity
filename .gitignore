@@ -43,6 +43,3 @@ next-env.d.ts
 /brands/registry.generated.ts
 
 /brands/routes.generated.ts
-
-# Generated imagery: rebuilt from seeds with `pnpm render-imagery <slug>`.
-brands/*/images/*.png

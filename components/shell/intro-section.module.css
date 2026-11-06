@@ -1,0 +1,32 @@
+.idea {
+  padding-bottom: clamp(48px, 7vw, 112px);
+  row-gap: 16px;
+}
+
+.ideaLabel {
+  grid-column: 1 / 4;
+  color: var(--quiet);
+  padding-top: 0.7em;
+}
+
+.ideaText {
+  grid-column: 4 / -1;
+  max-width: 26ch;
+  font-family: var(--display);
+  font-weight: var(--display-weight);
+  text-transform: var(--display-case);
+  letter-spacing: var(--display-tracking);
+  font-size: clamp(2rem, 1.2rem + 3vw, 4.25rem);
+  line-height: 1;
+  text-wrap: balance;
+}
+
+@media (max-width: 720px) {
+  .ideaLabel,
+  .ideaText {
+    grid-column: 1 / -1;
+  }
+  .ideaLabel {
+    padding-top: 0;
+  }
+}

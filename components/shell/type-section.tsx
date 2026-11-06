@@ -33,12 +33,21 @@ export function TypeSection({ active, number }: { active: ActiveBrand; number: n
 
   return (
     <section id="type" className={book.section} aria-labelledby="type-title">
-      <SectionHeader id="type" number={number} title="Type">
+      <SectionHeader id="type" number={number} title="Typography">
         <p>
           {faces.map(([, f]) => f.family).join(" and ")}. {faces.length} faces,{" "}
           {type.scale.steps.length} sizes, and nothing set outside them.
         </p>
       </SectionHeader>
+
+      {type.fit ? (
+        <ul className={book.rows}>
+          <li className={`grid ${book.row}`}>
+            <p className={`label ${book.rowLabel}`}>Why it fits</p>
+            <p className={book.rowBody}>{type.fit}</p>
+          </li>
+        </ul>
+      ) : null}
 
       <ul className={styles.faces}>
         {faces.map(([key, face]) => {

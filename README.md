@@ -37,13 +37,13 @@ brands/<slug>/
 
 ## Generate a brand
 
-The generator runs from chat. In Claude Code, type `/brand <slug>`; in Cursor, ask it to follow `AGENTS.md`. It works in nine gates, each waiting for your approval: interview, strategy, three routes, pick, build-out, graphic language, photography, applications and a completeness check. Every gate's result is committed in `brands/<slug>/work/`, so any session can resume it. The skills live in `.claude/skills/`.
+The generator runs from chat. In Claude Code, type `/brand <slug>`; in Cursor, ask it to follow `AGENTS.md`. It works in nine gates, each waiting for your approval: interview, strategy, three routes, pick, build-out, book copy, graphic device, mockup and the Figma file. Every gate's result is committed in `brands/<slug>/work/`, so any session can resume it. The skills live in `.claude/skills/`.
 
 - `pnpm fonts add <id> <slug>` copies an approved family from `fonts/library.json` into the brand.
 - `pnpm oklch "Name=L% C H" ...` turns OKLCH picks into hex and lists every contrast pair.
 - `pnpm render-marks <route folder>` renders marks to PNG, with a review sheet.
 - `pnpm check-route <slug>` lists everything that sends a route back.
-- `pnpm check-brand <slug>` checks the brand against the nine parts of a complete brand book and lists what each part lacks.
+- `pnpm check-brand <slug>` checks the brand against the book's eight sections (intro, wordmark, logo mark, graphic device, mockup, colors, typography, closing) and lists what each lacks.
 - `/routes/<slug>` (dev only) shows the three routes side by side. Run `pnpm brands` after adding a route.
 
 ## How it works

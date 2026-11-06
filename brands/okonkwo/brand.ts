@@ -52,6 +52,7 @@ export default defineBrand({
         dont: "Full project lifecycle support.",
       },
     ],
+    signoff: "As much light as the place needs, and no more.",
     rewrites: [
       {
         before: "Okonkwo-Marchetti delivers cutting-edge illumination for premium developments.",
@@ -68,12 +69,16 @@ export default defineBrand({
       file: "wordmark.svg",
       name: "Wordmark",
       use: "The surnames in capitals, joined by a beam of light. First choice wherever it fits.",
+      meaning:
+        "The two partners’ names on one line, because the partnership is the studio. The hyphen between them is redrawn as a beam: narrow where it leaves the fitting, wider where it lands, cut off flat at the top. The names are joined the way the studio joins a lamp to the ground it lights.",
       cites: ["equity.assets.names", "concept.primitives.cone", "concept.primitives.cut-off"],
     },
     symbol: {
       file: "symbol.svg",
       name: "Lamp",
       use: "A fitting and its beam. App icons, favicons, site signage.",
+      meaning:
+        "A streetlamp seen side on: the fitting, a gap, and the beam it throws, widening at the lamp’s own angle and cut off flat where the light stops. It stands for the one thing the studio does, light falling exactly where it was meant to and nowhere else.",
       cites: ["concept.primitives.cone", "concept.primitives.cut-off"],
     },
     alternates: [
@@ -136,53 +141,50 @@ export default defineBrand({
     },
   ],
   printProfile: "Coated FOGRA39L (VIGC 300), relative colorimetric",
-  graphicLanguage: {
-    elements: [
-      {
-        name: "Pool row",
-        file: "pool-row.svg",
-        ground: "Night",
-        ink: "Sodium",
-        construction: "3:1 Sodium pools in a row, each one pool-width from the next, running off both edges.",
-        use: "Section openers, hoardings and the website footer: the walk home, as a pattern.",
-        cites: ["concept.primitives.pool", "concept.primitives.interval", "concept.idea"],
-      },
-      {
-        name: "Beam and pool",
-        file: "beam-and-pool.svg",
-        ground: "Night",
-        ink: "Sodium",
-        construction: "A beam leaves the top edge at the lamp symbol’s angle (7 out for every 15 down) and stops at a hard line; its pool, 1.2 times the beam’s foot, lies just below and never touches it.",
-        use: "Covers and the competition board: one lamp, one place lit. At most one per page.",
-        cites: ["concept.primitives.cone", "concept.primitives.pool", "concept.primitives.cut-off"],
-      },
-      {
-        name: "Cut-off field",
-        file: "cut-off-field.svg",
-        ground: "Night",
-        ink: "Sodium",
-        construction: "A full-width Sodium field hanging from the top edge, stopping at one hard horizontal line.",
-        use: "Headers, slide titles and the top of the business card: where Sodium’s quarter of a layout goes.",
-        cites: ["concept.primitives.cut-off", "equity.assets.sodium"],
-      },
-      {
-        name: "The walk",
-        file: "walk.svg",
-        ground: "Night",
-        ink: "Sodium",
-        construction: "One pool per step at the interval; the current step is a filled pool, the rest are outlines.",
-        use: "Progress and position: website sections, deck chapters, a project’s stages.",
-        cites: ["concept.primitives.pool", "concept.primitives.interval"],
-      },
-    ],
-    layout: [
-      "Night carries the page. Sodium arrives as fields or pools, about a quarter of the area, never as a tint, gradient or glow.",
-      "Sodium fields hang from the top edge or a full-width line and stop at one hard horizontal edge. No rounded corners, no fades.",
+  device: {
+    name: "Pool row",
+    file: "pool-row.svg",
+    ground: "Night",
+    ink: "Sodium",
+    construction: "3:1 Sodium pools in a row, each one pool-width from the next, running off both edges: a lit street seen from above.",
+    use: "The walk home, as a pattern. It runs along the foot of hoardings, the edge of cards, the bottom of the website and the bottom of posts.",
+    rules: [
+      "Night carries the page. Sodium arrives only as pools, about a quarter of the area, never as a tint, gradient or glow.",
       "Pools repeat at the interval: the gap between two pools is one pool wide. Never closer, never scattered.",
-      "At most one beam per page, falling from the top edge onto its pool, at the lamp symbol’s angle.",
-      "Type sits in the dark between pools, or in Night on a Sodium field; never across a pool’s edge.",
-      "In imagery, light behaves like light: it falls off across the surfaces it lands on, stops at a hard cut-off and casts hard shadows, under a fine grain. It never glows, blooms or blurs past its edge. Sodium as a layout color stays flat.",
+      "The row runs off both edges, so it reads as a street that continues.",
+      "Type sits in the dark above the row, never across a pool’s edge.",
     ],
+    applications: [
+      {
+        kind: "signage",
+        why: "Hoardings around projects under construction, seen by the public every day.",
+        ground: "Night",
+        ink: "Stone",
+        copy: { headline: "The bridge is lit from the handrail, so the river stays dark.", lines: ["Lighting by Okonkwo-Marchetti", "Switch-on March 2027"] },
+      },
+      {
+        kind: "business-card",
+        why: "Handed to architects on site and at reviews.",
+        ground: "Night",
+        ink: "Stone",
+        copy: { name: "Adaeze Okonkwo", role: "Partner, lighting designer", lines: ["adaeze@okonkwo-marchetti.com", "+44 20 7946 0321"] },
+      },
+      {
+        kind: "website",
+        why: "The new website, due March 2027 with the bridge competition.",
+        ground: "Night",
+        ink: "Stone",
+        copy: { headline: "We design the light in buildings people remember at night.", lines: ["Work", "Studio", "Contact"] },
+      },
+      {
+        kind: "social-post",
+        why: "Announcing a project the night after it is switched on.",
+        ground: "Night",
+        ink: "Stone",
+        copy: { headline: "Switched on last night: the Ashby stair, at 2700 K.", lines: ["okonkwo-marchetti.com"] },
+      },
+    ],
+    cites: ["concept.primitives.pool", "concept.primitives.interval", "concept.idea"],
   },
   type: {
     display: {
@@ -214,6 +216,7 @@ export default defineBrand({
       "Sodium fields have hard edges and stop at a horizontal line, like a cut-off.",
       "Units written out with a space: 2700 K.",
     ],
+    fit: "Big Shoulders was drawn from the lettering on Chicago’s street signs, so the display face comes from the same streets the brand is about, and its narrow capitals fit the long double surname on one line. Chivo is a sturdy grotesque with clear figures, for the numbers the studio works in: lux, kelvin and fixture counts.",
     wordmark: {
       library: "big-shoulders",
       family: "Big Shoulders",
@@ -224,21 +227,6 @@ export default defineBrand({
       ],
       cites: ["concept.primitives.cone", "concept.primitives.cut-off"],
     },
-  },
-  imagery: {
-    main: "hard-light",
-    second: "symbol-render",
-    why: "Light with hard edges and no glow: the cut-off, the cone and the pool drawn as the studio draws light. Light and grain fields are ruled out by dark-and-glow (gloomy) and the never-graded Sodium; the symbol pattern repeats like a fixture catalog (spec-sheet).",
-    images: [
-      { name: "cover", type: "hard-light", width: 3200, height: 1800, seed: 1, ground: "Night", ink: "Sodium", surface: "Stone", for: "cover" },
-      { name: "website-hero", type: "hard-light", width: 2520, height: 1080, seed: 2, ground: "Night", ink: "Sodium", surface: "Stone", for: "website" },
-      { name: "competition-board", type: "hard-light", width: 2376, height: 3364, seed: 3, ground: "Night", ink: "Sodium", surface: "Stone", for: "poster" },
-      { name: "hoarding", type: "hard-light", width: 4000, height: 1000, seed: 4, ground: "Night", ink: "Sodium", surface: "Stone", for: "signage" },
-      { name: "social-post", type: "hard-light", width: 1080, height: 1350, seed: 5, ground: "Night", ink: "Sodium", surface: "Stone", for: "social-post" },
-      { name: "symbol", type: "symbol-render", width: 2048, height: 2048, seed: 7, ground: "Night", ink: "Sodium", surface: "Stone", for: "app-icon" },
-      { name: "deck-cover", type: "hard-light", width: 3200, height: 1800, seed: 6, ground: "Night", ink: "Sodium", surface: "Stone", for: "deck" },
-    ],
-    cites: ["concept.primitives.cut-off", "concept.primitives.cone", "concept.primitives.pool", "category.conventions.dark-and-glow"],
   },
   reveal: { mark: "primary", compactMark: "symbol.svg", ground: "Sodium", ink: "Night" },
 });

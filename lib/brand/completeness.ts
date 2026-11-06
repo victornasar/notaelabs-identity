@@ -1,26 +1,37 @@
 /**
- * Whether a brand is a complete brand book: each of the nine parts in
+ * Whether a brand is a complete brand book: each of the eight sections in
  * `parts` is either there in full or marked not applicable with a reason.
- * Node only: it reads the brand's work/ and images/ folders. Used by
- * `pnpm check-brand`, the last gate of /brand.
+ * Node only: it reads the mockup library. Used by `pnpm check-brand`, the
+ * last gate of /brand.
  */
 
-import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { parts, type Brand, type Part } from "./schema";
+import { parts, physicalKinds, type Brand, type Part } from "./schema";
 
 export type PartReport =
   | { part: Part; status: "complete" }
   | { part: Part; status: "missing"; missing: string[] }
   | { part: Part; status: "not applicable"; reason: string };
 
-/** Credits for the reference photographs, one per file in `images/`. */
-export type ImageCredit = { file: string; photographer: string; source: string; license: string };
+/** A photo in `mockups/library.json`: a real surface with a blank area the marks go on. */
+export type MockupPhoto = {
+  id: string;
+  /** File name inside `mockups/`. */
+  file: string;
+  photographer: string;
+  source: string;
+  license: string;
+  /** The blank area's corners in image pixels: top left, top right, bottom right, bottom left. */
+  corners: [number, number][];
+  /** What the surface is and suits: "hoarding", "night", "architecture". */
+  tags: string[];
+};
 
 const root = process.cwd();
 
 // The least a professional book shows of each list.
-const least = { values: 3, voiceLines: 3, rewrites: 2, misuse: 4, grounds: 2, scale: 4, references: 6, applications: 4 };
+const least = { voiceLines: 3, misuse: 4, grounds: 2, scale: 4, physical: 2, digital: 2 };
 
 function need(out: string[], ok: unknown, what: string) {
   if (!ok) out.push(what);
@@ -32,57 +43,59 @@ function count(out: string[], list: unknown[] | undefined, min: number, what: st
 }
 
 const checks: Record<Part, (brand: Brand) => string[]> = {
-  strategy(brand) {
+  intro(brand) {
     const out: string[] = [];
-    const { story, category } = brand;
     need(out, brand.positioning?.trim(), "positioning.");
-    need(out, story?.mission?.trim(), "story.mission.");
-    need(out, story?.vision?.trim(), "story.vision.");
-    count(out, story?.values, least.values, "story.values");
-    need(out, story?.audience?.trim(), "story.audience.");
-    count(out, story?.personality, 2, "story.personality");
-    const described = new Set((category.identities ?? []).map((i) => i.name));
-    for (const name of category.competitors) {
-      need(out, described.has(name), `category.identities: how ${name}'s identity looks.`);
+    need(out, brand.story?.mission?.trim(), "story.mission.");
+    return out;
+  },
+
+  wordmark(brand) {
+    const out: string[] = [];
+    need(out, brand.marks.primary.meaning?.trim(), "marks.primary.meaning: what the wordmark means.");
+    need(out, brand.type.wordmark, "type.wordmark: the font it was drawn from and what changed.");
+    count(out, brand.marks.misuse, least.misuse, "marks.misuse");
+    return out;
+  },
+
+  "logo-mark"(brand) {
+    const out: string[] = [];
+    const { symbol } = brand.marks;
+    need(out, symbol, "marks.symbol.");
+    need(out, symbol?.meaning?.trim(), "marks.symbol.meaning: what the mark represents.");
+    count(out, brand.marks.on, least.grounds, "marks.on (light and dark grounds)");
+    need(out, brand.marks.minimumSize.print, "marks.minimumSize.print.");
+    return out;
+  },
+
+  "graphic-device"(brand) {
+    const out: string[] = [];
+    const { device } = brand;
+    if (!device) return ["device: the brand's one graphic device and its applications."];
+    count(out, device.rules, 1, "device.rules");
+    const kinds = new Set(device.applications.map((a) => a.kind));
+    count(out, [...kinds].filter((k) => physicalKinds.includes(k)), least.physical, "device.applications (physical)");
+    count(out, [...kinds].filter((k) => !physicalKinds.includes(k)), least.digital, "device.applications (digital)");
+    return out;
+  },
+
+  mockup(brand) {
+    const out: string[] = [];
+    const { mockup } = brand;
+    if (!mockup) return ["mockup: a photo from mockups/library.json and the mark placed on it."];
+    const libraryFile = join(root, "mockups", "library.json");
+    const library: MockupPhoto[] = existsSync(libraryFile) ? JSON.parse(readFileSync(libraryFile, "utf8")) : [];
+    const photo = library.find((p) => p.id === mockup.photo);
+    need(out, photo, `mockups/library.json entry "${mockup.photo}".`);
+    if (photo) {
+      need(out, existsSync(join(root, "mockups", photo.file)), `mockups/${photo.file}.`);
+      need(out, photo.photographer && photo.source && photo.license, `credit for mockup "${photo.id}".`);
     }
+    need(out, existsSync(join(root, "brands", brand.slug, "marks", mockup.mark)), `marks/${mockup.mark}.`);
     return out;
   },
 
-  "creative-direction"(brand) {
-    const out: string[] = [];
-    const work = join(root, "brands", brand.slug, "work");
-    const routes = existsSync(join(work, "routes"))
-      ? readdirSync(join(work, "routes")).filter((l) => existsSync(join(work, "routes", l, "route.ts")))
-      : [];
-    count(out, routes, 2, "routes in work/routes");
-    const scores = join(work, "scores.md");
-    need(out, existsSync(scores) && /^picked:\s*[abc]\s*$/m.test(readFileSync(scores, "utf8")), "a picked route in work/scores.md.");
-    return out;
-  },
-
-  logo(brand) {
-    const out: string[] = [];
-    const { marks } = brand;
-    need(out, marks.symbol, "marks.symbol, for icons and small spaces.");
-    count(out, marks.alternates, 1, "marks.alternates (horizontal or stacked lockups)");
-    count(out, marks.on, least.grounds, "marks.on (light and dark grounds)");
-    count(out, marks.misuse, least.misuse, "marks.misuse");
-    need(out, marks.minimumSize.print, "marks.minimumSize.print.");
-    return out;
-  },
-
-  type(brand) {
-    const out: string[] = [];
-    const { scale, rules } = brand.type;
-    count(out, scale.steps, least.scale, "type.scale.steps");
-    for (const step of scale.steps.filter((s) => s.face === "display" && s.size > 40)) {
-      need(out, step.mobileSize, `type.scale.${step.id}.mobileSize.`);
-    }
-    count(out, rules, 1, "type.rules");
-    return out;
-  },
-
-  color(brand) {
+  colors(brand) {
     const out: string[] = [];
     for (const color of brand.colors) {
       need(out, color.cmyk, `colors.${color.name}.cmyk.`);
@@ -93,44 +106,21 @@ const checks: Record<Part, (brand: Brand) => string[]> = {
     return out;
   },
 
-  "graphic-language"(brand) {
+  typography(brand) {
     const out: string[] = [];
-    count(out, brand.graphicLanguage?.elements, 1, "graphicLanguage.elements");
-    count(out, brand.graphicLanguage?.layout, 1, "graphicLanguage.layout");
-    return out;
-  },
-
-  photography(brand) {
-    const out: string[] = [];
-    const photo = brand.photography;
-    if (!photo) return ["photography: style, subjects, lighting, composition, treatment, cropping, avoid, references."];
-    count(out, photo.subjects, 1, "photography.subjects");
-    count(out, photo.avoid, 1, "photography.avoid");
-    count(out, photo.references, least.references, "photography.references");
-    const dir = join(root, "brands", brand.slug, "images");
-    const creditsFile = join(dir, "credits.json");
-    const credits: ImageCredit[] = existsSync(creditsFile) ? JSON.parse(readFileSync(creditsFile, "utf8")) : [];
-    for (const file of photo.references) {
-      need(out, existsSync(join(dir, file)), `images/${file}.`);
-      const credit = credits.find((c) => c.file === file);
-      need(out, credit?.photographer && credit.source && credit.license, `images/credits.json entry for ${file}.`);
+    const { scale, fit } = brand.type;
+    need(out, fit?.trim(), "type.fit: why the faces fit the brand.");
+    count(out, scale.steps, least.scale, "type.scale.steps");
+    for (const step of scale.steps.filter((s) => s.face === "display" && s.size > 40)) {
+      need(out, step.mobileSize, `type.scale.${step.id}.mobileSize.`);
     }
     return out;
   },
 
-  applications(brand) {
+  closing(brand) {
     const out: string[] = [];
-    const kinds = new Set((brand.applications ?? []).map((a) => a.kind));
-    count(out, [...kinds], least.applications, "applications (distinct kinds)");
-    return out;
-  },
-
-  guidelines(brand) {
-    const out: string[] = [];
-    const { voice } = brand;
-    count(out, voice?.traits, 2, "voice.traits");
-    count(out, voice?.lines, least.voiceLines, "voice.lines (do and don't)");
-    count(out, voice?.rewrites, least.rewrites, "voice.rewrites");
+    count(out, brand.voice?.lines, least.voiceLines, "voice.lines (write this, not that)");
+    need(out, brand.voice?.signoff?.trim(), "voice.signoff.");
     return out;
   },
 };

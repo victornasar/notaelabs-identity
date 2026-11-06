@@ -131,6 +131,8 @@ export type BrandMark = Cited & {
   name: string;
   /** Why this version exists, in one line. */
   use: string;
+  /** What the mark means or represents, for the book: the idea it is drawn from. */
+  meaning?: string;
 };
 
 export type Marks = {
@@ -198,6 +200,8 @@ export type TypeSystem = {
   /** Case and setting rules, one per line: "Headlines in sentence case, never all caps". */
   rules: string[];
   wordmark?: WordmarkSource;
+  /** Why these faces fit the brand, in a few sentences. */
+  fit?: string;
 };
 
 export type VoiceTrait = { trait: string; means: string; doesNotMean: string };
@@ -229,56 +233,24 @@ export type GraphicElement = Cited & {
   use: string;
 };
 
-export type GraphicLanguage = {
-  elements: GraphicElement[];
-  /** Layout principles, one per line: grid, margins, where fields stop. */
-  layout: string[];
+/** The brand's one graphic device, and the applications that show it at work. */
+export type GraphicDevice = GraphicElement & {
+  /** How it is used, one rule per line. */
+  rules: string[];
+  /** At least two physical and two digital pieces. */
+  applications: Application[];
 };
 
-export type Photography = Cited & {
-  /** The style in a sentence. */
-  style: string;
-  subjects: string[];
-  lighting: string;
-  composition: string;
-  /** Color and grading applied to images. */
-  treatment: string;
-  cropping: string;
-  /** What never to show. */
-  avoid: string[];
-  /** File names in the brand's `images/` folder; each needs an entry in `images/credits.json`. */
-  references: string[];
-};
-
-/** The kinds of image the engine makes in code, from a brand's palette, symbol and graphic language. */
-export const imageTypes = ["light-field", "grain-field", "symbol-render", "hard-light", "symbol-pattern"] as const;
-export type ImageType = (typeof imageTypes)[number];
-
-/** One generated image, made at the size an application needs. */
-export type BrandImage = {
-  /** File stem in the brand's `images/` folder: `cover` writes `images/cover.png`. */
-  name: string;
-  type: ImageType;
-  width: number;
-  height: number;
-  /** Change it to re-roll this image alone. */
-  seed: number;
-  /** Color names. */
-  ground: string;
+/** A photograph of a real surface from the mockup library, carrying the marks. */
+export type Mockup = {
+  /** The photo's id in `mockups/library.json`. */
+  photo: string;
+  /** The mark file placed on it, inside the brand's `marks/` folder. */
+  mark: string;
+  /** Color names: the ink the mark is printed in on the surface. */
   ink: string;
-  /** The color of the surfaces light lands on, in a scene; the ground's when absent. */
-  surface?: string;
-  /** What the image is made for: an application kind, or "cover". */
-  for: string;
-};
-
-export type Imagery = Cited & {
-  /** The type most images use, and at most one second type. */
-  main: ImageType;
-  second?: ImageType;
-  /** Why the strategy picks these types, and rules the others out. */
+  /** Why this surface suits the brand. */
   why: string;
-  images: BrandImage[];
 };
 
 /** A kind of real-world application the renderer can draw. */
@@ -294,6 +266,9 @@ export type ApplicationKind =
   | "app-icon"
   | "dashboard";
 
+/** Kinds you can hold or stand in front of; the rest are on screens. */
+export const physicalKinds: ApplicationKind[] = ["business-card", "letterhead", "signage", "poster"];
+
 export type Application = {
   kind: ApplicationKind;
   /** Why the client needs it, from the brief. */
@@ -305,17 +280,16 @@ export type Application = {
   copy: Record<string, string | string[]>;
 };
 
-/** The nine parts of a complete brand book, in presentation order. */
+/** The eight sections of a brand book, in presentation order. */
 export const parts = [
-  "strategy",
-  "creative-direction",
-  "logo",
-  "type",
-  "color",
-  "graphic-language",
-  "photography",
-  "applications",
-  "guidelines",
+  "intro",
+  "wordmark",
+  "logo-mark",
+  "graphic-device",
+  "mockup",
+  "colors",
+  "typography",
+  "closing",
 ] as const;
 export type Part = (typeof parts)[number];
 
@@ -338,9 +312,12 @@ export type Brand = Strategy & {
     archetype?: string;
   };
   voice?: {
-    traits: VoiceTrait[];
+    traits?: VoiceTrait[];
+    /** Write this, not that. The closing shows three. */
     lines: { do: string; dont: string }[];
-    rewrites: { before: string; after: string }[];
+    rewrites?: { before: string; after: string }[];
+    /** The book's last line, in the brand's voice. */
+    signoff?: string;
   };
   marks: Marks;
   colors: BrandColor[];
@@ -349,10 +326,8 @@ export type Brand = Strategy & {
   /** Other arrangements of the palette, such as a day mode beside the default. */
   colorModes?: ColorMode[];
   type: TypeSystem;
-  graphicLanguage?: GraphicLanguage;
-  imagery?: Imagery;
-  photography?: Photography;
-  applications?: Application[];
+  device?: GraphicDevice;
+  mockup?: Mockup;
   /** Parts of the book this brand doesn't need, each with the reason. */
   notApplicable?: Partial<Record<Part, string>>;
   reveal: {
@@ -466,8 +441,8 @@ export function problems(label: string, strategy: Strategy, choices: VisualChoic
 
 /**
  * Checks for the parts a route doesn't have: the colors that mark grounds,
- * modes and applications name exist and pass contrast, mode proportions sum to
- * 100, and graphic elements and photography cite the strategy.
+ * modes, the device, its applications and the mockup name exist and pass
+ * contrast, mode proportions sum to 100, and the device cites the strategy.
  */
 function bookProblems(brand: Brand): string[] {
   const out: string[] = [];
@@ -497,38 +472,26 @@ function bookProblems(brand: Brand): string[] {
     if (Math.round(total) !== 100) out.push(`${where} proportions sum to ${total}, not 100.`);
   }
 
-  for (const element of brand.graphicLanguage?.elements ?? []) {
-    color(`graphicLanguage.${element.name}`, element.ground);
-    color(`graphicLanguage.${element.name}`, element.ink);
-  }
-
-  for (const image of brand.imagery?.images ?? []) {
-    color(`imagery.${image.name}`, image.ground);
-    color(`imagery.${image.name}`, image.ink);
-    const { main, second } = brand.imagery!;
-    if (image.type !== main && image.type !== second) out.push(`imagery.${image.name} is ${image.type}, not the main or second type.`);
-  }
-
-  const valid = citable(brand);
-  const cited: [string, Cited][] = [
-    ...(brand.graphicLanguage?.elements ?? []).map((e): [string, Cited] => [`graphicLanguage.${e.name}`, e]),
-    ...(brand.imagery ? [["imagery", brand.imagery] as [string, Cited]] : []),
-    ...(brand.photography ? [["photography", brand.photography] as [string, Cited]] : []),
-  ];
-  for (const [where, choice] of cited) {
-    if (choice.cites.length === 0) out.push(`${where} cites nothing.`);
-    for (const cite of choice.cites) {
-      if (!valid.has(cite)) out.push(`${where} cites "${cite}", which is not in the strategy.`);
+  const { device, mockup } = brand;
+  if (device) {
+    color("device", device.ground);
+    color("device", device.ink);
+    if (device.cites.length === 0) out.push("device cites nothing.");
+    const valid = citable(brand);
+    for (const cite of device.cites) {
+      if (!valid.has(cite)) out.push(`device cites "${cite}", which is not in the strategy.`);
     }
   }
 
-  for (const app of brand.applications ?? []) {
-    const where = `applications.${app.kind}`;
+  for (const app of device?.applications ?? []) {
+    const where = `device.applications.${app.kind}`;
     const [ground, ink] = [color(where, app.ground), color(where, app.ink)];
     if (ground && ink && !ink.pairs?.some((p) => p.on === ground.name)) {
       out.push(`${where} sets ${ink.name} on ${ground.name}, a pairing the palette doesn't list.`);
     }
   }
+
+  if (mockup) color("mockup", mockup.ink);
   return out.map((problem) => `${brand.slug}: ${problem}`);
 }
 

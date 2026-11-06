@@ -43,36 +43,27 @@ function grounds(colors: BrandColor[], listed?: { ground: string; ink: string }[
   return pairs.map((p) => ({ ...p, ratio: contrast(p.ground.hex, p.ink.hex) }));
 }
 
-export function LogoSection({ active, number }: { active: ActiveBrand; number: number }) {
+/** The wordmark: what it means, how it was drawn, the room it needs and how not to use it. */
+export function WordmarkSection({ active, number }: { active: ActiveBrand; number: number }) {
   const { brand, svg, byRole } = active;
   const { marks, type } = brand;
   const ground = byRole("ground")!;
   const ink = byRole("ink")!;
-  const family: BrandMark[] = [marks.primary, ...(marks.symbol ? [marks.symbol] : []), ...(marks.alternates ?? [])];
   const primary = svg(marks.primary);
-  const small = [marks.primary, ...(marks.symbol ? [marks.symbol] : [])];
 
   return (
-    <section id="logo" className={book.section} aria-labelledby="logo-title">
-      <SectionHeader id="logo" number={number} title="Logo">
-        <p>{marks.primary.use}</p>
+    <section id="wordmark" className={book.section} aria-labelledby="wordmark-title">
+      <SectionHeader id="wordmark" number={number} title="Wordmark">
+        <p>{marks.primary.meaning ?? marks.primary.use}</p>
       </SectionHeader>
 
-      <ul className={styles.family}>
-        {family.map((m, i) => (
-          <li key={m.file} className={styles.member} data-lead={i === 0 || undefined}>
-            <div className={styles.tile} data-edge style={{ background: ground.hex, color: ink.hex }}>
-              <Mark className={styles.fit} svg={svg(m)} label={`${brand.name} ${m.name.toLowerCase()}`} align="xMidYMid" />
-            </div>
-            <p className={styles.memberName}>{m.name}</p>
-            <p className={book.quiet}>{m.use}</p>
-          </li>
-        ))}
-      </ul>
+      <div className={`${styles.tile} ${styles.hero}`} data-edge style={{ background: ground.hex, color: ink.hex }}>
+        <Mark className={styles.fit} svg={primary} label={brand.name} align="xMidYMid" />
+      </div>
 
       {type.wordmark ? (
         <>
-          <Subhead label="Construction" title="How the wordmark is drawn">
+          <Subhead label="Construction" title="How it is drawn">
             {type.wordmark.changes.length
               ? `Set in ${type.wordmark.family} (${type.wordmark.setting}), then changed by hand.`
               : `Set in ${type.wordmark.family} (${type.wordmark.setting}), as it comes.`}
@@ -88,23 +79,6 @@ export function LogoSection({ active, number }: { active: ActiveBrand; number: n
         </>
       ) : null}
 
-      <Subhead label="Grounds" title="Where it sits">
-        Every ground the marks may sit on, with the one ink they take there.
-      </Subhead>
-      <ul className={styles.grounds}>
-        {grounds(brand.colors, marks.on).map(({ ground: g, ink: k, ratio }) => (
-          <li key={`${g.name}-${k.name}`}>
-            <div className={styles.tile} style={{ background: g.hex, color: k.hex }} data-edge={g === ground || undefined}>
-              <Mark className={styles.fit} svg={primary} label="" align="xMidYMid" />
-            </div>
-            <p className={styles.groundName}>
-              {k.name} on {g.name}
-            </p>
-            <p className={`label ${book.quiet}`}>{ratio.toFixed(2)}:1</p>
-          </li>
-        ))}
-      </ul>
-
       <Subhead label="Clear space" title="Room to breathe">
         Keep {marks.clearSpace.basis} clear on every side ({marks.clearSpace.ratio} × the mark’s
         height). Nothing enters the hatched area.
@@ -119,23 +93,6 @@ export function LogoSection({ active, number }: { active: ActiveBrand; number: n
           </div>
         </figure>
       </div>
-
-      <Subhead label="Minimum size" title="How small it goes">
-        On screen: {marks.minimumSize.screen}.
-        {marks.minimumSize.print ? ` In print: ${marks.minimumSize.print}.` : ""}
-      </Subhead>
-      <ul className={book.rows}>
-        {SIZES.map((size) => (
-          <li key={size} className={`grid ${book.row} ${styles.sizeRow}`}>
-            <p className={`label ${book.rowLabel}`}>{size} px</p>
-            <div className={styles.sizes} style={{ "--h": `${size}px` } as CSSProperties}>
-              {small.map((m) => (
-                <Mark key={m.file} className={styles.sized} svg={svg(m)} label="" />
-              ))}
-            </div>
-          </li>
-        ))}
-      </ul>
 
       <Subhead label="Misuse" title="Never">
         The marks are drawn once and used as they are.
@@ -160,6 +117,71 @@ export function LogoSection({ active, number }: { active: ActiveBrand; number: n
           ))}
         </ul>
       ) : null}
+    </section>
+  );
+}
+
+/** The logo mark: what it represents, its lockups, the grounds it sits on and how small it goes. */
+export function LogoMarkSection({ active, number }: { active: ActiveBrand; number: number }) {
+  const { brand, svg, byRole } = active;
+  const { marks } = brand;
+  if (!marks.symbol) return null;
+  const ground = byRole("ground")!;
+  const ink = byRole("ink")!;
+  const family: BrandMark[] = [marks.symbol, ...(marks.alternates ?? [])];
+  const symbol = svg(marks.symbol);
+
+  return (
+    <section id="logo-mark" className={book.section} aria-labelledby="logo-mark-title">
+      <SectionHeader id="logo-mark" number={number} title="Logo mark">
+        <p>{marks.symbol.meaning ?? marks.symbol.use}</p>
+      </SectionHeader>
+
+      <ul className={styles.family}>
+        {family.map((m, i) => (
+          <li key={m.file} className={styles.member} data-lead={i === 0 || undefined}>
+            <div className={styles.tile} data-edge style={{ background: ground.hex, color: ink.hex }}>
+              <Mark className={styles.fit} svg={svg(m)} label={`${brand.name} ${m.name.toLowerCase()}`} align="xMidYMid" />
+            </div>
+            <p className={styles.memberName}>{m.name}</p>
+            <p className={book.quiet}>{m.use}</p>
+          </li>
+        ))}
+      </ul>
+
+      <Subhead label="Grounds" title="Where it sits">
+        Every ground the marks may sit on, with the one ink they take there.
+      </Subhead>
+      <ul className={styles.grounds}>
+        {grounds(brand.colors, marks.on).map(({ ground: g, ink: k, ratio }) => (
+          <li key={`${g.name}-${k.name}`}>
+            <div className={styles.tile} style={{ background: g.hex, color: k.hex }} data-edge={g === ground || undefined}>
+              <Mark className={styles.fit} svg={symbol} label="" align="xMidYMid" />
+            </div>
+            <p className={styles.groundName}>
+              {k.name} on {g.name}
+            </p>
+            <p className={`label ${book.quiet}`}>{ratio.toFixed(2)}:1</p>
+          </li>
+        ))}
+      </ul>
+
+      <Subhead label="Minimum size" title="How small it goes">
+        On screen: {marks.minimumSize.screen}.
+        {marks.minimumSize.print ? ` In print: ${marks.minimumSize.print}.` : ""}
+      </Subhead>
+      <ul className={book.rows}>
+        {SIZES.map((size) => (
+          <li key={size} className={`grid ${book.row} ${styles.sizeRow}`}>
+            <p className={`label ${book.rowLabel}`}>{size} px</p>
+            <div className={styles.sizes} style={{ "--h": `${size}px` } as CSSProperties}>
+              {[marks.symbol!, marks.primary].map((m) => (
+                <Mark key={m.file} className={styles.sized} svg={svg(m)} label="" />
+              ))}
+            </div>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }

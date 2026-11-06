@@ -1,26 +1,28 @@
+import { ClosingSection } from "@/components/shell/closing-section";
 import { ColorSection } from "@/components/shell/color-section";
-import { GraphicsSection } from "@/components/shell/graphics-section";
+import { DeviceSection } from "@/components/shell/device-section";
 import { IndexBar, type Section } from "@/components/shell/index-bar";
-import { LogoSection } from "@/components/shell/logo-section";
+import { IntroSection } from "@/components/shell/intro-section";
+import { LogoMarkSection, WordmarkSection } from "@/components/shell/logo-section";
 import { Mark } from "@/components/shell/mark";
 import { Reveal } from "@/components/shell/reveal";
-import { StorySection } from "@/components/shell/story-section";
 import { TypeSection } from "@/components/shell/type-section";
-import { VoiceSection } from "@/components/shell/voice-section";
 import { getBrand } from "@/lib/brand/active";
 
 export default async function BrandPage({ params }: PageProps<"/[brand]">) {
   const active = getBrand((await params).brand);
   const { brand, svg } = active;
 
-  // Presentation order: why, then the identity, then how to write it.
+  // The book's eight sections, in order; the reveal is the intro's cover. A section
+  // the brand has nothing for yet is left out.
   const sections: Section[] = [
-    { id: "story", label: "Story" },
-    { id: "logo", label: "Logo" },
-    { id: "type", label: "Type" },
-    { id: "color", label: "Color" },
-    ...(brand.graphicLanguage ? [{ id: "graphics", label: "Graphics" }] : []),
-    ...(brand.voice ? [{ id: "voice", label: "Voice" }] : []),
+    { id: "intro", label: "Intro" },
+    { id: "wordmark", label: "Wordmark" },
+    ...(brand.marks.symbol ? [{ id: "logo-mark", label: "Logo mark" }] : []),
+    ...(brand.device ? [{ id: "device", label: "Device" }] : []),
+    { id: "color", label: "Colors" },
+    { id: "type", label: "Typography" },
+    ...(brand.voice ? [{ id: "closing", label: "Closing" }] : []),
   ];
   const number = (id: string) => sections.findIndex((s) => s.id === id) + 1;
 
@@ -37,12 +39,13 @@ export default async function BrandPage({ params }: PageProps<"/[brand]">) {
         sections={sections}
       />
       <main>
-        <StorySection active={active} number={number("story")} />
-        <LogoSection active={active} number={number("logo")} />
-        <TypeSection active={active} number={number("type")} />
+        <IntroSection active={active} number={number("intro")} />
+        <WordmarkSection active={active} number={number("wordmark")} />
+        <LogoMarkSection active={active} number={number("logo-mark")} />
+        <DeviceSection active={active} number={number("device")} />
         <ColorSection active={active} number={number("color")} />
-        <GraphicsSection active={active} number={number("graphics")} />
-        <VoiceSection active={active} number={number("voice")} />
+        <TypeSection active={active} number={number("type")} />
+        <ClosingSection active={active} number={number("closing")} />
       </main>
     </>
   );
