@@ -1,6 +1,6 @@
 ---
 slug: okonkwo
-status: interviewing
+status: approved
 ---
 # Okonkwo-Marchetti Architectural Lighting Studio: brief
 
@@ -8,27 +8,27 @@ Okonkwo-Marchetti is an invented client, kept to test the generator and the rend
 
 ## Brief so far
 
-1. Category: proposed: architectural lighting design. Not confirmed.
-2. Three competitors: proposed: Speirs Major, Arup Lighting, L'Observatoire International. Their identities are not described.
-3. Audience: proposed from Edition 1: architects and developers who already have the building. Not confirmed.
-4. Equity: open. Edition 1 has the two surnames on one line, Sodium orange, the Limestone and Basalt day and night pair, Filament yellow, Mercury teal, and the voice traits Warm and Exacting.
-5. Never: proposed from Edition 1: uplighting everything, color-changing LEDs as a personality, darkness treated as failure. Not yet in words.
-6. Budget tier: open.
-7. Deadline: open.
+1. Category: an independent architectural lighting design studio, designing the light in buildings and public spaces from concept to commissioning. Not a fixture manufacturer, not an electrical engineer, sells no products. (answered)
+2. Three competitors: Speirs Major, Arup Lighting, L'Observatoire International. Their identities are deliberately not described, since the studio is invented. (answered)
+3. Audience: architects and developers sign. Clients' marketing teams, planning committees and the public see the work afterward, mostly at night and in photographs. (answered)
+4. Equity: the mark is *Okonkwo-Marchetti*, with "Architectural Lighting Studio" as a separate descriptor. Keep the one-line surnames, Sodium, and the voice traits Warm and Exacting. Evolve the Limestone and Basalt day and night pair. Drop Filament and Mercury unless a route earns them. (answered)
+5. Never: spectacular (facades that change color every few seconds), technical (fixture catalogs and spec sheets), gloomy (black websites with glowing hero photography). (answered)
+6. Budget tier: £40–70k, for an identity, a website system and stationery. (answered)
+7. Deadline: March 2027, for a new website and a printed submission to a competition to relight a city bridge. (answered)
 
 ## Round 1
 
 1. **[Category]** What does the studio do, in the words an architect would use, and what is it not?
    *Proposed:* an independent lighting design studio that designs the light in buildings and public spaces (lobbies, stairs, bridges, streets) from concept to commissioning. It is not a fixture manufacturer and not an electrical engineering firm, and it sells no products.
-   **Answer:**
+   **Answer:** Accepted as proposed.
 
 2. **[Competitors]** Who does an architect also shortlist, and how does each one's identity look to you?
    *Proposed:* Speirs Major, Arup Lighting and L'Observatoire International. Because the studio is invented, their identities can stay undescribed; the scoring will then mark that criterion "not described" rather than guess.
-   **Answer:**
+   **Answer:** Accepted as proposed.
 
 3. **[Audience]** Who signs, and who lives with the brand afterward?
    *Proposed:* architects and developers sign. Clients' marketing teams, planning committees and the public see the work afterward, mostly at night and in photographs.
-   **Answer:**
+   **Answer:** Accepted as proposed.
 
 4. **[Equity]** Which parts of Edition 1 stay, change or go? And does the mark have to carry the full name, *Okonkwo-Marchetti Architectural Lighting Studio*, or can it be the surnames alone?
    - the two surnames on one line, joined by the hyphen
@@ -37,18 +37,20 @@ Okonkwo-Marchetti is an invented client, kept to test the generator and the rend
    - Filament yellow and Mercury teal
    - the voice traits Warm and Exacting
    *Proposed:* the mark is *Okonkwo-Marchetti*, with "Architectural Lighting Studio" as a descriptor set separately. Keep the one-line surnames and Sodium. Evolve the day and night pair. Drop Filament and Mercury unless a route earns them. Keep both voice traits.
-   **Answer:**
+   **Answer:** Accepted as proposed.
 
 5. **[Never]** Three words the studio must never be, each with an example of a brand or a kind of work that is.
    *Proposed:* spectacular (facades that change color every few seconds), technical (fixture catalogs and spec sheets), gloomy (black websites with glowing hero photography).
-   **Answer:**
+   **Answer:** Accepted as proposed.
 
 6. **[Budget tier]** What would the studio pay for this identity?
    *Proposed:* £40–70k, a mid-size independent studio's fee for an identity, a website system and stationery.
-   **Answer:**
+   **Answer:** Accepted as proposed.
 
 7. **[Deadline]** When, and for what?
    *Proposed:* March 2027: a new website and a printed submission for a competition to relight a city bridge.
-   **Answer:**
+   **Answer:** Accepted as proposed.
 
 ## Approval
+
+2026-11-05, the user (playing the client): "accept go". Every round 1 proposal was accepted, and the brief was approved for strategy.
