@@ -1,8 +1,6 @@
-# Notae Labs
+# Notae Labs brand renderer
 
-The identity, as a site you run on your own machine. Nothing is hosted.
-
-Notae Labs turns a founder’s brief into a living brand site the team can use without us in the room.
+Turns a client's brand into a guidelines site they can share with their team. Every client is a folder of data and assets. The site is the same house shell, dressed in that client's marks, colors, and type.
 
 ## Run
 
@@ -11,43 +9,49 @@ pnpm install
 pnpm dev
 ```
 
-Open the local address Next prints.
-
-`pnpm build` writes the static pages. `pnpm lint` runs ESLint.
-
-## The site
-
-Six routes, in this order:
-
-1. **Story.** Who it is for, the personality, and what the brand refuses.
-2. **Voice.** Direct, specific, brief, with the lines we use.
-3. **Marks.** Wordmark, short wordmark, logomark, lockup, clear space, and misuse.
-4. **Color and type.** OKLCH for CSS, hex for files, process recipes for print.
-5. **Applications.** Engagement letter, this site, avatar and favicon, co-brand, method cover, email.
-6. **Rules and files.** The instructions, and the downloads.
-
-The signal color marks the route you are on.
-
-## Files
-
-Marks live in `public/marks/`. The color table is `public/notae-colors.txt`.
-
-Each mark has an SVG, a PDF, and PNGs at 16, 32, 180, and 512. The PNG number is the height of the art in pixels. `*-on-ink` files are the paper reversal.
-
-The logomark is for 16 pixels and above. The wordmark is for 32 pixels of height and above.
-
-## Rebuild the marks
-
-The wordmark is a drawn path. Source Serif 4 is the text face on the site, and it is not the logo.
-
-Outlines start from a Literata instance (opsz 72, wght 560), then the spacing is redrawn. The font file is not in this repo. Pass a `.ttf`, or place one at `/tmp/Literata-wordmark.ttf`.
+Open the local address Next prints. `/` shows the first brand. Every brand has its own path, such as `/okonkwo`, and the switcher in the corner flips between them. The switcher only appears in dev.
 
 ```bash
-pnpm marks /path/to/Literata-wordmark.ttf
+BRAND=okonkwo pnpm build
 ```
 
-The script writes the SVG, PNG, and PDF files in `public/marks/`.
+A build needs `BRAND`. It includes that one brand and nothing else, so no client's data ships in another client's site. `pnpm lint` runs ESLint.
+
+## Add a brand
+
+Make a folder in `brands/`:
+
+```
+brands/<slug>/
+  brand.ts      the brand, as data
+  fonts.ts      the display and text faces
+  fonts/        font files and their licenses
+  marks/        single-color SVGs
+```
+
+- **`brand.ts`** exports `defineBrand({...})`. The types in `lib/brand/schema.ts` list every field. The build fails if a required piece is missing: color proportions must sum to 100, and there must be a ground and an ink color.
+- **`fonts.ts`** loads two local fonts with `next/font/local`, using `--brand-display` and `--brand-text` as their variables. Give each font constant a name unique to the brand, such as `acmeDisplay`, then export them as `display` and `text`. Next names the font family after the constant, and dev loads every brand at once.
+- **Marks** are drawn in one color. The shell recolors them, so you do not need reversed versions.
+
+`brands/notae` and `brands/okonkwo` are the reference brands. Okonkwo-Marchetti is invented. It has a long name, no symbol, and five colors, to catch anything the shell assumes.
+
+## How it works
+
+- `scripts/brands.mjs` writes `brands/registry.generated.ts` before `dev` and `build`. In dev it includes every brand. With `--production` it includes only `BRAND`. The file is not committed.
+- `app/[brand]/` renders one long page. `next.config.ts` serves the selected brand at `/`.
+- `components/shell/` holds the sections. Brand colors arrive as CSS variables by role: `--ground`, `--ink`, `--accent`, and `--support`.
+- `lib/brand/color.ts` works out OKLCH, RGB, and WCAG contrast from each hex value, so contrast figures cannot go stale.
+
+## Status
+
+Built so far: the opening Reveal and the Color section.
+
+Still to build: Story, Voice, Logo, Type, Applications, and Downloads. Downloads will generate PNGs, favicons, a zip of every file, `brand.css`, `tokens.json`, and a `BRAND.md` for agents. After that come private hosted links for each client.
+
+`public/marks/` and `scripts/build-marks.mjs` belong to the old Notae-only site. They stay until the Downloads pipeline replaces them.
 
 ## License
 
 All rights reserved. The repository is public to read. It is not licensed for reuse.
+
+The fonts in `brands/*/fonts/` and `lib/fonts/` are under the SIL Open Font License. Each license file sits beside its font.
