@@ -114,7 +114,7 @@ export type FigmaBundle = {
   fonts: BundleFont[];
   colors: BundleColor[];
   textStyles: BundleTextStyle[];
-  type: { fit: string; faces: BundleFace[] };
+  type: { fit: string; faces: BundleFace[]; rules?: string[] };
   /** The caveat beside print values, when the brand has them. */
   printNote?: string;
   marks: {
@@ -124,6 +124,9 @@ export type FigmaBundle = {
     cover: string;
     /** Things never to do to the marks; `show` says how to draw one. */
     misuse: { rule: string; show?: MisuseShow }[];
+    /** Clear space as a share of the primary mark's height. */
+    clearSpace?: { ratio: number; basis: string };
+    minimumSize?: { screen: string; print?: string };
   };
   device?: {
     name: string;
@@ -281,6 +284,7 @@ export function buildBundle(brand: Brand, files: BundleFiles): FigmaBundle {
     textStyles,
     type: {
       fit: type.fit ?? "",
+      rules: type.rules ?? [],
       faces: (["display", "text", "mono"] as const).flatMap((face) => {
         const spec = type[face];
         return spec ? [{ face, kind: faceNames[face], family: spec.family, role: spec.role, weights: spec.weights }] : [];
@@ -299,6 +303,8 @@ export function buildBundle(brand: Brand, files: BundleFiles): FigmaBundle {
       variants: brand.marks.on ?? [],
       cover: coverFile(brand),
       misuse: (brand.marks.misuse ?? []).map((m) => (typeof m === "string" ? { rule: misuseRule(m) } : m)),
+      clearSpace: brand.marks.clearSpace,
+      minimumSize: brand.marks.minimumSize,
     },
     ...(device
       ? {

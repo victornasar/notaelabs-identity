@@ -116,10 +116,11 @@ describe("bookPlan", () => {
       ["06 Digital Applications", "06.1 Digital Applications · Website"],
       ["07 Marketing Applications", "07.1 Marketing Applications · Signage", "07.2 Marketing Applications · Business card", "07.3 Marketing Applications · Social post"],
       ["08 Brand Voice", "08.1 Brand Voice · Traits", "08.2 Brand Voice · Write this", "08.3 Brand Voice · Rewrites", "08.4 Brand Voice · Sign-off"],
+      ["09 Brand Guidelines", "09.1 Brand Guidelines · Logo", "09.2 Brand Guidelines · Color", "09.3 Brand Guidelines · Typography"],
     ]);
     assert.deepEqual(
       plan.sections.flatMap((s) => s.frames.map((f) => f.page)),
-      ["02", "03", "04", "06", "07", "08", "09", "10", "12", "13", "14", "16", "17", "18", "20", "21", "23", "25", "26", "27", "29", "30", "31", "32"],
+      ["02", "03", "04", "06", "07", "08", "09", "10", "12", "13", "14", "16", "17", "18", "20", "21", "23", "25", "26", "27", "29", "30", "31", "32", "34", "35", "36"],
     );
     assert.equal(plan.sections[2]?.frames[0]?.eyebrow, "03 · Color · Palette");
     assert.deepEqual(plan.display, { font: { family: "Big Shoulders", style: "ExtraBold" }, upper: true });
@@ -145,6 +146,17 @@ describe("bookPlan", () => {
     quiet.voice = { lines: [] };
     const parts = bookPlan(buildBundle(quiet, files)).sections.find((s) => s.divider.title === "Brand Voice");
     assert.equal(parts, undefined);
+  });
+
+  it("sums the rules up as spec sheets: clear space, sizes and misuses, every color value, each face's job", () => {
+    const { clearSpace, minimumSize, never, colors, faces, typeRules } = plan.guidelines;
+    assert.deepEqual(clearSpace, { ratio: 0.5, basis: "half the cap height" });
+    assert.equal(minimumSize?.print, "Wordmark 5 mm tall");
+    assert.equal(never.length, 4);
+    assert.deepEqual(colors.map((c) => [c.name, c.edge]), [["Night", true], ["Sodium", false], ["Stone", false]]);
+    assert.deepEqual(colors[1]?.values.map((v) => v.label), ["Hex", "RGB", "OKLCH", "CMYK", "Pantone"]);
+    assert.deepEqual(faces.map((f) => f.family), ["Big Shoulders", "Chivo"]);
+    assert.equal(typeRules[2], "Units written out with a space: 2700 K.");
   });
 
   it("shows the lockup on each approved ground, lightest first, with the accent eyebrow only on the brand's own", () => {
