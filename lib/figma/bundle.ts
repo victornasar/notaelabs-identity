@@ -104,6 +104,10 @@ export type FigmaBundle = {
   slug: string;
   name: string;
   edition: string;
+  /** The web address, for a browser bar and a post's handle. */
+  domain?: string;
+  /** What the brand is, as a post's account line names it. */
+  category?: string;
   intro: BundleIntro;
   fonts: BundleFont[];
   colors: BundleColor[];
@@ -245,6 +249,8 @@ export function buildBundle(brand: Brand, files: BundleFiles): FigmaBundle {
     slug: brand.slug,
     name: brand.name,
     edition: brand.edition,
+    ...(brand.domain ? { domain: brand.domain } : {}),
+    category: brand.category.name,
     intro: {
       positioning: brand.positioning,
       idea: brand.concept.idea,

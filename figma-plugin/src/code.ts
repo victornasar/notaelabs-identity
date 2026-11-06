@@ -14,6 +14,7 @@ import {
   missingFonts,
   nearFonts,
   pageName,
+  type AppCard,
   type BookPlan,
   type ContentFrame,
   type MisuseCard,
@@ -673,7 +674,138 @@ async function drawPage(plan: BookPlan, variables: Map<string, Variable>, styles
     await caption(area, graphic, ink);
   };
 
-  const draw = { overview, refuses, idea, palette, pairs, roles, faces, scale, inUse, symbol, lockup, misuse, device, rhythm };
+  /** A headline in the display face at `size`, wrapped at `width`, as the surface's own type. */
+  const headline = (words: string, size: number, color: string, width: number) => {
+    const node = glyphs(plan.display.upper ? words.toUpperCase() : words, plan.display.font, size, { color });
+    node.lineHeight = { unit: "PERCENT", value: 92 };
+    node.resize(width, node.height);
+    node.textAutoResize = "HEIGHT";
+    return node;
+  };
+
+  /** A short line in the text face at `size`, sized to the surface rather than to the book. */
+  const line = (words: string, size: number, color: Paint) => {
+    const node = glyphs(words, plan.statement, size, color);
+    node.lineHeight = { unit: "PERCENT", value: 135 };
+    return node;
+  };
+
+  /** Lines stacked tight, as an address block. */
+  const lines = (list: string[], size: number, color: Paint) => {
+    const block = box("Lines", "VERTICAL", { gap: 4 });
+    for (const words of list) add(block, line(words, size, color));
+    return block;
+  };
+
+  /** The device along a surface's foot, tile after tile, running off both edges. */
+  const foot = (surface: FrameNode, width: number, height: number) => {
+    const graphic = plan.device!;
+    for (let x = 0; x < width; ) {
+      const tile = add(surface, vector(graphic.name, graphic.strip, graphic.ink, { height: Math.round(height * 0.12) }));
+      tile.layoutPositioning = "ABSOLUTE";
+      tile.x = x;
+      tile.y = Math.round(height * 0.82);
+      x += tile.width;
+    }
+  };
+
+  /**
+   * One surface of an application in its own ground: first child at the top, last at the bottom,
+   * and with `row`, the device at the foot and the type kept in the dark above it.
+   */
+  const surface = (name: string, app: AppCard, width: number, height: number, own: string, row = true) => {
+    const frame = box(name, "VERTICAL", { width, height, radius: 24, fill: { color: app.ground }, ...(app.ground === own ? { stroke: hairline(app.ink) } : {}) });
+    frame.clipsContent = true;
+    frame.primaryAxisAlignItems = "SPACE_BETWEEN";
+    const pad = Math.round(Math.min(width, height) * 0.09);
+    frame.paddingLeft = frame.paddingRight = frame.paddingTop = frame.paddingBottom = pad;
+    if (row) {
+      frame.paddingBottom = Math.round(height * 0.24);
+      foot(frame, width, height);
+    }
+    return frame;
+  };
+
+  /** The application drawn as the thing itself, as the page draws it, at a size that fills the stage. */
+  const thing = (app: AppCard, own: string) => {
+    const { lockup: lockupSvg, wordmark, symbol: symbolSvg, domain, handle, category } = plan.applications;
+    const { ink: on } = app;
+    switch (app.kind) {
+      case "website": {
+        // A browser window: its bar, then the site's nav, headline and the row at the foot.
+        const browser = box("Website", "VERTICAL", { width: 1040, radius: 24, stroke: hairline(ink) });
+        browser.clipsContent = true;
+        const bar = add(browser, box("Browser bar", "HORIZONTAL", { gap: 10, stretch: true, height: 52 }));
+        bar.paddingLeft = bar.paddingRight = 22;
+        bar.counterAxisAlignItems = "CENTER";
+        for (let i = 0; i < 3; i++) {
+          const dot = figma.createEllipse();
+          dot.resize(12, 12);
+          dot.fills = [paint(hairline(ink))];
+          add(bar, dot);
+        }
+        if (domain) add(bar, line(domain, 15, quiet(ink))).name = "Address";
+        const site = add(browser, surface("Site", app, 1040, 528, ""));
+        site.cornerRadius = 0;
+        const nav = add(site, box("Nav", "HORIZONTAL", { stretch: true }));
+        nav.primaryAxisAlignItems = "SPACE_BETWEEN";
+        nav.counterAxisAlignItems = "CENTER";
+        add(nav, vector("Lockup", lockupSvg, on, { width: 360, height: 34 }));
+        const links = add(nav, box("Links", "HORIZONTAL", { gap: 32 }));
+        for (const link of app.lines) add(links, line(link, 17, { color: on }));
+        add(site, headline(app.headline ?? plan.brand, 72, on, 780));
+        return browser;
+      }
+      case "signage": {
+        const hoarding = surface("Signage", app, 1320, 580, own);
+        add(hoarding, vector("Lockup", lockupSvg, on, { width: 520, height: 52 }));
+        const words = add(hoarding, box("Words", "VERTICAL", { gap: 24 }));
+        add(words, headline(app.headline ?? plan.brand, 76, on, 1000));
+        add(words, lines(app.lines, 20, { color: on }));
+        return hoarding;
+      }
+      case "business-card": {
+        // Front: the wordmark over the row. Back: the symbol in the accent, then who and how to reach them.
+        const pair = box("Business card", "HORIZONTAL", { gap: 48 });
+        const front = add(pair, surface("Front", app, 600, 388, own));
+        add(front, vector("Wordmark", wordmark, on, { width: 300, height: 60 }));
+        const back = add(pair, surface("Back", app, 600, 388, own, false));
+        add(back, vector("Symbol", symbolSvg, accent, { height: 56, width: 120 }));
+        const who = add(back, box("Contact", "VERTICAL", { gap: 18 }));
+        if (app.person) {
+          const name = add(who, box("Name", "VERTICAL", { gap: 6 }));
+          add(name, headline(app.person.name, 36, on, 520));
+          add(name, line(app.person.role, 17, quiet(on)));
+        }
+        add(who, lines(app.lines, 15, { color: on }));
+        return pair;
+      }
+      default: {
+        // A post, and any kind without its own drawing: the account, the headline, the row.
+        const post = surface(app.name, app, 580, 580, own);
+        const account = add(post, box("Account", "HORIZONTAL", { gap: 14 }));
+        account.counterAxisAlignItems = "CENTER";
+        const avatar = add(account, box("Avatar", "VERTICAL", { width: 52, height: 52, radius: 999, fill: { color: accent } }));
+        avatar.primaryAxisAlignItems = avatar.counterAxisAlignItems = "CENTER";
+        add(avatar, vector("Symbol", symbolSvg, app.ground, { width: 30, height: 26 }));
+        const names = add(account, box("Names", "VERTICAL", { gap: 2 }));
+        add(names, line(handle, 17, { color: on }));
+        if (category) add(names, line(category, 14, quiet(on)));
+        const words = add(post, box("Words", "VERTICAL", { gap: 18 }));
+        add(words, headline(app.headline ?? plan.brand, 56, on, 484));
+        if (app.lines[0]) add(words, line(app.lines[0], 17, quiet(on)));
+        return post;
+      }
+    }
+  };
+
+  const application = async (area: FrameNode, { ground: own, ink, app }: ContentFrame) => {
+    const card = plan.applications.cards[app!]!;
+    stage(area, thing(card, own));
+    await caption(area, { name: `${card.name} · ${card.medium}`, caption: card.why }, ink);
+  };
+
+  const draw = { overview, refuses, idea, palette, pairs, roles, faces, scale, inUse, symbol, lockup, misuse, device, rhythm, application };
 
   /** The edition over the cover's mark, in place of the first section's divider. */
   const cover = async (name: string, row: number) => {
