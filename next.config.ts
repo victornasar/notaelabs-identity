@@ -1,13 +1,9 @@
-import { existsSync, readdirSync } from "node:fs";
 import type { NextConfig } from "next";
 import { PHASE_DEVELOPMENT_SERVER } from "next/constants";
+import { listBrands } from "./lib/brand/folders";
 
-// `/` shows the brand named by BRAND, or the first brand folder in dev.
-const brand =
-  process.env.BRAND ??
-  readdirSync("brands", { withFileTypes: true }).find(
-    (entry) => entry.isDirectory() && existsSync(`brands/${entry.name}/brand.ts`),
-  )?.name;
+// `/` shows the brand named by BRAND, or the first client brand in dev.
+const brand = process.env.BRAND ?? listBrands()[0];
 
 export default function config(phase: string): NextConfig {
   const dev = phase === PHASE_DEVELOPMENT_SERVER;

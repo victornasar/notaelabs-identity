@@ -48,13 +48,17 @@ The generator runs from chat. In Claude Code, type `/brand <slug>`; in Cursor, a
 
 ## Checks
 
-`pnpm check` is the one gate, and CI runs the same command on every push and pull request. It runs route types, TypeScript, ESLint, the unit tests (`pnpm test`, Node's own runner), `check-route` for every route, `check-brand` for every brand, and a production build per brand, and it stops at the first failure.
+`pnpm check` is the one gate, and CI runs the same command on every push and pull request. It runs route types, TypeScript, ESLint, the unit tests (`pnpm test`, Node's own runner), `check-route` for every route, `check-brand` for every brand, then `pnpm shots`, and it stops at the first failure.
+
+`pnpm shots [slug]` builds each brand for production and opens its page at 1440 and 390 px. It fails on sideways scroll, console errors, a missing or empty section, a nav link that goes nowhere, and a mark drawn at zero size or cut off by its container. The screenshots land in `.shots/` (CI keeps them as an artifact) for a person to look at; nothing is compared pixel by pixel.
+
+`brands/fixture-sparse/` is a test brand, not a client: a long name, a wordmark only, a light ground, four colors, no device and no voice. Slugs starting with `fixture-` are checked, built and shot like any brand but are never the default.
 
 ## How it works
 
 - `scripts/brands.ts` writes `brands/registry.generated.ts` before `dev` and `build`. In dev it includes every brand. With `--production` it includes only `BRAND`. The file is not committed.
 - `app/[brand]/` renders one long page. `next.config.ts` serves the selected brand at `/`.
-- `components/shell/` holds the sections. Brand colors arrive as CSS variables by role: `--ground`, `--ink`, `--accent`, and `--support`.
+- `components/guide/` holds the page: one component and CSS module per section, with shared pieces in `ui/`. `lib/brand/sections.ts` decides which sections a brand gets, in what order. Brand colors arrive as CSS variables by role: `--ground`, `--ink`, `--accent`, and `--support`.
 - `lib/brand/color.ts` works out OKLCH, RGB, and WCAG contrast from each hex value, so contrast figures cannot go stale.
 
 ## Status

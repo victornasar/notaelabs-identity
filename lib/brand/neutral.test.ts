@@ -3,6 +3,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { it } from "node:test";
+import { listBrands } from "./folders";
 import type { Brand } from "./schema";
 
 // The shared page code is the same for every client. A client's name, colors
@@ -18,9 +19,7 @@ function files(dir: string): string[] {
   });
 }
 
-const slugs = readdirSync(join(root, "brands"), { withFileTypes: true })
-  .filter((entry) => entry.isDirectory() && readdirSync(join(root, "brands", entry.name)).includes("brand.ts"))
-  .map((entry) => entry.name);
+const slugs = listBrands(root);
 
 const escape = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 

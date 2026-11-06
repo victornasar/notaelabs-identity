@@ -1,0 +1,63 @@
+/* The closing panel and colophon. */
+
+.closing {
+  padding-top: clamp(72px, 10vw, 140px);
+  padding-bottom: 24px;
+}
+
+.closingPanel {
+  display: grid;
+  gap: 24px;
+  padding: clamp(28px, 5vw, 72px);
+  border-radius: calc(var(--radius) + 8px);
+}
+
+.closingLine {
+  font-family: var(--display);
+  font-weight: var(--display-weight);
+  text-transform: var(--display-case);
+  letter-spacing: var(--display-tracking);
+  font-size: clamp(2.75rem, 1.4rem + 5vw, 7rem);
+  line-height: 0.88;
+  max-width: 14ch;
+  text-wrap: balance;
+}
+
+.closingMission {
+  max-width: 48ch;
+  font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+}
+
+.closingMark {
+  margin-top: clamp(32px, 6vw, 96px);
+}
+
+.closingMark,
+.closingMark > span,
+.closingMark svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.colophon {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 4px 0;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--quiet);
+}
+
+.colophon a {
+  text-decoration: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .colophon a:hover {
+    color: var(--ink);
+  }
+}

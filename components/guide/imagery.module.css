@@ -71,23 +71,6 @@
 
 /* ---------- Shared inside every surface ---------- */
 
-.row {
-  display: flex;
-  overflow: hidden;
-}
-
-.rowTile {
-  display: block;
-  flex: none;
-  height: 100%;
-}
-
-.rowTile svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
 /* The row sits at the foot, running off both edges. */
 .foot {
   position: absolute;

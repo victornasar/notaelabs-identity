@@ -8,21 +8,14 @@
  * dev registry, since the per-brand builds leave a production one behind.
  */
 import { execFileSync } from "node:child_process";
-import { existsSync, readdirSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { join } from "node:path";
+import { listBrands } from "../lib/brand/folders";
 
 const root = process.cwd();
 const ts = ["--no-warnings", "--import", "./scripts/lib/ts-paths.ts"];
 
-const folders = (dir: string) =>
-  existsSync(dir)
-    ? readdirSync(dir, { withFileTypes: true })
-        .filter((entry) => entry.isDirectory())
-        .map((entry) => entry.name)
-        .sort()
-    : [];
-
-const brands = folders(join(root, "brands")).filter((slug) => existsSync(join(root, "brands", slug, "brand.ts")));
+const brands = listBrands(root);
 const routed = brands.filter((slug) => existsSync(join(root, "brands", slug, "work", "routes")));
 
 type Step = { name: string; command: string; args: string[]; env?: Record<string, string> };
@@ -37,12 +30,8 @@ const steps: Step[] = [
   { name: "tests", command: "pnpm", args: ["run", "--silent", "test"] },
   ...routed.map((slug) => ({ name: `routes: ${slug}`, command: "node", args: [...ts, "scripts/check-route.ts", slug] })),
   ...brands.map((slug) => ({ name: `book: ${slug}`, command: "node", args: [...ts, "scripts/check-brand.ts", slug] })),
-  ...brands.map((slug) => ({
-    name: `build: ${slug}`,
-    command: "pnpm",
-    args: ["run", "--silent", "build"],
-    env: { BRAND: slug },
-  })),
+  // Builds each brand for production, then looks at the page at two widths.
+  { name: "build and shots", command: "node", args: [...ts, "scripts/shots.ts"] },
 ];
 
 function run({ command, args, env }: Step) {

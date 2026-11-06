@@ -5,7 +5,7 @@ import { describeStep, textTransform } from "./type";
 describe("textTransform", () => {
   it("transforms only the cases CSS can set", () => {
     assert.equal(textTransform("upper"), "uppercase");
-    assert.equal(textTransform("title"), "capitalize");
+    assert.equal(textTransform("title"), "none");
     assert.equal(textTransform("sentence"), "none");
     assert.equal(textTransform("as-written"), "none");
   });

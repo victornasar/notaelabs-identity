@@ -1,53 +1,12 @@
 import type { CSSProperties } from "react";
 import { Mark } from "@/components/shell/mark";
-import type { ActiveBrand } from "@/lib/brand/active";
+import { kindNames } from "@/lib/brand/labels";
 import { physicalKinds, type Application } from "@/lib/brand/schema";
-import { viewBox } from "@/lib/brand/svg";
-import type { PageSection } from "@/lib/brand/sections";
-import { Heading } from "./heading";
 import styles from "./imagery.module.css";
-import guide from "./guide.module.css";
-
-type Props = { active: ActiveBrand };
-
-const KIND_NAMES: Record<string, string> = {
-  website: "Website",
-  "business-card": "Business card",
-  letterhead: "Letterhead",
-  "email-signature": "Email signature",
-  "social-post": "Social post",
-  deck: "Deck",
-  signage: "Signage",
-  poster: "Poster",
-  "app-icon": "App icon",
-  dashboard: "Dashboard",
-};
-
-/** The device's drawing, cut to the strip its shapes sit on, so a row stays low. */
-export function stripOf(source: string) {
-  const { x, y, w, h } = viewBox(source);
-  return { svg: source.replace(/viewBox="[^"]+"/, `viewBox="${x} ${y + h / 3} ${w} ${h / 3}"`), aspect: w / (h / 3) };
-}
-
-/** The device as a row that runs off both edges of whatever holds it. */
-export function DeviceRow({ active, className }: Props & { className?: string }) {
-  const { device } = active.brand;
-  if (!device) return null;
-  const { svg, aspect } = stripOf(active.graphic(device.file));
-  // More tiles than any surface needs; the row clips them at the far edge.
-  const tiles = 6;
-  return (
-    <div
-      className={`${styles.row} ${className ?? ""}`}
-      style={{ color: active.color(device.ink).hex }}
-      aria-hidden="true"
-    >
-      {Array.from({ length: tiles }, (_, i) => (
-        <Mark key={i} className={styles.rowTile} style={{ aspectRatio: aspect }} svg={svg} label="" align="xMinYMid" />
-      ))}
-    </div>
-  );
-}
+import { DeviceRow } from "./ui/device-row";
+import { Heading } from "./ui/heading";
+import type { SectionProps } from "./ui/types";
+import ui from "./ui/ui.module.css";
 
 const text = (copy: Application["copy"], key: string) => {
   const value = copy[key];
@@ -56,11 +15,11 @@ const text = (copy: Application["copy"], key: string) => {
 const lines = (copy: Application["copy"]) => (Array.isArray(copy.lines) ? copy.lines : []);
 
 /** The identity at work: each of the device's applications, drawn as the thing itself. */
-export function Imagery({ active, section }: Props & { section: PageSection }) {
+export function Imagery({ active, section }: SectionProps) {
   const { brand, color, svg } = active;
   const { device, marks } = brand;
   if (!device?.applications.length) return null;
-  const accent = active.byRole("accent") ?? active.byRole("ink")!;
+  const { accent } = active.roles;
   const lockup = svg(marks.alternates?.[0] ?? marks.primary);
   const wordmark = svg(marks.primary);
   const symbol = marks.symbol ? svg(marks.symbol) : wordmark;
@@ -157,7 +116,7 @@ export function Imagery({ active, section }: Props & { section: PageSection }) {
   };
 
   return (
-    <section id="imagery" className={guide.section} aria-labelledby="imagery-title">
+    <section id="imagery" className={`${ui.container} ${ui.section}`} aria-labelledby="imagery-title">
       <Heading section={section} title={brand.page?.titles?.imagery ?? device.name}>
         {device.use}
       </Heading>
@@ -168,7 +127,7 @@ export function Imagery({ active, section }: Props & { section: PageSection }) {
             <figure className={styles.scene}>{scene(app)}</figure>
             <p className={styles.caption}>
               <span className={styles.kind}>
-                {KIND_NAMES[app.kind]} · {physicalKinds.includes(app.kind) ? "Print" : "Screen"}
+                {kindNames[app.kind]} · {physicalKinds.includes(app.kind) ? "Print" : "Screen"}
               </span>
               {app.why}
             </p>

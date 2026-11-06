@@ -8,12 +8,11 @@
  * production build.
  */
 import { readdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { listBrands } from "../lib/brand/folders";
 
 const root = new URL("../brands/", import.meta.url);
-const all = readdirSync(root, { withFileTypes: true })
-  .filter((entry) => entry.isDirectory() && existsSync(new URL(`${entry.name}/brand.ts`, root)))
-  .map((entry) => entry.name)
-  .sort();
+const all = listBrands(fileURLToPath(new URL("..", root)));
 
 const production = process.argv.includes("--production");
 const selected = process.env.BRAND;

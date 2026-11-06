@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import styles from "./guide.module.css";
+import styles from "./nav.module.css";
 
 export type Section = { id: string; label: string };
 
