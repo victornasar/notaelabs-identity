@@ -8,7 +8,9 @@
  * carries this out.
  */
 import { bestOn, contrast, luminance, wcagLevel } from "../brand/color";
-import type { MisuseShow } from "../brand/schema";
+import { kindNames } from "../brand/labels";
+import { physicalKinds, type ApplicationKind, type DeviceMisuseKind, type MisuseShow } from "../brand/schema";
+import { strip } from "../brand/svg";
 import type { BundleFont, BundleIntro, BundleTextStyle, FigmaBundle, FontName } from "./bundle";
 
 /** The variable collection every brand color lives in. */
@@ -37,6 +39,12 @@ export type SwatchCard = {
   pills: { label: string; value: string }[];
 };
 
+/** The accent's two jobs side by side, when the device is drawn in it: a flat field, and the device's light. */
+export type AccentRoles = { color: string; asColor: string; asLight: string };
+
+/** One color's share of the bar, as wide as its proportion. */
+export type BarPart = { color: string; ink: string; width: number; label: string; edge: boolean };
+
 /** A color on a ground it is approved on: what for, and how far apart they are. */
 export type PairCard = { ink: string; ground: string; use: string; ratio: string; level: string };
 
@@ -52,6 +60,25 @@ export type FaceCard = {
   ink: string;
 };
 
+/** The scale set as one sheet of real copy: a label, a headline, a paragraph and a figure. */
+export type InUse = { label: string; headline: string; body: string; figure?: string };
+
+/** An application drawn as the thing itself: its words by slot, what it is, and why the brand needs it. */
+export type AppCard = {
+  kind: ApplicationKind;
+  name: string;
+  medium: "Print" | "Screen";
+  why: string;
+  ground: string;
+  ink: string;
+  headline?: string;
+  person?: { name: string; role: string };
+  lines: string[];
+};
+
+/** Applications on screens the brand owns; the rest are marketing, in print and on others' screens. */
+const digitalKinds: ApplicationKind[] = ["website", "app-icon", "dashboard"];
+
 export type ScaleRow = { id: string; spec: string; style: string; sample: string };
 
 /** A frame that only names its section: "02" and "COLOR". The cover opens the first section instead. */
@@ -64,12 +91,14 @@ export type Divider = { name: string; number: string; title: string; cover: bool
  */
 export type ContentFrame = {
   name: string;
-  kind: "overview" | "refuses" | "idea" | "palette" | "pairs" | "faces" | "scale" | "symbol" | "lockup" | "misuse" | "device";
+  kind: "overview" | "refuses" | "idea" | "palette" | "pairs" | "roles" | "faces" | "scale" | "inUse" | "symbol" | "lockup" | "misuse" | "device" | "rhythm" | "application";
   eyebrow: string;
   page: string;
   ground: string;
   ink: string;
   tint: string;
+  /** Which of `applications.cards` an application frame draws. */
+  app?: number;
 };
 
 /** A misuse drawn on its ground and crossed out, over the rule it breaks. `glow` is the light it sits on. */
@@ -107,12 +136,25 @@ export type BookPlan = {
   cover: { edition: string; svg: string };
   /** `refuses` as its separate sentences, one line each. */
   intro: Omit<BundleIntro, "refuses"> & { refuses: string[] };
-  palette: { cards: SwatchCard[]; note?: string; pairs: PairCard[] };
+  palette: { cards: SwatchCard[]; note?: string; pairs: PairCard[]; roles?: AccentRoles; bar: BarPart[] };
   faces: FaceCard[];
   scale: ScaleRow[];
+  inUse: InUse;
   /** The symbol alone, then the lockup, which each `lockup` frame sets on its own ground. */
   logo: { symbol: Showcase; lockup: string; misuse: MisuseCard[] };
-  device?: Showcase;
+  /** The device, and the ways it is drawn wrong: the construction is the right way's caption. */
+  device?: Showcase & { misuse: { rule: string; show: DeviceMisuseKind }[]; strip: string };
+  /** The device's applications, and the marks and names they carry. */
+  applications: {
+    cards: AppCard[];
+    lockup: string;
+    wordmark: string;
+    symbol: string;
+    domain?: string;
+    /** The account a post comes from: the domain's name, or the brand's own without one. */
+    handle: string;
+    category?: string;
+  };
   /** In reading order: one row on the canvas each. */
   sections: BookSection[];
 };
@@ -153,6 +195,19 @@ export function shareWidths(shares: number[], total: number, gap: number, min: n
   }
 }
 
+/**
+ * The sheet's copy: the first application with a headline, which is real copy the brand
+ * wrote for a real surface, else the positioning. Its lines become the label and the figure.
+ */
+function inUse(bundle: FigmaBundle): InUse {
+  const words = (value: string | string[] | undefined) => (Array.isArray(value) ? value : value ? [value] : []);
+  const app = bundle.device?.applications.find((a) => typeof a.copy.headline === "string");
+  const body = bundle.intro.mission ?? bundle.intro.positioning;
+  if (!app) return { label: bundle.name, headline: bundle.intro.positioning, body };
+  const [label = bundle.name, figure] = words(app.copy.lines);
+  return { label, headline: app.copy.headline as string, body, ...(figure ? { figure } : {}) };
+}
+
 export function bookPlan(bundle: FigmaBundle): BookPlan {
   const { colors, textStyles, fonts } = bundle;
   const byRole = (role: string) => colors.find((c) => c.role === role);
@@ -186,6 +241,18 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
       return { ink: c.name, ground: p.on, use: uses[p.as], ratio: `${ratio.toFixed(2)}:1`, level: wcagLevel(ratio) ?? "Below AA" };
     }),
   );
+  const roles: AccentRoles | undefined =
+    bundle.device && bundle.device.ink === accent.name && accent !== ink
+      ? { color: accent.name, asColor: accent.use, asLight: bundle.device.construction }
+      : undefined;
+  const barWidths = shareWidths(ordered.map((c) => c.proportion), column, 0, 0);
+  const bar = ordered.map((c, i): BarPart => ({
+    color: c.name,
+    ink: nameOf(bestOn(c.hex, hexes)),
+    width: barWidths[i]!,
+    label: `${c.name} ${c.proportion}%`,
+    edge: c.name === ground.name,
+  }));
   const widths = shareWidths(ordered.map((c) => c.proportion), column, layout.gap, layout.minSwatch);
 
   // The marks: the symbol (or the primary mark, when there is none) in the accent if it may sit on the
@@ -206,9 +273,29 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
     .filter((v, i) => variants.findIndex((w) => w.ground === v.ground) === i)
     .sort((a, b) => luminance(hexOf(b.ground)) - luminance(hexOf(a.ground)));
 
+  // The applications, each with its words by slot, as the page draws them.
+  const word = (value: string | string[] | undefined) => (typeof value === "string" ? value : undefined);
+  const apps = (bundle.device?.applications ?? []).map(({ kind, why, ground, ink, copy }): AppCard => {
+    const [headline, name, role] = [word(copy.headline), word(copy.name), word(copy.role)];
+    return {
+      kind,
+      name: kindNames[kind],
+      medium: physicalKinds.includes(kind) ? "Print" : "Screen",
+      why,
+      ground,
+      ink,
+      ...(headline ? { headline } : {}),
+      ...(name ? { person: { name, role: role ?? "" } } : {}),
+      lines: Array.isArray(copy.lines) ? copy.lines : [],
+    };
+  });
+  const appParts = (digital: boolean) =>
+    apps.flatMap((a, app): Part[] => (digitalKinds.includes(a.kind) === digital ? [{ kind: "application", part: a.name, app }] : []));
+  const primary = items.find((m) => m.role === "primary") ?? items[0]!;
+
   // The book's outline, as an agency sets out brand guidelines. A section is drawn once the brand has
   // what it shows, and numbers count only the drawn ones. Pages count dividers too.
-  type Part = { kind: ContentFrame["kind"]; part: string; ground?: string; ink?: string };
+  type Part = { kind: ContentFrame["kind"]; part: string; ground?: string; ink?: string; app?: number };
   const device = bundle.device;
   const outline: { title: string; parts: Part[] }[] = [
     {
@@ -227,23 +314,36 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
         ...(misuse.length ? [{ kind: "misuse" as const, part: "Misuse" }] : []),
       ],
     },
-    { title: "Color", parts: [{ kind: "palette", part: "Palette" }, ...(pairs.length ? [{ kind: "pairs" as const, part: "Pairs" }] : [])] },
+    {
+      title: "Color",
+      parts: [
+        { kind: "palette", part: "Palette" },
+        ...(pairs.length ? [{ kind: "pairs" as const, part: "Pairs" }] : []),
+        ...(roles ? [{ kind: "roles" as const, part: roles.color }] : []),
+      ],
+    },
     {
       title: "Typography",
       parts: [
         { kind: "faces", part: "Typefaces" },
         { kind: "scale", part: "Scale" },
+        { kind: "inUse", part: "In use" },
       ],
     },
     {
       title: "Visual Language",
-      parts: device ? [{ kind: "device", part: device.name, ground: device.ground, ink: nameOf(bestOn(hexOf(device.ground), hexes)) }] : [],
+      parts: device
+        ? [
+            { kind: "device" as const, part: device.name },
+            ...(device.misuse.length ? [{ kind: "rhythm" as const, part: "Rules" }] : []),
+          ].map((p): Part => ({ ...p, ground: device.ground, ink: nameOf(bestOn(hexOf(device.ground), hexes)) }))
+        : [],
     },
     { title: "Iconography & Illustration", parts: [] },
     { title: "Imagery & Art Direction", parts: [] },
     { title: "Layout & Composition", parts: [] },
-    { title: "Digital Applications", parts: [] },
-    { title: "Marketing Applications", parts: [] },
+    { title: "Digital Applications", parts: appParts(true) },
+    { title: "Marketing Applications", parts: appParts(false) },
     { title: "Brand Voice", parts: [] },
     { title: "Brand Guidelines", parts: [] },
   ];
@@ -255,7 +355,7 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
       page += 1;
       return {
         divider: n === 0 ? { name: "Cover", number, title, cover: true } : { name: `${number} ${title}`, number, title, cover: false },
-        frames: parts.map(({ kind, part, ...on }, i) => {
+        frames: parts.map(({ kind, part, app, ...on }, i) => {
           page += 1;
           const own = !on.ground || on.ground === ground.name;
           return {
@@ -266,6 +366,7 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
             ground: on.ground ?? ground.name,
             ink: on.ink ?? ink.name,
             tint: own ? accent.name : (on.ink ?? ink.name),
+            ...(app === undefined ? {} : { app }),
           };
         }),
       };
@@ -305,6 +406,8 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
       // The full caveat is in each variable's description; the frame keeps one line.
       ...(bundle.printNote ? { note: "CMYK and Pantone are approximate. Proof before print." } : {}),
       pairs,
+      ...(roles ? { roles } : {}),
+      bar,
     },
     faces: bundle.type.faces.flatMap((face, i) => {
       const font = heaviest(face.face);
@@ -323,14 +426,33 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
       ];
     }),
     scale: textStyles.map((t) => ({ id: t.id, spec: t.spec, style: t.name, sample: t.sample })),
+    inUse: inUse(bundle),
     logo: {
       symbol: { svg: symbol.svg, name: symbol.name, caption: symbol.meaning ?? symbol.use, ink: symbolInk },
       lockup: coverSvg,
       misuse,
     },
     ...(bundle.device
-      ? { device: { svg: bundle.device.svg, name: bundle.device.name, caption: bundle.device.construction, ink: bundle.device.ink } }
+      ? {
+          device: {
+            svg: bundle.device.svg,
+            name: bundle.device.name,
+            caption: bundle.device.construction,
+            ink: bundle.device.ink,
+            misuse: bundle.device.misuse,
+            strip: strip(bundle.device.svg).svg,
+          },
+        }
       : {}),
+    applications: {
+      cards: apps,
+      lockup: (items.find((m) => m.role === "alternate") ?? primary).svg,
+      wordmark: primary.svg,
+      symbol: symbol.svg,
+      ...(bundle.domain ? { domain: bundle.domain } : {}),
+      handle: bundle.domain?.replace(/\..*$/, "") ?? bundle.name,
+      ...(bundle.category ? { category: bundle.category } : {}),
+    },
     sections,
   };
 }

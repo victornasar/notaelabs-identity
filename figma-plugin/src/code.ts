@@ -4,6 +4,7 @@
  * Running it again updates the variables and styles in place and redraws the
  * page, so a file can be rebuilt after the brand changes.
  */
+import type { DeviceMisuseKind } from "../../lib/brand/schema";
 import { bundleFormat, type FigmaBundle } from "../../lib/figma/bundle";
 import {
   bookPlan,
@@ -13,6 +14,7 @@ import {
   missingFonts,
   nearFonts,
   pageName,
+  type AppCard,
   type BookPlan,
   type ContentFrame,
   type MisuseCard,
@@ -278,6 +280,66 @@ async function drawPage(plan: BookPlan, variables: Map<string, Variable>, styles
     if (plan.palette.note) add(area, await text(plan.palette.note, role.small, quiet(ink), { stretch: true }));
   };
 
+  const roles = async (area: FrameNode, { ink }: ContentFrame) => {
+    // The accent as a flat field cut by one hard edge, beside the accent as the device's light.
+    const { color, asColor, asLight } = plan.palette.roles!;
+    const pair = grow(add(area, box("Roles", "HORIZONTAL", { gap: layout.gap, stretch: true })));
+    const half = Math.floor((column - layout.gap) / 2);
+    const side = async (name: string, words: string) => {
+      const cell = fullHeight(add(pair, box(name, "VERTICAL", { gap: 16, width: half })));
+      const panel = grow(add(cell, box("Panel", "VERTICAL", { stretch: true, radius: layout.radius, stroke: hairline(ink) })));
+      const about = add(cell, box("About", "VERTICAL", { gap: 8, stretch: true }));
+      add(about, await text(name, role.label, quiet(ink), { stretch: true }));
+      add(about, await text(words, role.body, quiet(ink), { stretch: true }));
+      return panel;
+    };
+    const field = await side(`${color} as color`, asColor);
+    field.primaryAxisAlignItems = "MAX";
+    add(field, box(color, "VERTICAL", { stretch: true, height: 240, fill: { color } }));
+    const light = await side(`${color} as light`, asLight);
+    light.primaryAxisAlignItems = light.counterAxisAlignItems = "CENTER";
+    add(light, broken(null, half));
+
+    // How much of each, in one bar.
+    const bar = add(area, box("Proportion", "HORIZONTAL", { stretch: true, height: 88, radius: layout.radius, stroke: hairline(ink) }));
+    for (const part of plan.palette.bar) {
+      const share = fullHeight(add(bar, box(part.color, "VERTICAL", { width: part.width, fill: { color: part.color } })));
+      share.paddingLeft = 24;
+      share.primaryAxisAlignItems = "CENTER";
+      add(share, await text(part.label, role.label, { color: part.ink }));
+    }
+  };
+
+  const inUse = async (area: FrameNode, { ink }: ContentFrame) => {
+    // One sheet of real copy, each line tagged with its style, closed by a rule and the symbol.
+    const sheet = grow(add(area, box("Sheet", "VERTICAL", { stretch: true, radius: layout.radius, stroke: hairline(ink) })));
+    sheet.paddingLeft = sheet.paddingRight = sheet.paddingTop = sheet.paddingBottom = 64;
+    sheet.primaryAxisAlignItems = "SPACE_BETWEEN";
+    const copy = add(sheet, box("Copy", "VERTICAL", { gap: 40, stretch: true }));
+    const { label, headline, body, figure } = plan.inUse;
+    const lines: [string, string, string, number?][] = [
+      [role.label, label, accent],
+      [role.heading, headline, ink, 1200],
+      [role.body, body, ink, 760],
+      ...(figure ? [[role.small, figure, ink] as [string, string, string]] : []),
+    ];
+    for (const [style, words, color, width] of lines) {
+      const line = add(copy, box(style, "HORIZONTAL", { gap: 48, stretch: true }));
+      add(line, await text(style, role.label, quiet(ink), { width: 200 }));
+      add(line, await text(words, style, { color }, width ? { width } : {}));
+    }
+    const foot = add(sheet, box("Foot", "VERTICAL", { gap: 32, stretch: true }));
+    const rule = figma.createRectangle();
+    rule.name = "Rule";
+    rule.resize(column - 128, 2);
+    rule.fills = [paint({ color: accent })];
+    add(foot, rule).layoutAlign = "STRETCH";
+    const sign = add(foot, box("Sign-off", "HORIZONTAL", { gap: 20 }));
+    sign.counterAxisAlignItems = "CENTER";
+    add(sign, vector(plan.logo.symbol.name, plan.logo.symbol.svg, accent, { height: 40 }));
+    add(sign, await text(plan.brand, role.label, { color: ink }));
+  };
+
   const pairs = async (area: FrameNode, { ground: own }: ContentFrame) => {
     // A card per approved pairing: the ground, the color on it, and how far apart they are.
     const row = grow(add(area, box("Pairs", "HORIZONTAL", { gap: layout.gap, stretch: true })));
@@ -517,6 +579,88 @@ async function drawPage(plan: BookPlan, variables: Map<string, Variable>, styles
     }
   };
 
+  /** A tick, in the corner of the one card that shows the right way. */
+  const tick = (color: string) => {
+    const mark = cross(color);
+    mark.name = "Right";
+    mark.vectorPaths = [{ windingRule: "NONZERO", data: "M 0 14 L 10 24 L 28 4" }];
+    return mark;
+  };
+
+  /** The device's strip, `width` wide, its shapes moved to break one rule when `show` names one. */
+  const broken = (show: DeviceMisuseKind | null, width: number) => {
+    const graphic = plan.device!;
+    const node = vector(graphic.name, graphic.strip, graphic.ink, { width });
+    const span = node.width;
+    const shapes = [...node.children];
+    switch (show) {
+      case "crowded": {
+        // The gaps closed up, and the row repeated to fill the width again.
+        const f = 0.6;
+        for (const shape of shapes) shape.x *= f;
+        for (let offset = span * f; offset < span; offset += span * f) {
+          for (const shape of shapes) {
+            const copy = shape.clone();
+            node.appendChild(copy);
+            copy.x = shape.x + offset;
+          }
+        }
+        break;
+      }
+      case "scattered":
+        shapes.forEach((shape, i) => {
+          shape.x += (((i * 37) % 9) - 4) * span * 0.025;
+          shape.y += (((i * 53) % 7) - 3) * node.height * 0.12;
+        });
+        break;
+      case "glow":
+        for (const shape of shapes) {
+          if ("effects" in shape) shape.effects = [{ type: "LAYER_BLUR", radius: 24, visible: true } as BlurEffect];
+        }
+        break;
+      case "contained": {
+        // Drop what crosses the edges, and center the rest.
+        for (const shape of shapes) if (shape.x < 0 || shape.x + shape.width > span) shape.remove();
+        const kept = [...node.children];
+        const left = Math.min(...kept.map((k) => k.x));
+        const right = Math.max(...kept.map((k) => k.x + k.width));
+        for (const k of kept) k.x += (span - (right - left)) / 2 - left;
+        break;
+      }
+    }
+    return node;
+  };
+
+  /** A rounded panel holding one drawing, centered, with a tick or a cross in its corner. */
+  const sample = (drawing: SceneNode, right: boolean, color: string) => {
+    const panel = box(right ? "Right" : "Wrong", "VERTICAL", { stretch: true, radius: layout.radius, stroke: hairline(color) });
+    panel.primaryAxisAlignItems = panel.counterAxisAlignItems = "CENTER";
+    add(panel, drawing);
+    const badge = add(panel, right ? tick(color) : cross(color));
+    badge.layoutPositioning = "ABSOLUTE";
+    badge.x = badge.y = 32;
+    return panel;
+  };
+
+  const rhythm = async (area: FrameNode, { ink }: ContentFrame) => {
+    // The right way across the top, at full width; each wrong way below it, crossed out.
+    const graphic = plan.device!;
+    const right = add(area, box("Right way", "VERTICAL", { gap: 16, stretch: true }));
+    const top = add(right, sample(broken(null, column), true, ink));
+    top.primaryAxisSizingMode = "FIXED";
+    top.resize(column, 300);
+    top.layoutAlign = "STRETCH";
+    add(right, await text(graphic.caption, role.body, quiet(ink), { stretch: true }));
+
+    const row = grow(add(area, box("Wrong ways", "HORIZONTAL", { gap: layout.gap, stretch: true })));
+    const width = Math.floor((column - layout.gap * (graphic.misuse.length - 1)) / graphic.misuse.length);
+    for (const { rule, show } of graphic.misuse) {
+      const cell = fullHeight(add(row, box(show, "VERTICAL", { gap: 16, width })));
+      grow(add(cell, sample(broken(show, width), false, ink)));
+      add(cell, await text(rule, role.body, quiet(ink), { stretch: true }));
+    }
+  };
+
   const device = async (area: FrameNode, { ink }: ContentFrame) => {
     // The device runs off both edges, so it sits across the whole frame, outside the margins.
     const graphic = plan.device!;
@@ -530,7 +674,138 @@ async function drawPage(plan: BookPlan, variables: Map<string, Variable>, styles
     await caption(area, graphic, ink);
   };
 
-  const draw = { overview, refuses, idea, palette, pairs, faces, scale, symbol, lockup, misuse, device };
+  /** A headline in the display face at `size`, wrapped at `width`, as the surface's own type. */
+  const headline = (words: string, size: number, color: string, width: number) => {
+    const node = glyphs(plan.display.upper ? words.toUpperCase() : words, plan.display.font, size, { color });
+    node.lineHeight = { unit: "PERCENT", value: 92 };
+    node.resize(width, node.height);
+    node.textAutoResize = "HEIGHT";
+    return node;
+  };
+
+  /** A short line in the text face at `size`, sized to the surface rather than to the book. */
+  const line = (words: string, size: number, color: Paint) => {
+    const node = glyphs(words, plan.statement, size, color);
+    node.lineHeight = { unit: "PERCENT", value: 135 };
+    return node;
+  };
+
+  /** Lines stacked tight, as an address block. */
+  const lines = (list: string[], size: number, color: Paint) => {
+    const block = box("Lines", "VERTICAL", { gap: 4 });
+    for (const words of list) add(block, line(words, size, color));
+    return block;
+  };
+
+  /** The device along a surface's foot, tile after tile, running off both edges. */
+  const foot = (surface: FrameNode, width: number, height: number) => {
+    const graphic = plan.device!;
+    for (let x = 0; x < width; ) {
+      const tile = add(surface, vector(graphic.name, graphic.strip, graphic.ink, { height: Math.round(height * 0.12) }));
+      tile.layoutPositioning = "ABSOLUTE";
+      tile.x = x;
+      tile.y = Math.round(height * 0.82);
+      x += tile.width;
+    }
+  };
+
+  /**
+   * One surface of an application in its own ground: first child at the top, last at the bottom,
+   * and with `row`, the device at the foot and the type kept in the dark above it.
+   */
+  const surface = (name: string, app: AppCard, width: number, height: number, own: string, row = true) => {
+    const frame = box(name, "VERTICAL", { width, height, radius: 24, fill: { color: app.ground }, ...(app.ground === own ? { stroke: hairline(app.ink) } : {}) });
+    frame.clipsContent = true;
+    frame.primaryAxisAlignItems = "SPACE_BETWEEN";
+    const pad = Math.round(Math.min(width, height) * 0.09);
+    frame.paddingLeft = frame.paddingRight = frame.paddingTop = frame.paddingBottom = pad;
+    if (row) {
+      frame.paddingBottom = Math.round(height * 0.24);
+      foot(frame, width, height);
+    }
+    return frame;
+  };
+
+  /** The application drawn as the thing itself, as the page draws it, at a size that fills the stage. */
+  const thing = (app: AppCard, own: string) => {
+    const { lockup: lockupSvg, wordmark, symbol: symbolSvg, domain, handle, category } = plan.applications;
+    const { ink: on } = app;
+    switch (app.kind) {
+      case "website": {
+        // A browser window: its bar, then the site's nav, headline and the row at the foot.
+        const browser = box("Website", "VERTICAL", { width: 1040, radius: 24, stroke: hairline(ink) });
+        browser.clipsContent = true;
+        const bar = add(browser, box("Browser bar", "HORIZONTAL", { gap: 10, stretch: true, height: 52 }));
+        bar.paddingLeft = bar.paddingRight = 22;
+        bar.counterAxisAlignItems = "CENTER";
+        for (let i = 0; i < 3; i++) {
+          const dot = figma.createEllipse();
+          dot.resize(12, 12);
+          dot.fills = [paint(hairline(ink))];
+          add(bar, dot);
+        }
+        if (domain) add(bar, line(domain, 15, quiet(ink))).name = "Address";
+        const site = add(browser, surface("Site", app, 1040, 528, ""));
+        site.cornerRadius = 0;
+        const nav = add(site, box("Nav", "HORIZONTAL", { stretch: true }));
+        nav.primaryAxisAlignItems = "SPACE_BETWEEN";
+        nav.counterAxisAlignItems = "CENTER";
+        add(nav, vector("Lockup", lockupSvg, on, { width: 360, height: 34 }));
+        const links = add(nav, box("Links", "HORIZONTAL", { gap: 32 }));
+        for (const link of app.lines) add(links, line(link, 17, { color: on }));
+        add(site, headline(app.headline ?? plan.brand, 72, on, 780));
+        return browser;
+      }
+      case "signage": {
+        const hoarding = surface("Signage", app, 1320, 580, own);
+        add(hoarding, vector("Lockup", lockupSvg, on, { width: 520, height: 52 }));
+        const words = add(hoarding, box("Words", "VERTICAL", { gap: 24 }));
+        add(words, headline(app.headline ?? plan.brand, 76, on, 1000));
+        add(words, lines(app.lines, 20, { color: on }));
+        return hoarding;
+      }
+      case "business-card": {
+        // Front: the wordmark over the row. Back: the symbol in the accent, then who and how to reach them.
+        const pair = box("Business card", "HORIZONTAL", { gap: 48 });
+        const front = add(pair, surface("Front", app, 600, 388, own));
+        add(front, vector("Wordmark", wordmark, on, { width: 300, height: 60 }));
+        const back = add(pair, surface("Back", app, 600, 388, own, false));
+        add(back, vector("Symbol", symbolSvg, accent, { height: 56, width: 120 }));
+        const who = add(back, box("Contact", "VERTICAL", { gap: 18 }));
+        if (app.person) {
+          const name = add(who, box("Name", "VERTICAL", { gap: 6 }));
+          add(name, headline(app.person.name, 36, on, 520));
+          add(name, line(app.person.role, 17, quiet(on)));
+        }
+        add(who, lines(app.lines, 15, { color: on }));
+        return pair;
+      }
+      default: {
+        // A post, and any kind without its own drawing: the account, the headline, the row.
+        const post = surface(app.name, app, 580, 580, own);
+        const account = add(post, box("Account", "HORIZONTAL", { gap: 14 }));
+        account.counterAxisAlignItems = "CENTER";
+        const avatar = add(account, box("Avatar", "VERTICAL", { width: 52, height: 52, radius: 999, fill: { color: accent } }));
+        avatar.primaryAxisAlignItems = avatar.counterAxisAlignItems = "CENTER";
+        add(avatar, vector("Symbol", symbolSvg, app.ground, { width: 30, height: 26 }));
+        const names = add(account, box("Names", "VERTICAL", { gap: 2 }));
+        add(names, line(handle, 17, { color: on }));
+        if (category) add(names, line(category, 14, quiet(on)));
+        const words = add(post, box("Words", "VERTICAL", { gap: 18 }));
+        add(words, headline(app.headline ?? plan.brand, 56, on, 484));
+        if (app.lines[0]) add(words, line(app.lines[0], 17, quiet(on)));
+        return post;
+      }
+    }
+  };
+
+  const application = async (area: FrameNode, { ground: own, ink, app }: ContentFrame) => {
+    const card = plan.applications.cards[app!]!;
+    stage(area, thing(card, own));
+    await caption(area, { name: `${card.name} · ${card.medium}`, caption: card.why }, ink);
+  };
+
+  const draw = { overview, refuses, idea, palette, pairs, roles, faces, scale, inUse, symbol, lockup, misuse, device, rhythm, application };
 
   /** The edition over the cover's mark, in place of the first section's divider. */
   const cover = async (name: string, row: number) => {

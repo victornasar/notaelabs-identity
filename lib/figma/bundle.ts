@@ -9,13 +9,13 @@
  */
 import { hexToRgb, toOklch, toRgbString } from "../brand/color";
 import { faceNames, printNote, roleNames } from "../brand/labels";
-import { misuseRule, type Application, type Brand, type ColorRole, type ColorUse, type MisuseShow, type TypeStyle } from "../brand/schema";
+import { misuseRule, type Application, type Brand, type ColorRole, type ColorUse, type DeviceMisuseKind, type MisuseShow, type TypeStyle } from "../brand/schema";
 import { completeness, pageSections, sectionTitle, sections, type SectionId } from "../brand/sections";
 import { viewBox } from "../brand/svg";
 import { describeStep, stepSample } from "../brand/type";
 
 /** Bumped when the plugin can no longer read an older bundle. */
-export const bundleFormat = 3;
+export const bundleFormat = 4;
 
 /** A font as Figma names it: the family and the style it lists. */
 export type FontName = { family: string; style: string };
@@ -104,6 +104,10 @@ export type FigmaBundle = {
   slug: string;
   name: string;
   edition: string;
+  /** The web address, for a browser bar and a post's handle. */
+  domain?: string;
+  /** What the brand is, as a post's account line names it. */
+  category?: string;
   intro: BundleIntro;
   fonts: BundleFont[];
   colors: BundleColor[];
@@ -126,6 +130,7 @@ export type FigmaBundle = {
     ink: string;
     construction: string;
     rules: string[];
+    misuse: { rule: string; show: DeviceMisuseKind }[];
     applications: Application[];
   };
   frames: BundleFrame[];
@@ -244,6 +249,8 @@ export function buildBundle(brand: Brand, files: BundleFiles): FigmaBundle {
     slug: brand.slug,
     name: brand.name,
     edition: brand.edition,
+    ...(brand.domain ? { domain: brand.domain } : {}),
+    category: brand.category.name,
     intro: {
       positioning: brand.positioning,
       idea: brand.concept.idea,
@@ -299,6 +306,7 @@ export function buildBundle(brand: Brand, files: BundleFiles): FigmaBundle {
             ink: device.ink,
             construction: device.construction,
             rules: device.rules,
+            misuse: device.misuse ?? [],
             applications: device.applications,
           },
         }
