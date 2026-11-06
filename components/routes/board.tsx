@@ -2,33 +2,16 @@ import type { CSSProperties, ReactNode } from "react";
 import { Mark } from "@/components/shell/mark";
 import { contrast } from "@/lib/brand/color";
 import type { BoardRoute, getBoard } from "@/lib/brand/route-board";
-import type { Case, TypeStyle } from "@/lib/brand/schema";
+import type { TypeStyle } from "@/lib/brand/schema";
+import { stepStyle } from "@/lib/brand/type";
 import styles from "./board.module.css";
 
 type Board = NonNullable<ReturnType<typeof getBoard>>;
 
 const ROWS = ["Marks", "Palette", "Type", "App tile", "Website hero", "Business card", "Score"] as const;
 
-const transform: Record<Case, CSSProperties["textTransform"]> = {
-  sentence: "none",
-  title: "none",
-  "as-written": "none",
-  upper: "uppercase",
-  lower: "lowercase",
-};
-
 /** Inline style for one step of a route's type scale, at a given size. */
-function styleFor(r: BoardRoute, step: TypeStyle, fontSize: string): CSSProperties {
-  return {
-    fontFamily: r.family(step.face),
-    fontSize,
-    fontWeight: step.weight,
-    lineHeight: step.lineHeight,
-    letterSpacing: `${step.tracking}em`,
-    textTransform: transform[step.case],
-    fontFeatureSettings: step.features?.map((f) => `"${f}"`).join(", ") || undefined,
-  };
-}
+const styleFor = (r: BoardRoute, step: TypeStyle, fontSize: string) => stepStyle(step, r.family(step.face), fontSize);
 
 function fontCss(board: Board) {
   const seen = new Set<string>();
@@ -141,8 +124,10 @@ function surface(r: BoardRoute, ground: string, ink: string): CSSProperties {
 
 function Marks({ r }: { r: BoardRoute }) {
   const { marks, colors } = r.route;
-  const ground = colors.find((c) => c.role === "ground")!.name;
-  const ink = colors.find((c) => c.role === "ink")!.name;
+  const ground = colors.find((c) => c.role === "ground")?.name;
+  const ink = colors.find((c) => c.role === "ink")?.name;
+  // A route without a ground and an ink fails check-route; there is nothing to draw on.
+  if (!ground || !ink) return null;
   const lockup = marks.alternates?.find((m) => /lockup/i.test(`${m.file} ${m.name}`)) ?? marks.primary;
   const small = [marks.symbol, marks.primary].filter((m) => m !== undefined);
   return (

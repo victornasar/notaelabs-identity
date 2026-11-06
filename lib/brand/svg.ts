@@ -12,6 +12,15 @@ export function viewBox(svg: string): ViewBox {
   return { x, y, w, h };
 }
 
+/**
+ * The middle third of a drawing, where a row device's shapes sit, so a band of
+ * it stays low. Returns the cropped SVG and its aspect ratio.
+ */
+export function strip(svg: string) {
+  const { x, y, w, h } = viewBox(svg);
+  return { svg: svg.replace(/viewBox="[^"]+"/, `viewBox="${x} ${y + h / 3} ${w} ${h / 3}"`), aspect: w / (h / 3) };
+}
+
 /** Width over height. */
 export const aspect = (svg: string) => {
   const { w, h } = viewBox(svg);

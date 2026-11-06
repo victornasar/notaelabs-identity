@@ -6,6 +6,6 @@ export async function GET(_request: Request, { params }: { params: Promise<{ slu
   const bytes = fontFile(slug, file.map(decodeURIComponent));
   if (!bytes) return new Response("Not found", { status: 404 });
   return new Response(new Uint8Array(bytes), {
-    headers: { "content-type": file.at(-1)!.endsWith(".otf") ? "font/otf" : "font/ttf" },
+    headers: { "content-type": file.at(-1)?.endsWith(".otf") ? "font/otf" : "font/ttf" },
   });
 }

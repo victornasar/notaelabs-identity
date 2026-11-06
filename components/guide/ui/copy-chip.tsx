@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import styles from "./guide.module.css";
+import styles from "./ui.module.css";
 
 /** One value as a pill. Click to copy; the pill confirms in place. */
 export function CopyChip({ label, value }: { label: string; value: string }) {

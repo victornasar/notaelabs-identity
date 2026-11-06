@@ -1,8 +1,25 @@
+import type { CSSProperties } from "react";
 import type { Case, TypeStyle } from "./schema";
 
-/** The CSS text-transform that sets a case. Sentence case is written, not transformed. */
-export function textTransform(c: Case) {
-  return c === "upper" ? "uppercase" : c === "lower" ? "lowercase" : c === "title" ? "capitalize" : "none";
+/**
+ * The CSS text-transform that sets a case. Sentence and title case are written,
+ * not transformed: CSS `capitalize` would capitalize every word, "and" included.
+ */
+export function textTransform(c: Case): CSSProperties["textTransform"] {
+  return c === "upper" ? "uppercase" : c === "lower" ? "lowercase" : "none";
+}
+
+/** Inline style that sets text in one step of a type scale. */
+export function stepStyle(step: TypeStyle, fontFamily: string, fontSize?: string): CSSProperties {
+  return {
+    fontFamily,
+    fontSize,
+    fontWeight: step.weight,
+    lineHeight: step.lineHeight,
+    letterSpacing: `${step.tracking}em`,
+    textTransform: textTransform(step.case),
+    fontFeatureSettings: step.features?.map((f) => `"${f}"`).join(", ") || undefined,
+  };
 }
 
 const CASE_NAMES: Record<Case, string> = {

@@ -54,7 +54,7 @@ The generator runs from chat. In Claude Code, type `/brand <slug>`; in Cursor, a
 
 - `scripts/brands.ts` writes `brands/registry.generated.ts` before `dev` and `build`. In dev it includes every brand. With `--production` it includes only `BRAND`. The file is not committed.
 - `app/[brand]/` renders one long page. `next.config.ts` serves the selected brand at `/`.
-- `components/shell/` holds the sections. Brand colors arrive as CSS variables by role: `--ground`, `--ink`, `--accent`, and `--support`.
+- `components/guide/` holds the page: one component and CSS module per section, with shared pieces in `ui/`. `lib/brand/sections.ts` decides which sections a brand gets, in what order. Brand colors arrive as CSS variables by role: `--ground`, `--ink`, `--accent`, and `--support`.
 - `lib/brand/color.ts` works out OKLCH, RGB, and WCAG contrast from each hex value, so contrast figures cannot go stale.
 
 ## Status

@@ -1,0 +1,55 @@
+/* Voice: write this, not that. */
+
+.lines {
+  display: grid;
+  gap: var(--card-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.line {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: var(--card-gap);
+}
+
+.write {
+  background: var(--ink);
+  color: var(--ground);
+}
+
+.not {
+  color: var(--quiet);
+}
+
+.verdict {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 36px;
+}
+
+.quote {
+  margin-top: auto;
+  font-size: clamp(1.25rem, 1rem + 0.8vw, 1.75rem);
+  line-height: 1.25;
+  text-wrap: pretty;
+}
+
+.not .quote {
+  font-size: 1.0625rem;
+  line-height: 1.4;
+}
+
+.not s {
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 1.5px;
+}
+
+@media (max-width: 960px) {
+  .line {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

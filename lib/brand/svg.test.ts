@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { aspect, viewBox } from "./svg";
+import { aspect, strip, viewBox } from "./svg";
 
 describe("viewBox", () => {
   it("reads space- or comma-separated values", () => {
@@ -15,5 +15,12 @@ describe("viewBox", () => {
 
   it("gives width over height", () => {
     assert.equal(aspect('<svg viewBox="0 0 20 10">'), 2);
+  });
+
+  it("cuts a drawing to its middle third", () => {
+    assert.deepEqual(strip('<svg viewBox="0 0 2400 900"><ellipse/></svg>'), {
+      svg: '<svg viewBox="0 300 2400 300"><ellipse/></svg>',
+      aspect: 8,
+    });
   });
 });

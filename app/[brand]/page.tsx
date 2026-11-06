@@ -1,11 +1,17 @@
+import { Closing } from "@/components/guide/closing";
+import { Colors } from "@/components/guide/colors";
+import { Band, Hero } from "@/components/guide/hero";
 import { Imagery } from "@/components/guide/imagery";
+import { Marks } from "@/components/guide/marks";
 import { Nav } from "@/components/guide/nav";
-import { Band, Closing, Colors, Hero, Marks, Type, Voice } from "@/components/guide/sections";
+import { Type } from "@/components/guide/type";
+import type { SectionProps } from "@/components/guide/ui/types";
+import { Voice } from "@/components/guide/voice";
 import { Mark } from "@/components/shell/mark";
-import { getBrand, type ActiveBrand } from "@/lib/brand/active";
-import { pageSections, type NavSectionId, type PageSection } from "@/lib/brand/sections";
+import { getBrand } from "@/lib/brand/active";
+import { pageSections, type NavSectionId } from "@/lib/brand/sections";
 
-type Body = (props: { active: ActiveBrand; section: PageSection }) => React.ReactNode;
+type Body = (props: SectionProps) => React.ReactNode;
 
 // Each nav section's component. The cover and closing frame every page.
 const bodies: Record<NavSectionId, Body> = {
