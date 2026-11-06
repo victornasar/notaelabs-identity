@@ -385,16 +385,19 @@ async function drawPage(plan: BookPlan, variables: Map<string, Variable>, styles
     }
   };
 
-  const concept = async (area: FrameNode, { ink }: ContentFrame) => {
-    await lead(area, "Idea", plan.intro.idea, ink);
-    await caption(area, { name: "Source", caption: plan.intro.source }, ink);
+  const refuses = async (area: FrameNode, { ink }: ContentFrame) => {
+    // Each sentence on its own line, large: what the category does that the brand won't.
+    add(area, await text("What we refuse", role.label, quiet(ink), { stretch: true }));
+    const list = grow(add(area, box("Refuses", "VERTICAL", { gap: 40, stretch: true })));
+    list.primaryAxisAlignItems = "CENTER";
+    for (const line of plan.intro.refuses) add(list, statement(line, ink));
   };
 
-  const vision = async (area: FrameNode, { ink }: ContentFrame) => {
-    const { vision: words = "", values } = plan.intro;
-    await lead(area, "Vision", words, ink);
+  const idea = async (area: FrameNode, { ink }: ContentFrame) => {
+    const { idea: words, values } = plan.intro;
+    await lead(area, "The idea", words, ink);
     if (!values.length) return;
-    // The values as outlined cards in a row, sharing the width.
+    // How the studio works, as outlined cards in a row: the idea's evidence.
     const row = add(area, box("Values", "HORIZONTAL", { gap: layout.gap, stretch: true }));
     const width = Math.floor((column - layout.gap * (values.length - 1)) / values.length);
     for (const { value, means } of values) {
@@ -427,18 +430,20 @@ async function drawPage(plan: BookPlan, variables: Map<string, Variable>, styles
     await caption(area, graphic, ink);
   };
 
-  const draw = { overview, concept, vision, palette, faces, scale, symbol, lockup, device };
+  const draw = { overview, refuses, idea, palette, faces, scale, symbol, lockup, device };
 
-  // The cover on a row of its own: the edition over the cover's mark.
-  const cover = landscape(plan.cover.name, 0, 0);
-  add(cover, await text(plan.cover.edition, role.label, { color: accent }, { stretch: true }));
-  stage(cover, vector(plan.cover.name, plan.cover.svg, ink, { width: 1400, height: 600 }));
-  const drawn: FrameNode[] = [cover];
+  /** The edition over the cover's mark, in place of the first section's divider. */
+  const cover = async (name: string, row: number) => {
+    const frame = landscape(name, row, 0);
+    add(frame, await text(plan.cover.edition, role.label, { color: accent }, { stretch: true }));
+    stage(frame, vector(name, plan.cover.svg, ink, { width: 1400, height: 600 }));
+    return frame;
+  };
 
-  for (const [index, section] of plan.sections.entries()) {
-    const row = index + 1;
+  const drawn: FrameNode[] = [];
+  for (const [row, section] of plan.sections.entries()) {
     const { name, number, title } = section.divider;
-    drawn.push(await divider(name, number, title, row));
+    drawn.push(section.divider.cover ? await cover(name, row) : await divider(name, number, title, row));
     for (const [i, spec] of section.frames.entries()) {
       const area = await content(spec, row, i + 1);
       await draw[spec.kind](area, spec);

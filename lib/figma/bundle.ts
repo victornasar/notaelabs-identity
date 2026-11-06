@@ -86,13 +86,13 @@ export type BundleFrame = {
   uses: { colors: string[]; textStyles: string[]; marks: string[]; device: boolean };
 };
 
-/** What the book opens with: who the company is, the idea behind the identity, and where it is going. */
+/** What the book opens with: who the company is, what it refuses, and the idea it works from. */
 export type BundleIntro = {
   positioning: string;
   idea: string;
-  source: string;
   mission?: string;
-  vision?: string;
+  /** What the category does that the company won't. */
+  refuses?: string;
   personality: string[];
   values: { value: string; means: string }[];
 };
@@ -243,9 +243,8 @@ export function buildBundle(brand: Brand, files: BundleFiles): FigmaBundle {
     intro: {
       positioning: brand.positioning,
       idea: brand.concept.idea,
-      source: brand.concept.source,
       ...(story?.mission ? { mission: story.mission } : {}),
-      ...(story?.vision ? { vision: story.vision } : {}),
+      ...(story?.refuses ? { refuses: story.refuses } : {}),
       personality: story?.personality ?? [],
       values: story?.values ?? [],
     },

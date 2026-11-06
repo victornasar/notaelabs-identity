@@ -86,7 +86,7 @@ describe("bookPlan", () => {
   it("follows the outline, drawing only the sections the brand has, numbered without gaps", () => {
     const names = plan.sections.map((s) => [s.divider.name, ...s.frames.map((f) => f.name)]);
     assert.deepEqual(names, [
-      ["01 Introduction", "01.1 Introduction · Overview", "01.2 Introduction · Concept", "01.3 Introduction · Vision"],
+      ["Cover", "01.1 Introduction · Overview", "01.2 Introduction · What we refuse", "01.3 Introduction · The idea"],
       ["02 Logo", "02.1 Logo · Logo mark", "02.2 Logo · On Stone", "02.3 Logo · On Sodium", "02.4 Logo · On Night"],
       ["03 Color", "03.1 Color · Palette"],
       ["04 Typography", "04.1 Typography · Typefaces", "04.2 Typography · Scale"],
@@ -112,18 +112,24 @@ describe("bookPlan", () => {
     );
   });
 
-  it("opens on the cover's mark, then introduces the company in its own words", () => {
+  it("opens on the cover in place of a divider, then says what the brand refuses before its idea", () => {
+    assert.equal(plan.sections[0]?.divider.cover, true);
+    assert.ok(plan.sections.slice(1).every((s) => !s.divider.cover));
     assert.equal(plan.cover.edition, "Brand guidelines · Edition 2 · November 2026");
     assert.deepEqual(plan.statement, { family: "Chivo", style: "Regular" });
+    assert.deepEqual(plan.intro.refuses, [
+      "Spectacle: facades that change color every few seconds.",
+      "Spec sheets with a logo on them.",
+      "Darkness treated as a failure.",
+    ]);
     assert.match(plan.intro.idea, /^Good night light comes in measured pools/);
-    assert.deepEqual(plan.intro.personality, ["Warm", "Exacting", "Nocturnal", "Generous"]);
   });
 
-  it("leaves the Vision frame out of a brand without a vision", () => {
+  it("leaves out the refusals frame for a brand that names none", () => {
     const bare = structuredClone(brand);
-    delete bare.story!.vision;
+    bare.story!.refuses = "";
     const parts = bookPlan(buildBundle(bare, files)).sections[0]!.frames.map((f) => f.kind);
-    assert.deepEqual(parts, ["overview", "concept"]);
+    assert.deepEqual(parts, ["overview", "idea"]);
   });
 
   it("draws the symbol in the accent, captioned with what it represents", () => {

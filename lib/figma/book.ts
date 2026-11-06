@@ -50,8 +50,8 @@ export type FaceCard = {
 
 export type ScaleRow = { id: string; spec: string; style: string; sample: string };
 
-/** A frame that only names its section: "02" and "COLOR". */
-export type Divider = { name: string; number: string; title: string };
+/** A frame that only names its section: "02" and "COLOR". The cover opens the first section instead. */
+export type Divider = { name: string; number: string; title: string; cover: boolean };
 
 /**
  * A landscape frame showing one part of a section. `page` is its place in the
@@ -60,7 +60,7 @@ export type Divider = { name: string; number: string; title: string };
  */
 export type ContentFrame = {
   name: string;
-  kind: "overview" | "concept" | "vision" | "palette" | "faces" | "scale" | "symbol" | "lockup" | "device";
+  kind: "overview" | "refuses" | "idea" | "palette" | "faces" | "scale" | "symbol" | "lockup" | "device";
   eyebrow: string;
   page: string;
   ground: string;
@@ -88,9 +88,10 @@ export type BookPlan = {
   /** The Introduction's large sentences, in the text face's lightest weight. */
   statement: FontName;
   brand: string;
-  /** The first frame, before any section: the edition over the cover's mark. */
-  cover: { name: string; edition: string; svg: string };
-  intro: BundleIntro;
+  /** The first frame, opening the first section: the edition over the cover's mark. */
+  cover: { edition: string; svg: string };
+  /** `refuses` as its separate sentences, one line each. */
+  intro: Omit<BundleIntro, "refuses"> & { refuses: string[] };
   palette: { cards: SwatchCard[]; note?: string };
   faces: FaceCard[];
   scale: ScaleRow[];
@@ -185,8 +186,8 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
       title: "Introduction",
       parts: [
         { kind: "overview", part: "Overview" },
-        { kind: "concept", part: "Concept" },
-        ...(bundle.intro.vision ? [{ kind: "vision" as const, part: "Vision" }] : []),
+        ...(bundle.intro.refuses ? [{ kind: "refuses" as const, part: "What we refuse" }] : []),
+        { kind: "idea", part: "The idea" },
       ],
     },
     {
@@ -223,7 +224,7 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
       const number = String(n + 1).padStart(2, "0");
       page += 1;
       return {
-        divider: { name: `${number} ${title}`, number, title },
+        divider: n === 0 ? { name: "Cover", number, title, cover: true } : { name: `${number} ${title}`, number, title, cover: false },
         frames: parts.map(({ kind, part, ...on }, i) => {
           page += 1;
           const own = !on.ground || on.ground === ground.name;
@@ -259,8 +260,8 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
     display: { font: { family: display.family, style: display.style }, upper: upper("display") },
     statement: { family: lightest.family, style: lightest.style },
     brand: bundle.name,
-    cover: { name: "Cover", edition: bundle.edition, svg: coverSvg },
-    intro: bundle.intro,
+    cover: { edition: bundle.edition, svg: coverSvg },
+    intro: { ...bundle.intro, refuses: bundle.intro.refuses?.split(/(?<=\.)\s+/) ?? [] },
     palette: {
       cards: ordered.map((c, i) => ({
         color: c.name,
