@@ -17,7 +17,8 @@ const ellipse = (cx, cy, rx, ry) => `<ellipse cx="${r(cx)}" cy="${r(cy)}" rx="${
 // Pool row: 3:1 pools, each one pool-width apart, running off both edges.
 const POOL = 300;
 const pools = [];
-for (let cx = POOL / 2; cx < W + POOL; cx += POOL * 2) pools.push(ellipse(cx, H / 2, POOL / 2, POOL / 6));
+// Centered on both edges, so a half pool is cut off at each.
+for (let cx = 0; cx <= W; cx += POOL * 2) pools.push(ellipse(cx, H / 2, POOL / 2, POOL / 6));
 writeFileSync(here + "pool-row.svg", svg(pools.join("")));
 
 console.log("graphics: pool-row");
