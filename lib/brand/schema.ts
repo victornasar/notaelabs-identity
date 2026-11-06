@@ -250,6 +250,37 @@ export type Photography = Cited & {
   references: string[];
 };
 
+/** The kinds of image the engine makes in code, from a brand's palette, symbol and graphic language. */
+export const imageTypes = ["light-field", "grain-field", "symbol-render", "hard-light", "symbol-pattern"] as const;
+export type ImageType = (typeof imageTypes)[number];
+
+/** One generated image, made at the size an application needs. */
+export type BrandImage = {
+  /** File stem in the brand's `images/` folder: `cover` writes `images/cover.png`. */
+  name: string;
+  type: ImageType;
+  width: number;
+  height: number;
+  /** Change it to re-roll this image alone. */
+  seed: number;
+  /** Color names. */
+  ground: string;
+  ink: string;
+  /** The color of the surfaces light lands on, in a scene; the ground's when absent. */
+  surface?: string;
+  /** What the image is made for: an application kind, or "cover". */
+  for: string;
+};
+
+export type Imagery = Cited & {
+  /** The type most images use, and at most one second type. */
+  main: ImageType;
+  second?: ImageType;
+  /** Why the strategy picks these types, and rules the others out. */
+  why: string;
+  images: BrandImage[];
+};
+
 /** A kind of real-world application the renderer can draw. */
 export type ApplicationKind =
   | "website"
@@ -319,6 +350,7 @@ export type Brand = Strategy & {
   colorModes?: ColorMode[];
   type: TypeSystem;
   graphicLanguage?: GraphicLanguage;
+  imagery?: Imagery;
   photography?: Photography;
   applications?: Application[];
   /** Parts of the book this brand doesn't need, each with the reason. */
@@ -470,9 +502,17 @@ function bookProblems(brand: Brand): string[] {
     color(`graphicLanguage.${element.name}`, element.ink);
   }
 
+  for (const image of brand.imagery?.images ?? []) {
+    color(`imagery.${image.name}`, image.ground);
+    color(`imagery.${image.name}`, image.ink);
+    const { main, second } = brand.imagery!;
+    if (image.type !== main && image.type !== second) out.push(`imagery.${image.name} is ${image.type}, not the main or second type.`);
+  }
+
   const valid = citable(brand);
   const cited: [string, Cited][] = [
     ...(brand.graphicLanguage?.elements ?? []).map((e): [string, Cited] => [`graphicLanguage.${e.name}`, e]),
+    ...(brand.imagery ? [["imagery", brand.imagery] as [string, Cited]] : []),
     ...(brand.photography ? [["photography", brand.photography] as [string, Cited]] : []),
   ];
   for (const [where, choice] of cited) {

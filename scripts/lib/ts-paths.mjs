@@ -22,6 +22,7 @@ registerHooks({
         if (existsSync(fileURLToPath(candidate))) return next(candidate.href, context);
       }
     }
-    return next(url ? url.href : specifier, context);
+    // Relative imports that already resolve go through untouched, so CommonJS requires keep working.
+    return next(specifier.startsWith("@/") ? url.href : specifier, context);
   },
 });

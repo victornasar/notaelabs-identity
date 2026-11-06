@@ -14,6 +14,7 @@
     "render-marks": "node scripts/render-marks.mjs",
     "check-route": "node --no-warnings --import ./scripts/lib/ts-paths.mjs scripts/check-route.ts",
     "check-brand": "node --no-warnings --import ./scripts/lib/ts-paths.mjs scripts/check-brand.ts",
+    "render-imagery": "node --no-warnings --import ./scripts/lib/ts-paths.mjs scripts/render-imagery.ts",
     "oklch": "node --no-warnings --import ./scripts/lib/ts-paths.mjs scripts/oklch.ts"
   },
   "dependencies": {
@@ -26,9 +27,12 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/three": "0.187.0",
     "eslint": "^9",
     "eslint-config-next": "16.4.5",
     "opentype.js": "^2.0.0",
+    "playwright": "1.64.1",
+    "three": "0.187.0",
     "typescript": "^5"
   }
 }

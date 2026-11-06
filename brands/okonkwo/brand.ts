@@ -181,6 +181,7 @@ export default defineBrand({
       "Pools repeat at the interval: the gap between two pools is one pool wide. Never closer, never scattered.",
       "At most one beam per page, falling from the top edge onto its pool, at the lamp symbol’s angle.",
       "Type sits in the dark between pools, or in Night on a Sodium field; never across a pool’s edge.",
+      "In imagery, light behaves like light: it falls off across the surfaces it lands on, stops at a hard cut-off and casts hard shadows, under a fine grain. It never glows, blooms or blurs past its edge. Sodium as a layout color stays flat.",
     ],
   },
   type: {
@@ -223,6 +224,21 @@ export default defineBrand({
       ],
       cites: ["concept.primitives.cone", "concept.primitives.cut-off"],
     },
+  },
+  imagery: {
+    main: "hard-light",
+    second: "symbol-render",
+    why: "Light with hard edges and no glow: the cut-off, the cone and the pool drawn as the studio draws light. Light and grain fields are ruled out by dark-and-glow (gloomy) and the never-graded Sodium; the symbol pattern repeats like a fixture catalog (spec-sheet).",
+    images: [
+      { name: "cover", type: "hard-light", width: 3200, height: 1800, seed: 1, ground: "Night", ink: "Sodium", surface: "Stone", for: "cover" },
+      { name: "website-hero", type: "hard-light", width: 2520, height: 1080, seed: 2, ground: "Night", ink: "Sodium", surface: "Stone", for: "website" },
+      { name: "competition-board", type: "hard-light", width: 2376, height: 3364, seed: 3, ground: "Night", ink: "Sodium", surface: "Stone", for: "poster" },
+      { name: "hoarding", type: "hard-light", width: 4000, height: 1000, seed: 4, ground: "Night", ink: "Sodium", surface: "Stone", for: "signage" },
+      { name: "social-post", type: "hard-light", width: 1080, height: 1350, seed: 5, ground: "Night", ink: "Sodium", surface: "Stone", for: "social-post" },
+      { name: "symbol", type: "symbol-render", width: 2048, height: 2048, seed: 7, ground: "Night", ink: "Sodium", surface: "Stone", for: "app-icon" },
+      { name: "deck-cover", type: "hard-light", width: 3200, height: 1800, seed: 6, ground: "Night", ink: "Sodium", surface: "Stone", for: "deck" },
+    ],
+    cites: ["concept.primitives.cut-off", "concept.primitives.cone", "concept.primitives.pool", "category.conventions.dark-and-glow"],
   },
   reveal: { mark: "primary", compactMark: "symbol.svg", ground: "Sodium", ink: "Night" },
 });
