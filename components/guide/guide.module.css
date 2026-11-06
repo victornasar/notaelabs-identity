@@ -222,44 +222,45 @@
 /* ---------- Hero ---------- */
 
 .hero {
-  position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: end;
-  gap: 32px var(--column-gap);
-  padding-top: clamp(120px, 18vh, 200px);
-  padding-bottom: clamp(32px, 5vw, 64px);
+  grid-template-rows: auto 1fr auto;
+  min-height: calc(100svh - clamp(56px, 7vw, 96px) - clamp(24px, 4vw, 48px));
+  min-height: max(calc(100svh - clamp(56px, 7vw, 96px) - clamp(24px, 4vw, 48px)), 560px);
+  padding-top: 84px;
 }
 
-.heroCopy > * {
-  animation: enter 600ms var(--ease-out) both;
+.heroMeta {
+  animation: enter 600ms var(--ease-out) 500ms both;
 }
 
-.heroCopy > :nth-child(2) {
-  animation-delay: 60ms;
-}
-.heroCopy > :nth-child(3) {
-  animation-delay: 120ms;
-}
-.heroCopy > :nth-child(4) {
-  animation-delay: 180ms;
+/* The lockup is revealed once, bottom up, the way a lamp's light lands. */
+.heroLockup {
+  align-self: center;
+  margin: clamp(48px, 8vh, 96px) auto;
+  width: min(100%, 1160px);
+  font-size: 0;
+  color: var(--ink);
+  animation: reveal 1100ms var(--ease-in-out) 80ms both;
 }
 
-.heroTitle {
-  margin-top: 28px;
-  font-family: var(--display);
-  font-weight: var(--display-weight);
-  text-transform: var(--display-case);
-  letter-spacing: var(--display-tracking);
-  font-size: clamp(3.25rem, 1.6rem + 6.4vw, 8.5rem);
-  line-height: 0.88;
-  max-width: 13ch;
-  text-wrap: balance;
+.heroLockup > span,
+.heroLockup svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.heroFoot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px 40px;
+  animation: enter 600ms var(--ease-out) 600ms both;
 }
 
 .heroLede {
-  margin-top: 28px;
-  max-width: 44ch;
+  max-width: 46ch;
   font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
   color: var(--quiet);
   text-wrap: pretty;
@@ -269,63 +270,6 @@
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-top: 36px;
-}
-
-/* The lamp, stuck on at an angle like a label on a fitting. */
-.sticker {
-  display: grid;
-  justify-items: center;
-  gap: 14px;
-  width: clamp(170px, 18vw, 240px);
-  padding: 30px 26px 20px;
-  border-radius: var(--radius);
-  background: var(--accent);
-  color: var(--ground);
-  rotate: 6deg;
-  box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.8);
-  animation: stick 900ms var(--ease-out) 260ms both;
-  transition: rotate 500ms cubic-bezier(0.34, 1.4, 0.64, 1);
-  align-self: center;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .sticker:hover {
-    rotate: 0deg;
-  }
-}
-
-.stickerMark {
-  display: block;
-  width: 100%;
-  aspect-ratio: 1;
-}
-
-.stickerMark svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-.stickerName {
-  font-family: var(--mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.heroMark {
-  grid-column: 1 / -1;
-  margin-top: clamp(24px, 6vw, 72px);
-  color: var(--ink);
-  animation: enter 800ms var(--ease-out) 240ms both;
-}
-
-.heroMark > span,
-.heroMark svg {
-  display: block;
-  width: 100%;
-  height: auto;
 }
 
 @keyframes enter {
@@ -335,11 +279,13 @@
   }
 }
 
-@keyframes stick {
+@keyframes reveal {
   from {
-    opacity: 0;
-    transform: scale(0.92) translateY(10px);
-    rotate: 14deg;
+    clip-path: inset(100% 0 0 0);
+    transform: translateY(12%);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
   }
 }
 
@@ -997,32 +943,6 @@
 /* ---------- Smaller screens ---------- */
 
 @media (max-width: 960px) {
-  .hero {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .sticker {
-    position: absolute;
-    top: clamp(96px, 14vh, 140px);
-    right: var(--gutter);
-    width: 104px;
-    padding: 16px 14px 10px;
-    gap: 8px;
-    border-radius: 20px;
-  }
-
-  .stickerName {
-    font-size: 0.625rem;
-  }
-
-  .heroTitle {
-    margin-top: 64px;
-  }
-
-  .heroCopy > .pill {
-    max-width: calc(100% - 128px);
-  }
-
   .title,
   .lede {
     grid-column: 1 / -1;
@@ -1082,9 +1002,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .heroCopy > *,
-  .heroMark,
-  .sticker {
+  .heroMeta,
+  .heroLockup,
+  .heroFoot {
     animation: fade 300ms ease both;
   }
 
@@ -1095,7 +1015,6 @@
   .button,
   .chip,
   .navHome,
-  .sticker,
   .swap {
     transition-property: opacity, background-color, color;
   }

@@ -5,6 +5,7 @@ import { bestOn, contrast, toOklch, toRgbString, wcagLevel } from "@/lib/brand/c
 import { minimumContrast, type BrandColor, type Face, type TypeStyle } from "@/lib/brand/schema";
 import { describeStep, textTransform } from "@/lib/brand/type";
 import { CopyChip } from "./copy-chip";
+import { stripOf } from "./imagery";
 import styles from "./guide.module.css";
 
 type Props = { active: ActiveBrand };
@@ -27,53 +28,54 @@ function aspect(svg: string) {
   return w / h;
 }
 
-function Heading({ eyebrow, title, children }: { eyebrow: string; title: string; children?: React.ReactNode }) {
+function Heading({
+  id,
+  eyebrow,
+  title,
+  children,
+}: {
+  id: string;
+  eyebrow: string;
+  title: string;
+  children?: React.ReactNode;
+}) {
   return (
     <header className={styles.heading}>
       <p className={styles.eyebrow}>{eyebrow}</p>
-      <h2 className={styles.title}>{title}</h2>
+      <h2 id={`${id}-title`} className={styles.title}>
+        {title}
+      </h2>
       {children ? <p className={styles.lede}>{children}</p> : null}
     </header>
   );
 }
 
-/** The cover: what the brand does, in its own type, with the lamp stuck on like a label. */
+/** The cover: the lamp and the wordmark together, as large as the screen allows. */
 export function Hero({ active }: Props) {
   const { brand, svg } = active;
-  // The positioning up to its list, as a headline; the whole of it stays in the lede.
-  const headline = brand.positioning.split(":")[0].replace(/\.$/, "") + ".";
+  const lockup = brand.marks.alternates?.[0] ?? brand.marks.primary;
 
   return (
     <section id="top" className={styles.hero} aria-label={`${brand.name}, brand guidelines`}>
-      <div className={styles.heroCopy}>
+      <div className={styles.heroMeta}>
         <p className={styles.pill}>
           <span className={styles.dot} aria-hidden="true" />
           {brand.edition}
         </p>
-        <h1 className={styles.heroTitle}>{headline}</h1>
-        <p className={styles.heroLede}>
-          The {brand.name} identity on one page: the marks, the color, the type and the voice. Click any
-          value to copy it.
-        </p>
+      </div>
+      <h1 className={styles.heroLockup}>
+        <Mark svg={svg(lockup)} label={brand.name} align="xMidYMid" />
+      </h1>
+      <div className={styles.heroFoot}>
+        <p className={styles.heroLede}>{brand.positioning}</p>
         <div className={styles.actions}>
           <a href="#marks" className={styles.button}>
             See the marks
           </a>
-          <a href="#color" className={`${styles.button} ${styles.ghost}`}>
-            Get the colors
+          <a href="#imagery" className={`${styles.button} ${styles.ghost}`}>
+            See it at work
           </a>
         </div>
-      </div>
-
-      {brand.marks.symbol ? (
-        <div className={styles.sticker} aria-hidden="true">
-          <Mark className={styles.stickerMark} svg={svg(brand.marks.symbol)} label="" align="xMidYMid" />
-          <span className={styles.stickerName}>{brand.marks.symbol.name}</span>
-        </div>
-      ) : null}
-
-      <div className={styles.heroMark}>
-        <Mark svg={svg(brand.marks.primary)} label={brand.name} align="xMidYMid" />
       </div>
     </section>
   );
@@ -84,10 +86,7 @@ export function Band({ active }: Props) {
   const { brand, color, graphic } = active;
   const { device } = brand;
   if (!device) return null;
-  // The middle third of the drawing, where the pools sit, so the band stays low.
-  const source = graphic(device.file);
-  const [x, y, w, h] = source.match(/viewBox="([^"]+)"/)![1].split(/\s+/).map(Number);
-  const drawing = source.replace(/viewBox="[^"]+"/, `viewBox="${x} ${y + h / 3} ${w} ${h / 3}"`);
+  const { svg: drawing, aspect } = stripOf(graphic(device.file));
 
   return (
     <div
@@ -100,7 +99,7 @@ export function Band({ active }: Props) {
           <Mark
             key={i}
             className={styles.bandTile}
-            style={{ aspectRatio: `${w} / ${h / 3}` }}
+            style={{ aspectRatio: aspect }}
             svg={drawing}
             label=""
             align="xMinYMid"
@@ -133,7 +132,7 @@ export function Marks({ active }: Props) {
 
   return (
     <section id="marks" className={styles.section} aria-labelledby="marks-title">
-      <Heading eyebrow="01 · Marks" title="Drawn once. Used as drawn.">
+      <Heading id="marks" eyebrow="01 · Marks" title="Drawn once. Used as drawn.">
         {marks.primary.use}
       </Heading>
 
@@ -266,7 +265,7 @@ export function Colors({ active }: Props) {
 
   return (
     <section id="color" className={styles.section} aria-labelledby="color-title">
-      <Heading eyebrow="02 · Color" title={`${colors.length} colors. One carries the page.`}>
+      <Heading id="color" eyebrow="02 · Color" title={`${colors.length} colors. One carries the page.`}>
         Each card is as wide as the color’s share of a typical page.
       </Heading>
 
@@ -351,7 +350,7 @@ export function Type({ active }: Props) {
 
   return (
     <section id="type" className={styles.section} aria-labelledby="type-title">
-      <Heading eyebrow="03 · Typography" title={faces.map(([, f]) => f.family).join(" & ")}>
+      <Heading id="type" eyebrow="03 · Typography" title={faces.map(([, f]) => f.family).join(" & ")}>
         {type.fit}
       </Heading>
 
@@ -435,7 +434,7 @@ export function Voice({ active }: Props) {
 
   return (
     <section id="voice" className={styles.section} aria-labelledby="voice-title">
-      <Heading eyebrow="04 · Voice" title="Write this, not that.">
+      <Heading id="voice" eyebrow="05 · Voice" title="Write this, not that.">
         {voice.traits?.map((t) => `${t.trait}: ${t.means.charAt(0).toLowerCase()}${t.means.slice(1)}`).join(" ")}
       </Heading>
 
