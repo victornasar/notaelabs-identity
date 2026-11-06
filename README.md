@@ -35,6 +35,16 @@ brands/<slug>/
 
 `brands/notae` and `brands/okonkwo` are the reference brands. Okonkwo-Marchetti is invented. It has a long name, no symbol, and five colors, to catch anything the shell assumes.
 
+## Generate a brand
+
+The generator runs from chat. In Claude Code, type `/brand <slug>`; in Cursor, ask it to follow `AGENTS.md`. It works in five gates, each waiting for your approval: interview, strategy, three routes, pick, build-out. Every gate's result is committed in `brands/<slug>/work/`, so any session can resume it. The skills live in `.claude/skills/`.
+
+- `pnpm fonts add <id> <slug>` copies an approved family from `fonts/library.json` into the brand.
+- `pnpm oklch "Name=L% C H" ...` turns OKLCH picks into hex and lists every contrast pair.
+- `pnpm render-marks <route folder>` renders marks to PNG, with a review sheet.
+- `pnpm check-route <slug>` lists everything that sends a route back.
+- `/routes/<slug>` (dev only) shows the three routes side by side. Run `pnpm brands` after adding a route.
+
 ## How it works
 
 - `scripts/brands.mjs` writes `brands/registry.generated.ts` before `dev` and `build`. In dev it includes every brand. With `--production` it includes only `BRAND`. The file is not committed.
