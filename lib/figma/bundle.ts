@@ -9,13 +9,13 @@
  */
 import { hexToRgb, toOklch, toRgbString } from "../brand/color";
 import { faceNames, printNote, roleNames } from "../brand/labels";
-import { misuseRule, type Application, type Brand, type ColorRole, type ColorUse, type MisuseShow, type TypeStyle } from "../brand/schema";
+import { misuseRule, type Application, type Brand, type ColorRole, type ColorUse, type DeviceMisuseKind, type MisuseShow, type TypeStyle } from "../brand/schema";
 import { completeness, pageSections, sectionTitle, sections, type SectionId } from "../brand/sections";
 import { viewBox } from "../brand/svg";
 import { describeStep, stepSample } from "../brand/type";
 
 /** Bumped when the plugin can no longer read an older bundle. */
-export const bundleFormat = 3;
+export const bundleFormat = 4;
 
 /** A font as Figma names it: the family and the style it lists. */
 export type FontName = { family: string; style: string };
@@ -126,6 +126,7 @@ export type FigmaBundle = {
     ink: string;
     construction: string;
     rules: string[];
+    misuse: { rule: string; show: DeviceMisuseKind }[];
     applications: Application[];
   };
   frames: BundleFrame[];
@@ -299,6 +300,7 @@ export function buildBundle(brand: Brand, files: BundleFiles): FigmaBundle {
             ink: device.ink,
             construction: device.construction,
             rules: device.rules,
+            misuse: device.misuse ?? [],
             applications: device.applications,
           },
         }

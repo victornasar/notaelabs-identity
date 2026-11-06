@@ -4,6 +4,7 @@
  * Running it again updates the variables and styles in place and redraws the
  * page, so a file can be rebuilt after the brand changes.
  */
+import type { DeviceMisuseKind } from "../../lib/brand/schema";
 import { bundleFormat, type FigmaBundle } from "../../lib/figma/bundle";
 import {
   bookPlan,
@@ -547,6 +548,88 @@ async function drawPage(plan: BookPlan, variables: Map<string, Variable>, styles
     }
   };
 
+  /** A tick, in the corner of the one card that shows the right way. */
+  const tick = (color: string) => {
+    const mark = cross(color);
+    mark.name = "Right";
+    mark.vectorPaths = [{ windingRule: "NONZERO", data: "M 0 14 L 10 24 L 28 4" }];
+    return mark;
+  };
+
+  /** The device's strip, `width` wide, its shapes moved to break one rule when `show` names one. */
+  const broken = (show: DeviceMisuseKind | null, width: number) => {
+    const graphic = plan.device!;
+    const node = vector(graphic.name, graphic.strip, graphic.ink, { width });
+    const span = node.width;
+    const shapes = [...node.children];
+    switch (show) {
+      case "crowded": {
+        // The gaps closed up, and the row repeated to fill the width again.
+        const f = 0.6;
+        for (const shape of shapes) shape.x *= f;
+        for (let offset = span * f; offset < span; offset += span * f) {
+          for (const shape of shapes) {
+            const copy = shape.clone();
+            node.appendChild(copy);
+            copy.x = shape.x + offset;
+          }
+        }
+        break;
+      }
+      case "scattered":
+        shapes.forEach((shape, i) => {
+          shape.x += (((i * 37) % 9) - 4) * span * 0.025;
+          shape.y += (((i * 53) % 7) - 3) * node.height * 0.12;
+        });
+        break;
+      case "glow":
+        for (const shape of shapes) {
+          if ("effects" in shape) shape.effects = [{ type: "LAYER_BLUR", radius: 24, visible: true } as BlurEffect];
+        }
+        break;
+      case "contained": {
+        // Drop what crosses the edges, and center the rest.
+        for (const shape of shapes) if (shape.x < 0 || shape.x + shape.width > span) shape.remove();
+        const kept = [...node.children];
+        const left = Math.min(...kept.map((k) => k.x));
+        const right = Math.max(...kept.map((k) => k.x + k.width));
+        for (const k of kept) k.x += (span - (right - left)) / 2 - left;
+        break;
+      }
+    }
+    return node;
+  };
+
+  /** A rounded panel holding one drawing, centered, with a tick or a cross in its corner. */
+  const sample = (drawing: SceneNode, right: boolean, color: string) => {
+    const panel = box(right ? "Right" : "Wrong", "VERTICAL", { stretch: true, radius: layout.radius, stroke: hairline(color) });
+    panel.primaryAxisAlignItems = panel.counterAxisAlignItems = "CENTER";
+    add(panel, drawing);
+    const badge = add(panel, right ? tick(color) : cross(color));
+    badge.layoutPositioning = "ABSOLUTE";
+    badge.x = badge.y = 32;
+    return panel;
+  };
+
+  const rhythm = async (area: FrameNode, { ink }: ContentFrame) => {
+    // The right way across the top, at full width; each wrong way below it, crossed out.
+    const graphic = plan.device!;
+    const right = add(area, box("Right way", "VERTICAL", { gap: 16, stretch: true }));
+    const top = add(right, sample(broken(null, column), true, ink));
+    top.primaryAxisSizingMode = "FIXED";
+    top.resize(column, 300);
+    top.layoutAlign = "STRETCH";
+    add(right, await text(graphic.caption, role.body, quiet(ink), { stretch: true }));
+
+    const row = grow(add(area, box("Wrong ways", "HORIZONTAL", { gap: layout.gap, stretch: true })));
+    const width = Math.floor((column - layout.gap * (graphic.misuse.length - 1)) / graphic.misuse.length);
+    for (const { rule, show } of graphic.misuse) {
+      const cell = fullHeight(add(row, box(show, "VERTICAL", { gap: 16, width })));
+      grow(add(cell, sample(broken(show, width), false, ink)));
+      add(cell, await text(rule, role.body, quiet(ink), { stretch: true }));
+    }
+  };
+
   const device = async (area: FrameNode, { ink }: ContentFrame) => {
     // The device runs off both edges, so it sits across the whole frame, outside the margins.
     const graphic = plan.device!;
@@ -560,7 +643,7 @@ async function drawPage(plan: BookPlan, variables: Map<string, Variable>, styles
     await caption(area, graphic, ink);
   };
 
-  const draw = { overview, refuses, idea, palette, pairs, faces, scale, inUse, symbol, lockup, misuse, device };
+  const draw = { overview, refuses, idea, palette, pairs, faces, scale, inUse, symbol, lockup, misuse, device, rhythm };
 
   /** The edition over the cover's mark, in place of the first section's divider. */
   const cover = async (name: string, row: number) => {

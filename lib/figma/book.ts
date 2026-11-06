@@ -8,7 +8,8 @@
  * carries this out.
  */
 import { bestOn, contrast, luminance, wcagLevel } from "../brand/color";
-import type { MisuseShow } from "../brand/schema";
+import { strip } from "../brand/svg";
+import type { DeviceMisuseKind, MisuseShow } from "../brand/schema";
 import type { BundleFont, BundleIntro, BundleTextStyle, FigmaBundle, FontName } from "./bundle";
 
 /** The variable collection every brand color lives in. */
@@ -67,7 +68,7 @@ export type Divider = { name: string; number: string; title: string; cover: bool
  */
 export type ContentFrame = {
   name: string;
-  kind: "overview" | "refuses" | "idea" | "palette" | "pairs" | "faces" | "scale" | "inUse" | "symbol" | "lockup" | "misuse" | "device";
+  kind: "overview" | "refuses" | "idea" | "palette" | "pairs" | "faces" | "scale" | "inUse" | "symbol" | "lockup" | "misuse" | "device" | "rhythm";
   eyebrow: string;
   page: string;
   ground: string;
@@ -116,7 +117,8 @@ export type BookPlan = {
   inUse: InUse;
   /** The symbol alone, then the lockup, which each `lockup` frame sets on its own ground. */
   logo: { symbol: Showcase; lockup: string; misuse: MisuseCard[] };
-  device?: Showcase;
+  /** The device, and the ways it is drawn wrong: the construction is the right way's caption. */
+  device?: Showcase & { misuse: { rule: string; show: DeviceMisuseKind }[]; strip: string };
   /** In reading order: one row on the canvas each. */
   sections: BookSection[];
 };
@@ -255,7 +257,12 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
     },
     {
       title: "Visual Language",
-      parts: device ? [{ kind: "device", part: device.name, ground: device.ground, ink: nameOf(bestOn(hexOf(device.ground), hexes)) }] : [],
+      parts: device
+        ? [
+            { kind: "device" as const, part: device.name },
+            ...(device.misuse.length ? [{ kind: "rhythm" as const, part: "Rules" }] : []),
+          ].map((p): Part => ({ ...p, ground: device.ground, ink: nameOf(bestOn(hexOf(device.ground), hexes)) }))
+        : [],
     },
     { title: "Iconography & Illustration", parts: [] },
     { title: "Imagery & Art Direction", parts: [] },
@@ -348,7 +355,16 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
       misuse,
     },
     ...(bundle.device
-      ? { device: { svg: bundle.device.svg, name: bundle.device.name, caption: bundle.device.construction, ink: bundle.device.ink } }
+      ? {
+          device: {
+            svg: bundle.device.svg,
+            name: bundle.device.name,
+            caption: bundle.device.construction,
+            ink: bundle.device.ink,
+            misuse: bundle.device.misuse,
+            strip: strip(bundle.device.svg).svg,
+          },
+        }
       : {}),
     sections,
   };

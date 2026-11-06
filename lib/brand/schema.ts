@@ -251,9 +251,18 @@ export type GraphicElement = Cited & {
 };
 
 /** The brand's one graphic device, and the applications that show it at work. */
+/**
+ * How the book breaks a device to show a misuse, working on the drawing's shapes:
+ * gaps closed up, shapes jittered out of line, shapes blurred, or the shapes that
+ * cross the edges dropped so the rest stops short.
+ */
+export type DeviceMisuseKind = "crowded" | "scattered" | "glow" | "contained";
+
 export type GraphicDevice = GraphicElement & {
   /** How it is used, one rule per line. */
   rules: string[];
+  /** Ways never to draw it, each shown broken and crossed out. */
+  misuse?: { rule: string; show: DeviceMisuseKind }[];
   /** At least two physical and two digital pieces. */
   applications: Application[];
 };
