@@ -20,7 +20,7 @@ Each item is answered, specifically, before the brief can be approved:
 7. **Deadline**: the date, and what must exist by then.
 8. **Mission and vision**: what the company does and for whom, today, in one sentence; and what it is working toward.
 9. **Values**: at least three, each with what it means in the work, not a single word ("Measured: every lux level has a reason").
-10. **Applications**: where the brand will be seen and the pieces that must exist, from the deadline's deliverables and the category's usual ones (a lighting studio: website, competition boards, stationery, site hoardings; a software company: product UI, app icon, pitch deck). These become the book's application mockups.
+10. **Applications**: where the brand will be seen and the pieces that must exist, from the deadline's deliverables and the category's usual ones (a lighting studio: website, competition boards, stationery, site hoardings; a software company: product UI, app icon, pitch deck). These become the applications the book's Imagery section draws.
 
 Ask for an archetype only if the client brings one up.
 

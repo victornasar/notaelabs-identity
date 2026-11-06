@@ -7,7 +7,7 @@ disable-model-invocation: true
 
 # /brand <slug>
 
-Generates a brand book of eight sections (intro, wordmark, logo mark, graphic device, mockup, colors, typography, closing), delivered as a Figma file, in nine gates. Each gate ends with the user's approval, given in chat. Every result is a committed file in `brands/<slug>/work/`, so any session (Claude Code or Cursor) can pick up where the last one stopped.
+Generates a brand book (its sections are listed, with what each needs, in `lib/brand/sections.ts`), delivered as a Figma file, in eight gates. Each gate ends with the user's approval, given in chat. Every result is a committed file in `brands/<slug>/work/`, so any session (Claude Code or Cursor) can pick up where the last one stopped.
 
 | Gate | File | Done when |
 |---|---|---|
@@ -15,11 +15,10 @@ Generates a brand book of eight sections (intro, wordmark, logo mark, graphic de
 | 2. Strategy | `work/strategy.md` + `work/strategy.ts` | `strategy.md` frontmatter `status: approved` |
 | 3. Routes | `work/routes/a/`, `b/`, `c/` + `work/scores.md` | all three pass `pnpm check-route <slug>`, scored, shown on `/routes/<slug>` |
 | 4. Pick | `work/scores.md` frontmatter `picked:` | the user names a route and its changes |
-| 5. Build-out | `brands/<slug>/brand.ts`, `fonts.ts`, `marks/` | `BRAND=<slug> pnpm build` passes |
-| 6. Book copy | `brand.ts` mark meanings, `type.fit`, `voice.signoff` | `work/book.md` records the user's approval under `## Book copy` |
+| 5. Build-out | `brands/<slug>/brand.ts`, `fonts.ts`, `marks/` | `pnpm check` passes |
+| 6. Book copy | `brand.ts` mark meanings, `type.fit`, `voice.signoff`, `page.titles` | `work/book.md` records the user's approval under `## Book copy` |
 | 7. Graphic device | `graphics/` + `brand.ts` `device` | `work/book.md` records approval under `## Graphic device` |
-| 8. Mockup | `brand.ts` `mockup` (+ `mockups/` when the library needs a photo) | `work/book.md` records approval under `## Mockup` |
-| 9. Figma file | `brands/<slug>/figma/` | `pnpm check-brand <slug>` passes and the user has built the file with the plugin |
+| 8. Figma file | `brands/<slug>/figma/` | `pnpm check` passes and the user has built the file with the plugin |
 
 ## Steps
 
@@ -55,7 +54,7 @@ For each route:
 5. **Look.** `pnpm render-marks brands/<slug>/work/routes/<x>`, then read `renders/review.png`. Fill `review` with what you saw at 16px, 64px and as a lockup, and `readable: false` if a mark fills in, breaks up or stops reading as itself. Fix and re-render before moving on.
 6. **Gate.** `pnpm check-route <slug> <x>` until it passes. A route that fails is reworked, never shown.
 
-Then use the `brand-score` skill to write `scores.md`. Run `pnpm brands`, start `pnpm dev` if it isn't running, and give the user `/routes/<slug>`. Ask them to pick one route and say what to change.
+Then use the `brand-score` skill to write `scores.md`. Run `pnpm shots <slug>`, which checks the board and saves `.shots/<slug>-routes.png`; look at it. Then start `pnpm dev` if it isn't running, and give the user `/routes/<slug>`. Ask them to pick one route and say what to change.
 
 ## Gate 4: Pick
 
@@ -63,7 +62,7 @@ Record the pick in `scores.md` frontmatter (`picked: b`) and the requested chang
 
 ## Gate 5: Build-out
 
-Turn the picked route into the brand: `brand.ts` spreads `strategy.ts` (`...strategy`) and takes the route's marks, colors and type; `fonts.ts` loads the faces from `fonts/<id>/` with `next/font/local` (see the README's "Add a brand"); copy the route's marks into `marks/`. Story and voice come from the brief. Leave the earlier `brand.ts` choices in git history, not in comments. Run `BRAND=<slug> pnpm build` and `pnpm lint`, then show the guidelines page. Then run `pnpm check-brand <slug>` and show the user which of the eight sections are still missing.
+Turn the picked route into the brand: `brand.ts` spreads `strategy.ts` (`...strategy`) and takes the route's marks, colors and type; `fonts.ts` loads the faces from `fonts/<id>/` with `next/font/local` (see the README's "Add a brand"); copy the route's marks into `marks/`. Story and voice come from the brief. Leave the earlier `brand.ts` choices in git history, not in comments. Run `pnpm check`, look at `.shots/<slug>-desktop.png` and `-phone.png`, then show the user the guidelines page and which sections `pnpm check-brand <slug>` still lists as missing.
 
 The gates after build-out fill the rest of the book. Each records its approval in `work/book.md`, one `##` heading per gate, with the user's words and the date. The intro comes from the brief (positioning and mission); if the brief lacks them, run a `brand-interview` round for the missing items first. Values, audience and competitors stay in `work/`; the book doesn't show them.
 
@@ -74,7 +73,8 @@ The words the book needs beside the marks, each in a few sentences in the brand'
 - `marks.primary.meaning`: what the wordmark means. Say what each named change in `type.wordmark.changes` stands for.
 - `marks.symbol.meaning`: what the logo mark represents, from `concept.source` and the primitives it is drawn from.
 - `type.fit`: why the faces fit: where each comes from, and what it does for this brand.
-- `voice.signoff`: the book's last line. The closing shows it with the first three `voice.lines`.
+- `voice.signoff`: the book's last line, on the closing panel. The Voice section shows the first three `voice.lines`.
+- `page.titles`: a headline per section in the brand's voice, where the plain default ("Marks", "4 colors") undersells it. Optional.
 
 ## Gate 7: Graphic device
 
@@ -83,15 +83,8 @@ One device that works across real life and screens. It is built from the strateg
 - Write `brands/<slug>/graphics/build.mjs`, which draws it as one single-color SVG in code, taking its construction from a primitive (proportions, angle or spacing), so the device and the marks share their geometry.
 - In `brand.ts`, `device` gives the file, its ground and ink, its construction in words someone could redraw from, where it is used, 2–5 rules, and `cites`.
 - `device.applications` lists at least two physical pieces (business card, letterhead, signage, poster) and two digital ones (website, social post, email signature, deck, app icon), chosen from the brief's applications answer. Each has why the client needs it, its ground and ink (a pairing the palette lists) and its copy, in the brand's voice.
-- Run `pnpm brands` and look at the Device section before showing it. A device that reads as something else (a hat, a warning sign, a generic icon) is redrawn first, as a mark would be.
+- Run `pnpm shots <slug>` and look at the Imagery section in `.shots/` before showing it. A device that reads as something else (a hat, a warning sign, a generic icon) is redrawn first, as a mark would be.
 
-## Gate 8: Mockup
+## Gate 8: Figma file
 
-One photograph of a real surface carrying the marks.
-
-- Pick the photo from `mockups/library.json` whose tags fit the brand's category and applications. If none fits, add one: a licensed photo (Unsplash or similar) of a blank surface, saved in `mockups/`, with its credit and the corners of the blank area.
-- In `brand.ts`, `mockup` names the photo, the mark file placed on it, the ink it is printed in, and why the surface suits the brand. The marks are never presented as installed on a real client's building.
-
-## Gate 9: Figma file
-
-Run `pnpm check-brand <slug>` and fix what it lists. A section the brand genuinely doesn't need goes in `notApplicable` with the reason, and the user agrees to it. When it passes, run `pnpm export-figma <slug>`, then ask the user to build the file with the plugin in `figma-plugin/` and save a local copy: that `.fig` is the deliverable.
+Run `pnpm check` and fix what it lists. Only optional sections (imagery, voice) can be left out: each goes in `notApplicable` with the reason, and the user agrees to it. When it passes, run `pnpm export-figma <slug>`, then ask the user to build the file with the plugin in `figma-plugin/` and save a local copy: that `.fig` is the deliverable. The exporter and plugin are not built yet; say so and stop here until they are.
