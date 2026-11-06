@@ -1,6 +1,6 @@
 ---
 slug: okonkwo
-status: draft
+status: approved
 ---
 # Okonkwo-Marchetti: strategy
 
@@ -57,3 +57,5 @@ This idea answers all three "nevers". It isn't spectacular, because a pool is mo
 - No route uses color cycling, glow effects or a black-first site without a reason drawn from the idea.
 
 ## Approval
+
+2026-11-05, the user (playing the client): "approve".
