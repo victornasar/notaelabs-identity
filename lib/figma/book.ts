@@ -91,7 +91,7 @@ export type Divider = { name: string; number: string; title: string; cover: bool
  */
 export type ContentFrame = {
   name: string;
-  kind: "overview" | "refuses" | "idea" | "palette" | "pairs" | "roles" | "faces" | "scale" | "inUse" | "symbol" | "lockup" | "misuse" | "device" | "rhythm" | "application" | "traits" | "lines" | "rewrites" | "signoff";
+  kind: "overview" | "refuses" | "idea" | "palette" | "pairs" | "roles" | "faces" | "scale" | "inUse" | "symbol" | "lockup" | "misuse" | "device" | "rhythm" | "application" | "traits" | "lines" | "rewrites" | "signoff" | "logoRules" | "colorSpecs" | "typeRules";
   eyebrow: string;
   page: string;
   ground: string;
@@ -157,6 +157,16 @@ export type BookPlan = {
   };
   /** How the brand writes: its traits, lines to write and not, rewrites, and the last line. */
   voice: { traits: { trait: string; means: string; doesNotMean: string }[]; lines: { do: string; dont: string }[]; rewrites: { before: string; after: string }[]; signoff?: string };
+  /** The rules in brief, as spec sheets: the logo's space, sizes and misuses; each color's values; each face's job. */
+  guidelines: {
+    wordmark: string;
+    clearSpace?: { ratio: number; basis: string };
+    minimumSize?: { screen: string; print?: string };
+    never: string[];
+    colors: { name: string; role: string; use: string; edge: boolean; values: { label: string; value: string }[] }[];
+    faces: { kind: string; family: string; font: FontName; role: string; weights: string }[];
+    typeRules: string[];
+  };
   /** In reading order: one row on the canvas each. */
   sections: BookSection[];
 };
@@ -362,7 +372,14 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
         ...(voice.signoff ? [{ kind: "signoff" as const, part: "Sign-off" }] : []),
       ],
     },
-    { title: "Brand Guidelines", parts: [] },
+    {
+      title: "Brand Guidelines",
+      parts: [
+        ...(bundle.marks.clearSpace || bundle.marks.misuse.length ? [{ kind: "logoRules" as const, part: "Logo" }] : []),
+        { kind: "colorSpecs", part: "Color" },
+        ...(bundle.type.faces.length ? [{ kind: "typeRules" as const, part: "Typography" }] : []),
+      ],
+    },
   ];
   let page = 0;
   const sections = outline
@@ -471,6 +488,18 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
       ...(bundle.category ? { category: bundle.category } : {}),
     },
     voice,
+    guidelines: {
+      wordmark: primary.svg,
+      ...(bundle.marks.clearSpace ? { clearSpace: bundle.marks.clearSpace } : {}),
+      ...(bundle.marks.minimumSize ? { minimumSize: bundle.marks.minimumSize } : {}),
+      never: bundle.marks.misuse.map((m) => m.rule),
+      colors: ordered.map((c) => ({ name: c.name, role: `${c.roleName} · ${c.proportion}%`, use: c.use, edge: c.name === ground.name, values: c.values })),
+      faces: bundle.type.faces.flatMap((face) => {
+        const font = heaviest(face.face);
+        return font ? [{ kind: face.kind, family: face.family, font: { family: font.family, style: font.style }, role: face.role, weights: `Weights ${face.weights.join(", ")}` }] : [];
+      }),
+      typeRules: bundle.type.rules ?? [],
+    },
     sections,
   };
 }

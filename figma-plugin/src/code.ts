@@ -888,6 +888,87 @@ async function drawPage(plan: BookPlan, variables: Map<string, Variable>, styles
     add(space, vector(plan.logo.symbol.name, plan.logo.symbol.svg, accent, { height: 72 }));
   };
 
+  /** A label over a numbered list of rules, in the reading text. */
+  const numbered = async (parent: FrameNode, label: string, rules: string[], color: string, width: number) => {
+    const block = add(parent, box(label, "VERTICAL", { gap: 20, width }));
+    add(block, await text(label, role.label, quiet(color), { stretch: true }));
+    for (const [i, words] of rules.entries()) {
+      const item = add(block, box("Rule", "HORIZONTAL", { gap: 20, stretch: true }));
+      add(item, await text(String(i + 1).padStart(2, "0"), role.label, { color: accent }, { width: 32 }));
+      add(item, await text(words, role.body, { color }, { width: width - 52 }));
+    }
+    return block;
+  };
+
+  const logoRules = async (area: FrameNode, { ink }: ContentFrame) => {
+    // Left, the wordmark in its clear space; right, the minimum sizes and the misuses in words.
+    const { wordmark: svg, clearSpace, minimumSize, never } = plan.guidelines;
+    const row = grow(add(area, box("Logo rules", "HORIZONTAL", { gap: 64, stretch: true })));
+    const left = fullHeight(add(row, box("Clear space", "VERTICAL", { gap: 16, width: 960 })));
+    const panel = grow(add(left, box("Panel", "VERTICAL", { stretch: true, radius: layout.radius, stroke: hairline(ink) })));
+    panel.primaryAxisAlignItems = panel.counterAxisAlignItems = "CENTER";
+    const mark = vector("Wordmark", svg, ink, { width: 640, height: 120 });
+    const space = Math.round((clearSpace?.ratio ?? 0) * mark.height);
+    const zone = add(panel, box("Zone", "VERTICAL", { pad: space, stroke: { color: accent } }));
+    zone.dashPattern = [8, 8];
+    add(zone, mark);
+    if (space) {
+      // One unit of clear space, shaded in the corner it is measured from.
+      const unit = figma.createRectangle();
+      unit.name = "x";
+      unit.resize(space, space);
+      unit.fills = [paint({ color: accent, opacity: 0.32 })];
+      add(zone, unit).layoutPositioning = "ABSOLUTE";
+    }
+    if (clearSpace) add(left, await text(`x = ${clearSpace.basis}`, role.body, quiet(ink), { stretch: true }));
+
+    const right = fullHeight(add(row, box("Rules", "VERTICAL", { gap: 56, width: column - 960 - 64 })));
+    if (minimumSize) {
+      const sizes = [`Screen: ${minimumSize.screen}`, ...(minimumSize.print ? [`Print: ${minimumSize.print}`] : [])];
+      const block = add(right, box("Minimum size", "VERTICAL", { gap: 12, stretch: true }));
+      add(block, await text("Minimum size", role.label, quiet(ink), { stretch: true }));
+      for (const size of sizes) add(block, await text(size, role.body, { color: ink }, { stretch: true }));
+    }
+    if (never.length) await numbered(right, "Never", never, ink, column - 960 - 64);
+  };
+
+  const colorSpecs = async (area: FrameNode, { ink, ground: own }: ContentFrame) => {
+    // A row per color: its chip, name, role and use, then every value in a column of its own.
+    const table = grow(add(area, box("Color specs", "VERTICAL", { stretch: true })));
+    table.primaryAxisAlignItems = "CENTER";
+    for (const [i, c] of plan.guidelines.colors.entries()) {
+      if (i > 0) divide(table, ink);
+      const row = add(table, box(c.name, "HORIZONTAL", { gap: 32, stretch: true }));
+      row.paddingTop = row.paddingBottom = 36;
+      const chip = add(row, box("Chip", "VERTICAL", { width: 96, height: 96, radius: 20, fill: { color: c.name }, ...(c.name === own ? { stroke: hairline(ink) } : {}) }));
+      chip.name = c.name;
+      const about = add(row, box("About", "VERTICAL", { gap: 8, width: 440 }));
+      add(about, await text(c.role, role.label, quiet(ink), { stretch: true }));
+      add(about, glyphs(plan.display.upper ? c.name.toUpperCase() : c.name, plan.display.font, 44, { color: ink }));
+      add(about, await text(c.use, role.small, quiet(ink), { stretch: true }));
+      for (const { label, value } of c.values) {
+        const cell = add(row, box(label, "VERTICAL", { gap: 8, width: 190 }));
+        add(cell, await text(label, role.label, quiet(ink), { stretch: true }));
+        add(cell, await text(value, role.small, { color: ink }, { stretch: true }));
+      }
+    }
+    if (plan.palette.note) add(area, await text(plan.palette.note, role.small, quiet(ink), { stretch: true }));
+  };
+
+  const typeRules = async (area: FrameNode, { ink }: ContentFrame) => {
+    // Left, each face set in itself with the job it does; right, the rules.
+    const half = Math.floor((column - 96) / 2);
+    const row = grow(add(area, box("Type rules", "HORIZONTAL", { gap: 96, stretch: true })));
+    const faces = add(row, box("Faces", "VERTICAL", { gap: 56, width: half }));
+    for (const face of plan.guidelines.faces) {
+      const block = add(faces, box(face.kind, "VERTICAL", { gap: 12, stretch: true }));
+      add(block, await text(`${face.kind} · ${face.weights}`, role.label, quiet(ink), { stretch: true }));
+      add(block, glyphs(plan.display.upper && face.font.family === plan.display.font.family ? face.family.toUpperCase() : face.family, face.font, 64, { color: ink }));
+      add(block, await text(face.role, role.body, { color: ink }, { stretch: true }));
+    }
+    if (plan.guidelines.typeRules.length) await numbered(row, "Rules", plan.guidelines.typeRules, ink, half);
+  };
+
   const draw = {
     overview,
     refuses,
@@ -908,6 +989,9 @@ async function drawPage(plan: BookPlan, variables: Map<string, Variable>, styles
     lines,
     rewrites,
     signoff,
+    logoRules,
+    colorSpecs,
+    typeRules,
   };
 
   /** The edition over the cover's mark, in place of the first section's divider. */
