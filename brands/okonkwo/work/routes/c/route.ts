@@ -1,0 +1,136 @@
+import { defineRoute } from "@/lib/brand/route";
+
+export default defineRoute({
+  letter: "c",
+  name: "Dusk",
+  idea: "The system route: every layout is split between day and night, and the warm colors step from sodium to filament to stone like color temperatures. The marks stay plain so the color does the talking; it is the only route where Filament comes back.",
+  marks: {
+    primary: {
+      file: "wordmark.svg",
+      name: "Wordmark",
+      use: "The surnames on one line in a grotesk, the hyphen drawn as one step.",
+      cites: ["equity.assets.names", "concept.primitives.kelvin-steps"],
+    },
+    symbol: {
+      file: "symbol.svg",
+      name: "Steps",
+      use: "A beam drawn in three steps, one per color temperature. App icons and favicons.",
+      cites: ["concept.primitives.kelvin-steps", "concept.primitives.cone"],
+    },
+    alternates: [
+      {
+        file: "lockup.svg",
+        name: "Lockup",
+        use: "Steps, then the wordmark. Signage and covers.",
+        cites: ["concept.primitives.kelvin-steps", "equity.assets.names"],
+      },
+    ],
+    clearSpace: { ratio: 0.5, basis: "the height of one step" },
+    minimumSize: { screen: "Wordmark 16 px tall, steps 16 px", print: "Wordmark 5 mm tall" },
+  },
+  colors: [
+    {
+      name: "Limestone",
+      role: "ground",
+      proportion: 38,
+      hex: "#EFE8DC",
+      oklch: "oklch(93.32% 0.018 81.33)",
+      use: "Day: the left or upper half of a split layout. 3000 K, the last step.",
+      pairs: [{ on: "Basalt", as: "text" }],
+      cites: ["concept.primitives.dusk-pair", "equity.assets.dusk-pair", "concept.primitives.kelvin-steps"],
+    },
+    {
+      name: "Basalt",
+      role: "ink",
+      proportion: 36,
+      hex: "#1B1A17",
+      oklch: "oklch(21.78% 0.006 91.62)",
+      use: "Night: the other half of every split, and type on Limestone.",
+      pairs: [
+        { on: "Limestone", as: "text" },
+        { on: "Sodium", as: "text" },
+        { on: "Filament", as: "text" },
+      ],
+      cites: ["concept.primitives.dusk-pair", "equity.assets.dusk-pair"],
+    },
+    {
+      name: "Sodium",
+      role: "accent",
+      proportion: 15,
+      hex: "#FF5A1F",
+      oklch: "oklch(68.24% 0.211 37.70)",
+      use: "1800 K, the first step: the warmest band in any sequence.",
+      pairs: [{ on: "Basalt", as: "large" }],
+      cites: ["equity.assets.sodium", "concept.primitives.kelvin-steps"],
+    },
+    {
+      name: "Filament",
+      role: "support",
+      proportion: 11,
+      hex: "#F6C445",
+      oklch: "oklch(84.32% 0.149 86.54)",
+      use: "2400 K, the middle step. On Basalt only.",
+      pairs: [{ on: "Basalt", as: "text" }],
+      cites: ["equity.assets.filament-mercury", "concept.primitives.kelvin-steps"],
+    },
+  ],
+  type: {
+    display: {
+      library: "familjen-grotesk",
+      family: "Familjen Grotesk",
+      role: "Headlines and the wordmark.",
+      weights: [400, 620],
+      cites: ["equity.assets.voice", "category.conventions.spec-sheet"],
+    },
+    text: {
+      library: "familjen-grotesk",
+      family: "Familjen Grotesk",
+      role: "Reading text: one family, so the colors carry the variety.",
+      weights: [400, 620],
+      cites: ["concept.idea"],
+    },
+    scale: {
+      steps: [
+        { id: "display", face: "display", size: 128, mobileSize: 52, lineHeight: 0.95, weight: 620, tracking: -0.03, case: "sentence", use: "Covers and openers." },
+        { id: "title", face: "display", size: 56, mobileSize: 30, lineHeight: 1, weight: 620, tracking: -0.02, case: "sentence", use: "Project names." },
+        { id: "body", face: "text", size: 17, lineHeight: 1.5, weight: 400, tracking: 0, case: "sentence", use: "Everything people read." },
+        { id: "label", face: "text", size: 13, lineHeight: 1.3, weight: 620, tracking: 0, case: "sentence", use: "Labels and figures: 2700 K." },
+      ],
+      cites: ["concept.idea", "equity.assets.voice"],
+    },
+    rules: [
+      "Sentence case everywhere.",
+      "Colors appear in kelvin order, Sodium → Filament → Limestone, never shuffled.",
+      "A page is day, night, or split at a hard horizontal or vertical line.",
+    ],
+    wordmark: {
+      library: "familjen-grotesk",
+      family: "Familjen Grotesk",
+      setting: "wght 620",
+      changes: ["Tracking −0.022 em", "Hyphen redrawn at stem weight, 0.42 cap long, to match a step", "k–w and w–o pairs closed 14 units each"],
+      cites: ["concept.primitives.kelvin-steps", "equity.assets.names"],
+    },
+  },
+  applications: {
+    tile: { mark: "symbol.svg", ground: "Basalt", ink: "Filament" },
+    hero: {
+      ground: "Basalt",
+      ink: "Limestone",
+      headline: "We light buildings for the people who use them after dark.",
+      sub: "Lighting design for lobbies, stairs, bridges and streets, from the first sketch to the night we switch it on.",
+      action: "See the work",
+    },
+    card: {
+      ground: "Limestone",
+      ink: "Basalt",
+      name: "Adaeze Okonkwo",
+      title: "Partner, lighting design",
+      lines: ["adaeze@okonkwo-marchetti.studio", "+44 20 7946 0958", "12 Cable Street, London E1"],
+    },
+  },
+  review: {
+    at16: { readable: true, saw: "Wordmark reads cleanly; the plainest of the three. Steps keep their silhouette but could pass for a generic stack icon." },
+    at64: { readable: true, saw: "Clear on both grounds; the steps read as a widening beam only once you know the idea." },
+    lockup: { readable: true, saw: "Steps and wordmark balance at cap height." },
+  },
+});

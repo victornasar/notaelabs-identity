@@ -1,0 +1,136 @@
+import { defineRoute } from "@/lib/brand/route";
+
+export default defineRoute({
+  letter: "a",
+  name: "Pool",
+  idea: "The quiet route: daylight pages and an editorial serif, with the pool of light placed exactly where the partners join. It is the only route led by the light ground, and the only one with a serif.",
+  marks: {
+    primary: {
+      file: "wordmark.svg",
+      name: "Wordmark",
+      use: "The surnames on one line, joined by a pool of light. First choice everywhere it fits.",
+      cites: ["equity.assets.names", "concept.primitives.pool"],
+    },
+    symbol: {
+      file: "symbol.svg",
+      name: "Monogram",
+      use: "O and M joined by the pool. App icons, avatars, favicons.",
+      cites: ["equity.assets.names", "concept.primitives.pool"],
+    },
+    alternates: [
+      {
+        file: "lockup.svg",
+        name: "Lockup",
+        use: "Wordmark over the descriptor. Covers, signage, competition boards.",
+        cites: ["equity.assets.descriptor"],
+      },
+    ],
+    clearSpace: { ratio: 0.5, basis: "the width of the pool" },
+    minimumSize: { screen: "Wordmark 16 px tall, monogram 16 px", print: "Wordmark 5 mm tall" },
+  },
+  colors: [
+    {
+      name: "Limestone",
+      role: "ground",
+      proportion: 62,
+      hex: "#F3ECE0",
+      oklch: "oklch(94.5% 0.018 80)",
+      use: "Daylight: the default page, a touch lighter than Edition 1.",
+      pairs: [{ on: "Basalt", as: "text" }],
+      cites: ["concept.primitives.dusk-pair", "equity.assets.dusk-pair"],
+    },
+    {
+      name: "Basalt",
+      role: "ink",
+      proportion: 24,
+      hex: "#1F1915",
+      oklch: "oklch(22% 0.012 60)",
+      use: "Type, and the night fields that hold photographs.",
+      pairs: [
+        { on: "Limestone", as: "text" },
+        { on: "Sodium", as: "text" },
+        { on: "Lamplight", as: "text" },
+      ],
+      cites: ["concept.primitives.dusk-pair", "category.conventions.night-photography"],
+    },
+    {
+      name: "Sodium",
+      role: "accent",
+      proportion: 8,
+      hex: "#FF5A1F",
+      oklch: "oklch(68.24% 0.211 37.70)",
+      use: "One pool per page: the app tile, a single field, never text on Limestone.",
+      pairs: [{ on: "Basalt", as: "text" }],
+      cites: ["equity.assets.sodium", "concept.source"],
+    },
+    {
+      name: "Lamplight",
+      role: "support",
+      proportion: 6,
+      hex: "#EFD7B3",
+      oklch: "oklch(89% 0.055 78)",
+      use: "The lit area under a heading or a figure: a pool on the page.",
+      cites: ["concept.primitives.pool", "concept.primitives.kelvin-steps"],
+    },
+  ],
+  type: {
+    display: {
+      library: "newsreader",
+      family: "Newsreader",
+      role: "Headlines, project names and the wordmark: the studio talking.",
+      weights: [400, 520],
+      cites: ["category.conventions.spec-sheet", "equity.assets.voice"],
+    },
+    text: {
+      library: "libre-franklin",
+      family: "Libre Franklin",
+      role: "Reading text, labels and figures.",
+      weights: [400, 500],
+      cites: ["equity.assets.voice"],
+    },
+    scale: {
+      steps: [
+        { id: "display", face: "display", size: 120, mobileSize: 48, lineHeight: 1, weight: 400, tracking: -0.02, case: "sentence", use: "One statement per page." },
+        { id: "title", face: "display", size: 56, mobileSize: 32, lineHeight: 1.05, weight: 520, tracking: -0.015, case: "sentence", use: "Project names." },
+        { id: "body", face: "text", size: 17, lineHeight: 1.55, weight: 400, tracking: 0, case: "sentence", use: "Everything people read." },
+        { id: "figure", face: "text", size: 15, lineHeight: 1.4, weight: 500, tracking: 0, case: "as-written", features: ["tnum"], use: "Lux, kelvin and fixture counts: 2700 K." },
+        { id: "label", face: "text", size: 12, lineHeight: 1.3, weight: 500, tracking: 0.12, case: "upper", use: "The descriptor and section labels." },
+      ],
+      cites: ["equity.assets.voice", "category.conventions.spec-sheet"],
+    },
+    rules: [
+      "Headlines in sentence case, in the serif; the sans only ever supports.",
+      "Units written out with a space: 2700 K, 150 lux.",
+      "Capitals only for labels, tracked at 0.12 em.",
+    ],
+    wordmark: {
+      library: "newsreader",
+      family: "Newsreader",
+      setting: "opsz 72, wght 520",
+      changes: ["Tracking −0.012 em", "Hyphen redrawn as a 3:1 ellipse (the pool), 1.6× the hyphen's width"],
+      cites: ["concept.primitives.pool", "equity.assets.names"],
+    },
+  },
+  applications: {
+    tile: { mark: "symbol.svg", ground: "Sodium", ink: "Basalt" },
+    hero: {
+      ground: "Limestone",
+      ink: "Basalt",
+      headline: "We light buildings for the people who use them after dark.",
+      sub: "Lighting design for lobbies, stairs, bridges and streets, from the first sketch to the night we switch it on.",
+      action: "See the work",
+    },
+    card: {
+      ground: "Limestone",
+      ink: "Basalt",
+      name: "Adaeze Okonkwo",
+      title: "Partner, lighting design",
+      lines: ["adaeze@okonkwo-marchetti.studio", "+44 20 7946 0958", "12 Cable Street, London E1"],
+    },
+  },
+  review: {
+    at16: { readable: true, saw: "Wordmark reads as a hyphenated name; the pool is a hyphen at this size. Monogram O-M holds on light and dark, the M closes up slightly." },
+    at64: { readable: true, saw: "Clean on both grounds. The pool starts to show as a lens rather than a bar." },
+    lockup: { readable: true, saw: "Descriptor legible from 64 px up; below that use the wordmark alone." },
+  },
+});
