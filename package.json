@@ -11,6 +11,7 @@
     "lint": "eslint",
     "test": "node --no-warnings --import ./scripts/lib/ts-paths.ts --test \"lib/**/*.test.ts\" \"scripts/**/*.test.ts\"",
     "check": "node --no-warnings --import ./scripts/lib/ts-paths.ts scripts/check.ts",
+    "shots": "node --no-warnings --import ./scripts/lib/ts-paths.ts scripts/shots.ts",
     "brands": "node --no-warnings --import ./scripts/lib/ts-paths.ts scripts/brands.ts",
     "fonts": "node --no-warnings --import ./scripts/lib/ts-paths.ts scripts/fonts.ts",
     "render-marks": "node --no-warnings --import ./scripts/lib/ts-paths.ts scripts/render-marks.ts",
@@ -31,6 +32,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.4.5",
     "opentype.js": "^2.0.0",
+    "playwright": "1.64.1",
     "typescript": "^5"
   }
 }

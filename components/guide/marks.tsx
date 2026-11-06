@@ -15,6 +15,11 @@ export function Marks({ active, section }: SectionProps) {
   const primary = svg(marks.primary);
   const compact = marks.symbol ? svg(marks.symbol) : primary;
 
+  // The size rows, largest first. The top row is as tall as the marks can be
+  // and still fit a half-width desktop card (about 480px) side by side.
+  const rowAspect = aspect(primary) + (marks.symbol ? aspect(compact) + 0.5 : 0);
+  const sizes = [Math.min(40, Math.floor(480 / rowAspect)), 24, 16];
+
   const grounds = (marks.on ?? []).map(({ ground: g, ink: k }) => ({
     ground: color(g),
     ink: color(k),
@@ -118,7 +123,7 @@ export function Marks({ active, section }: SectionProps) {
             On screen: {marks.minimumSize.screen}.{marks.minimumSize.print ? ` In print: ${marks.minimumSize.print}.` : ""}
           </p>
           <ul className={styles.sizes}>
-            {[40, 24, 16].map((h) => (
+            {sizes.map((h) => (
               <li key={h} style={{ "--h": `${h}px` } as CSSProperties}>
                 <span className={ui.quiet}>{h}</span>
                 {marks.symbol ? <Mark className={styles.sized} svg={compact} label="" /> : null}

@@ -10,6 +10,7 @@ export function DeviceRow({ active, className, tiles = 6 }: { active: ActiveBran
   return (
     <div
       className={`${styles.deviceRow} ${className ?? ""}`}
+      data-bleed
       style={{ color: color(brand.device.ink).hex }}
       aria-hidden="true"
     >

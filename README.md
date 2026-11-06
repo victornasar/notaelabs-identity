@@ -48,7 +48,11 @@ The generator runs from chat. In Claude Code, type `/brand <slug>`; in Cursor, a
 
 ## Checks
 
-`pnpm check` is the one gate, and CI runs the same command on every push and pull request. It runs route types, TypeScript, ESLint, the unit tests (`pnpm test`, Node's own runner), `check-route` for every route, `check-brand` for every brand, and a production build per brand, and it stops at the first failure.
+`pnpm check` is the one gate, and CI runs the same command on every push and pull request. It runs route types, TypeScript, ESLint, the unit tests (`pnpm test`, Node's own runner), `check-route` for every route, `check-brand` for every brand, then `pnpm shots`, and it stops at the first failure.
+
+`pnpm shots [slug]` builds each brand for production and opens its page at 1440 and 390 px. It fails on sideways scroll, console errors, a missing or empty section, a nav link that goes nowhere, and a mark drawn at zero size or cut off by its container. The screenshots land in `.shots/` (CI keeps them as an artifact) for a person to look at; nothing is compared pixel by pixel.
+
+`brands/fixture-sparse/` is a test brand, not a client: a long name, a wordmark only, a light ground, four colors, no device and no voice. Slugs starting with `fixture-` are checked, built and shot like any brand but are never the default.
 
 ## How it works
 

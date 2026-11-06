@@ -181,8 +181,14 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  /* The wordmark at 40 px is wider than a phone. */
-  .sizes li:first-child {
-    display: none;
+  /* A long mark at its real size can be wider than a phone; scroll, don't shrink it. */
+  .sizes {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .sizes li {
+    flex-wrap: nowrap;
+    width: max-content;
   }
 }

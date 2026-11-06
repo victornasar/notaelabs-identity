@@ -43,7 +43,7 @@ export function Band({ active }: BrandProps) {
   if (!device || !deviceStrip) return null;
 
   return (
-    <div className={styles.band} style={{ background: color(device.ground).hex, color: color(device.ink).hex }} aria-hidden="true">
+    <div className={styles.band} data-bleed style={{ background: color(device.ground).hex, color: color(device.ink).hex }} aria-hidden="true">
       <div className={styles.bandTrack}>
         {[0, 1, 2, 3, 4, 5].map((i) => (
           <Mark
