@@ -2,11 +2,13 @@
   "name": "notaelabs-identity",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@12.16.1",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "marks": "node scripts/build-marks.mjs"
   },
   "dependencies": {
     "next": "16.4.5",
