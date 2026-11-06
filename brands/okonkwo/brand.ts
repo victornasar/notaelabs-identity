@@ -16,15 +16,16 @@ export default defineBrand({
       "We light buildings and streets for the people who use them after dark, with as much light as the place needs and no more.",
     vision: "A city where the walk home at night is as good as the walk in daylight.",
     values: [
-      { value: "Measured", means: "Every lux level and color temperature has a reason we can say out loud." },
-      { value: "Darkness is designed", means: "We decide where light doesn’t go as carefully as where it does." },
-      { value: "Warm first", means: "Warm white and sodium tones before anything cooler, and never color for its own sake." },
+      { value: "Measured", means: "Every lux level has a reason we can say out loud. The stair glows at 2700 K so nobody squints on the way down." },
+      { value: "Darkness is designed", means: "We decide where light doesn’t go. The bridge is lit from the handrail, so the river stays dark." },
+      { value: "Warm first", means: "Warm white and sodium tones before anything cooler. Light stays put; it never changes color for show." },
       { value: "There at switch-on", means: "We commission what we design, on site, the night it’s turned on." },
     ],
     audience:
       "Architects and developers who already have the building and need the hours after sunset to be as considered as the hours before. Planning committees and the public see the work afterward, mostly at night and in photographs.",
     personality: ["Warm", "Exacting", "Nocturnal", "Generous"],
-    refuses: "Spectacle: facades that change color every few seconds. Spec sheets with a logo on them. Darkness treated as a failure.",
+    refuses:
+      "Facades that change color every few seconds, so the building disappears behind the show. Spec sheets with a logo on them, selling fittings when clients are buying judgment. Darkness treated as a failure, so every surface is lit and nothing stands out.",
   },
   voice: {
     traits: [
@@ -99,10 +100,22 @@ export default defineBrand({
       { ground: "Stone", ink: "Night" },
     ],
     misuse: [
-      "Never replace the beam with a typed hyphen.",
-      "Never set “Architectural Lighting Studio” on the wordmark’s line; it sits below or beside, in the label style.",
-      "Never put the marks in Stone on Sodium (2.45:1).",
-      "Never set the marks over a photograph’s light; place them on a Night or Sodium field cut into the image.",
+      {
+        rule: "Never replace the beam with a typed hyphen.",
+        show: { kind: "typed", mark: "wordmark.svg", text: "OKONKWO-MARCHETTI" },
+      },
+      {
+        rule: "Never set “Architectural Lighting Studio” on the wordmark’s line; it sits below or beside, in the label style.",
+        show: { kind: "beside", mark: "wordmark.svg", text: "Architectural Lighting Studio" },
+      },
+      {
+        rule: "Never put the marks in Stone on Sodium (2.45:1).",
+        show: { kind: "colors", mark: "lockup.svg", ground: "Sodium", ink: "Stone" },
+      },
+      {
+        rule: "Never set the marks over a photograph’s light; place them on a Night or Sodium field cut into the image.",
+        show: { kind: "glow", mark: "symbol.svg" },
+      },
     ],
   },
   colors: [
@@ -154,6 +167,12 @@ export default defineBrand({
       "Pools repeat at the interval: the gap between two pools is one pool wide. Never closer, never scattered.",
       "The row runs off both edges, so it reads as a street that continues.",
       "Type sits in the dark above the row, never across a pool’s edge.",
+    ],
+    misuse: [
+      { rule: "Never closer than the interval.", show: "crowded" },
+      { rule: "Never scattered.", show: "scattered" },
+      { rule: "Never as a glow.", show: "glow" },
+      { rule: "Never stopped short of the edges.", show: "contained" },
     ],
     applications: [
       {

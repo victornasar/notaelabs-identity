@@ -136,6 +136,22 @@ export type BrandMark = Cited & {
   meaning?: string;
 };
 
+/** How the book draws a misuse, crossed out. Marks are file names in `marks/`; colors are color names. */
+export type MisuseShow =
+  /** The mark replaced by `text`, typed in the display face. */
+  | { kind: "typed"; mark: string; text: string }
+  /** `text` set on the mark's own line, in the label style. */
+  | { kind: "beside"; mark: string; text: string }
+  /** The mark in a pairing it may not take. */
+  | { kind: "colors"; mark: string; ground: string; ink: string }
+  /** The mark set over a light. */
+  | { kind: "glow"; mark: string };
+
+/** A thing never to do to the marks: the rule alone, or the rule and how to draw it. */
+export type Misuse = string | { rule: string; show: MisuseShow };
+
+export const misuseRule = (misuse: Misuse) => (typeof misuse === "string" ? misuse : misuse.rule);
+
 export type Marks = {
   /** The one mark every brand needs. */
   primary: BrandMark;
@@ -148,7 +164,7 @@ export type Marks = {
   /** The grounds the marks may sit on, and the ink they take there. Color names. */
   on?: { ground: string; ink: string }[];
   /** Things never to do to the marks, one per line: "Never outline the wordmark". */
-  misuse?: string[];
+  misuse?: Misuse[];
 };
 
 export type Face = Cited & {
@@ -235,9 +251,18 @@ export type GraphicElement = Cited & {
 };
 
 /** The brand's one graphic device, and the applications that show it at work. */
+/**
+ * How the book breaks a device to show a misuse, working on the drawing's shapes:
+ * gaps closed up, shapes jittered out of line, shapes blurred, or the shapes that
+ * cross the edges dropped so the rest stops short.
+ */
+export type DeviceMisuseKind = "crowded" | "scattered" | "glow" | "contained";
+
 export type GraphicDevice = GraphicElement & {
   /** How it is used, one rule per line. */
   rules: string[];
+  /** Ways never to draw it, each shown broken and crossed out. */
+  misuse?: { rule: string; show: DeviceMisuseKind }[];
   /** At least two physical and two digital pieces. */
   applications: Application[];
 };
@@ -438,6 +463,18 @@ function bookProblems(brand: Brand): string[] {
     const [g, i] = [color("marks.on", ground), color("marks.on", ink)];
     if (g && i && contrast(g.hex, i.hex) < minimumContrast.graphic) {
       out.push(`marks on ${ground} in ${ink} are ${contrast(g.hex, i.hex).toFixed(2)}:1, under ${minimumContrast.graphic}:1.`);
+    }
+  }
+
+  const files = [brand.marks.primary, brand.marks.symbol, ...(brand.marks.alternates ?? [])].flatMap((m) => (m ? [m.file] : []));
+  for (const misuse of brand.marks.misuse ?? []) {
+    if (typeof misuse === "string") continue;
+    const { show } = misuse;
+    const where = `marks.misuse "${misuse.rule}"`;
+    if (!files.includes(show.mark)) out.push(`${where} shows ${show.mark}, which is not one of the brand's marks.`);
+    if (show.kind === "colors") {
+      color(where, show.ground);
+      color(where, show.ink);
     }
   }
 

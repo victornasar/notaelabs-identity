@@ -9,13 +9,13 @@
  */
 import { hexToRgb, toOklch, toRgbString } from "../brand/color";
 import { faceNames, printNote, roleNames } from "../brand/labels";
-import type { Application, Brand, ColorRole, TypeStyle } from "../brand/schema";
+import { misuseRule, type Application, type Brand, type ColorRole, type ColorUse, type DeviceMisuseKind, type MisuseShow, type TypeStyle } from "../brand/schema";
 import { completeness, pageSections, sectionTitle, sections, type SectionId } from "../brand/sections";
 import { viewBox } from "../brand/svg";
 import { describeStep, stepSample } from "../brand/type";
 
 /** Bumped when the plugin can no longer read an older bundle. */
-export const bundleFormat = 1;
+export const bundleFormat = 4;
 
 /** A font as Figma names it: the family and the style it lists. */
 export type FontName = { family: string; style: string };
@@ -43,6 +43,8 @@ export type BundleColor = {
   values: { label: string; value: string }[];
   /** The variable's description: every notation, then the print caveat. */
   description: string;
+  /** The grounds the color is approved on, and for what. */
+  pairs: ColorUse[];
 };
 
 export type BundleTextStyle = {
@@ -86,11 +88,27 @@ export type BundleFrame = {
   uses: { colors: string[]; textStyles: string[]; marks: string[]; device: boolean };
 };
 
+/** What the book opens with: who the company is, what it refuses, and the idea it works from. */
+export type BundleIntro = {
+  positioning: string;
+  idea: string;
+  mission?: string;
+  /** What the category does that the company won't. */
+  refuses?: string;
+  personality: string[];
+  values: { value: string; means: string }[];
+};
+
 export type FigmaBundle = {
   format: typeof bundleFormat;
   slug: string;
   name: string;
   edition: string;
+  /** The web address, for a browser bar and a post's handle. */
+  domain?: string;
+  /** What the brand is, as a post's account line names it. */
+  category?: string;
+  intro: BundleIntro;
   fonts: BundleFont[];
   colors: BundleColor[];
   textStyles: BundleTextStyle[];
@@ -102,6 +120,8 @@ export type FigmaBundle = {
     /** Each ground and the ink the marks take on it: one component variant each. */
     variants: { ground: string; ink: string }[];
     cover: string;
+    /** Things never to do to the marks; `show` says how to draw one. */
+    misuse: { rule: string; show?: MisuseShow }[];
   };
   device?: {
     name: string;
@@ -110,6 +130,7 @@ export type FigmaBundle = {
     ink: string;
     construction: string;
     rules: string[];
+    misuse: { rule: string; show: DeviceMisuseKind }[];
     applications: Application[];
   };
   frames: BundleFrame[];
@@ -213,7 +234,7 @@ export function buildBundle(brand: Brand, files: BundleFiles): FigmaBundle {
     };
   });
 
-  const { device, type } = brand;
+  const { device, type, story } = brand;
   const numbers = new Map(pageSections(brand).map((s) => [s.id as SectionId, s.number]));
   const values = (c: Brand["colors"][number]) => [
     { label: "Hex", value: c.hex.toUpperCase() },
@@ -228,6 +249,16 @@ export function buildBundle(brand: Brand, files: BundleFiles): FigmaBundle {
     slug: brand.slug,
     name: brand.name,
     edition: brand.edition,
+    ...(brand.domain ? { domain: brand.domain } : {}),
+    category: brand.category.name,
+    intro: {
+      positioning: brand.positioning,
+      idea: brand.concept.idea,
+      ...(story?.mission ? { mission: story.mission } : {}),
+      ...(story?.refuses ? { refuses: story.refuses } : {}),
+      personality: story?.personality ?? [],
+      values: story?.values ?? [],
+    },
     fonts: files.fonts,
     colors: brand.colors.map((c) => {
       const [r, g, b] = hexToRgb(c.hex);
@@ -241,6 +272,7 @@ export function buildBundle(brand: Brand, files: BundleFiles): FigmaBundle {
         use: c.use,
         values: values(c),
         description: colorDescription(brand, c),
+        pairs: c.pairs ?? [],
       };
     }),
     textStyles,
@@ -263,6 +295,7 @@ export function buildBundle(brand: Brand, files: BundleFiles): FigmaBundle {
       })),
       variants: brand.marks.on ?? [],
       cover: coverFile(brand),
+      misuse: (brand.marks.misuse ?? []).map((m) => (typeof m === "string" ? { rule: misuseRule(m) } : m)),
     },
     ...(device
       ? {
@@ -273,6 +306,7 @@ export function buildBundle(brand: Brand, files: BundleFiles): FigmaBundle {
             ink: device.ink,
             construction: device.construction,
             rules: device.rules,
+            misuse: device.misuse ?? [],
             applications: device.applications,
           },
         }

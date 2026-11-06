@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import { Mark } from "@/components/shell/mark";
 import { contrast } from "@/lib/brand/color";
+import { misuseRule } from "@/lib/brand/schema";
 import { sectionTitle } from "@/lib/brand/sections";
 import { aspect } from "@/lib/brand/svg";
 import styles from "./marks.module.css";
@@ -139,7 +140,7 @@ export function Marks({ active, section }: SectionProps) {
         <>
           <h3 className={ui.subtitle}>Never</h3>
           <ul className={styles.nevers}>
-            {marks.misuse.map((rule) => (
+            {marks.misuse.map(misuseRule).map((rule) => (
               <li key={rule} className={styles.never}>
                 <span className={styles.cross} aria-hidden="true" />
                 <p>{rule}</p>

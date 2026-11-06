@@ -8,7 +8,7 @@ import { bookPlan, column, layout, missingFonts, nearFonts, shareWidths } from "
 const brand = structuredClone(okonkwo) as Brand;
 const files: BundleFiles = {
   marks: {},
-  graphics: {},
+  graphics: { "pool-row.svg": '<svg viewBox="0 0 2400 900"><ellipse cx="0" cy="450" rx="150" ry="50"/></svg>' },
   fonts: [
     { face: "display", weight: 800, family: "Big Shoulders", style: "ExtraBold", file: "a.ttf" },
     { face: "text", weight: 400, family: "Chivo", style: "Regular", file: "b.ttf" },
@@ -76,6 +76,28 @@ describe("bookPlan", () => {
     assert.deepEqual(plan.palette.cards.filter((c) => c.edge).map((c) => c.name), ["Night"]);
   });
 
+  it("shows each approved pairing with its contrast and level", () => {
+    assert.deepEqual(
+      plan.palette.pairs.map((p) => [`${p.ink} on ${p.ground}`, p.use, p.level]),
+      [
+        ["Night on Sodium", "Text", "AA"],
+        ["Stone on Night", "Text", "AAA"],
+        ["Sodium on Night", "Text", "AA"],
+      ],
+    );
+    assert.match(plan.palette.pairs[0]!.ratio, /^\d+\.\d\d:1$/);
+  });
+
+  it("sets the accent as color beside the accent as light, over one bar of proportions", () => {
+    assert.deepEqual(plan.palette.roles, {
+      color: "Sodium",
+      asColor: brand.colors.find((c) => c.name === "Sodium")!.use,
+      asLight: brand.device!.construction,
+    });
+    assert.deepEqual(plan.palette.bar.map((b) => [b.label, b.ink]), [["Night 56%", "Stone"], ["Sodium 28%", "Night"], ["Stone 16%", "Night"]]);
+    assert.equal(plan.palette.bar.reduce((sum, b) => sum + b.width, 0) <= column, true);
+  });
+
   it("leads the faces with an accent card set in the face's heaviest weight", () => {
     const [display, text] = plan.faces;
     assert.deepEqual([display?.glyphs, display?.family, display?.fill, display?.ink], ["AG", "BIG SHOULDERS", "Sodium", "Night"]);
@@ -86,18 +108,36 @@ describe("bookPlan", () => {
   it("follows the outline, drawing only the sections the brand has, numbered without gaps", () => {
     const names = plan.sections.map((s) => [s.divider.name, ...s.frames.map((f) => f.name)]);
     assert.deepEqual(names, [
-      ["01 Logo", "01.1 Logo · Logo mark", "01.2 Logo · On Stone", "01.3 Logo · On Sodium", "01.4 Logo · On Night"],
-      ["02 Color", "02.1 Color · Palette"],
-      ["03 Typography", "03.1 Typography · Typefaces", "03.2 Typography · Scale"],
-      ["04 Visual Language", "04.1 Visual Language · Pool row"],
+      ["Cover", "01.1 Introduction · Overview", "01.2 Introduction · What we refuse", "01.3 Introduction · The idea"],
+      ["02 Logo", "02.1 Logo · Logo mark", "02.2 Logo · On Stone", "02.3 Logo · On Sodium", "02.4 Logo · On Night", "02.5 Logo · Misuse"],
+      ["03 Color", "03.1 Color · Palette", "03.2 Color · Pairs", "03.3 Color · Sodium"],
+      ["04 Typography", "04.1 Typography · Typefaces", "04.2 Typography · Scale", "04.3 Typography · In use"],
+      ["05 Visual Language", "05.1 Visual Language · Pool row", "05.2 Visual Language · Rules"],
+      ["06 Digital Applications", "06.1 Digital Applications · Website"],
+      ["07 Marketing Applications", "07.1 Marketing Applications · Signage", "07.2 Marketing Applications · Business card", "07.3 Marketing Applications · Social post"],
     ]);
-    assert.deepEqual(plan.sections.flatMap((s) => s.frames.map((f) => f.page)), ["02", "03", "04", "05", "07", "09", "10", "12"]);
-    assert.equal(plan.sections[1]?.frames[0]?.eyebrow, "02 · Color · Palette");
+    assert.deepEqual(
+      plan.sections.flatMap((s) => s.frames.map((f) => f.page)),
+      ["02", "03", "04", "06", "07", "08", "09", "10", "12", "13", "14", "16", "17", "18", "20", "21", "23", "25", "26", "27"],
+    );
+    assert.equal(plan.sections[2]?.frames[0]?.eyebrow, "03 · Color · Palette");
     assert.deepEqual(plan.display, { font: { family: "Big Shoulders", style: "ExtraBold" }, upper: true });
   });
 
+  it("draws each application with its words by slot, website under Digital and the rest under Marketing", () => {
+    const { cards, handle, domain, category } = plan.applications;
+    assert.deepEqual(
+      cards.map((c) => [c.name, c.medium]),
+      [["Signage", "Print"], ["Business card", "Print"], ["Website", "Screen"], ["Social post", "Screen"]],
+    );
+    assert.deepEqual(cards[1]?.person, { name: "Adaeze Okonkwo", role: "Partner, lighting designer" });
+    assert.deepEqual([handle, domain, category], ["okonkwo-marchetti", "okonkwo-marchetti.com", brand.category.name]);
+    const frames = plan.sections.flatMap((s) => s.frames).filter((f) => f.kind === "application");
+    assert.deepEqual(frames.map((f) => cards[f.app!]?.kind), ["website", "signage", "business-card", "social-post"]);
+  });
+
   it("shows the lockup on each approved ground, lightest first, with the accent eyebrow only on the brand's own", () => {
-    const lockups = plan.sections[0]!.frames.filter((f) => f.kind === "lockup");
+    const lockups = plan.sections.flatMap((s) => s.frames).filter((f) => f.kind === "lockup");
     assert.deepEqual(
       lockups.map((f) => [f.ground, f.ink, f.tint]),
       [
@@ -106,6 +146,46 @@ describe("bookPlan", () => {
         ["Night", "Stone", "Sodium"],
       ],
     );
+  });
+
+  it("opens on the cover in place of a divider, then says what the brand refuses before its idea", () => {
+    assert.equal(plan.sections[0]?.divider.cover, true);
+    assert.ok(plan.sections.slice(1).every((s) => !s.divider.cover));
+    assert.equal(plan.cover.edition, "Brand guidelines · Edition 2 · November 2026");
+    assert.deepEqual(plan.statement, { family: "Chivo", style: "Regular" });
+    assert.deepEqual(plan.intro.refuses, [
+      "Facades that change color every few seconds, so the building disappears behind the show.",
+      "Spec sheets with a logo on them, selling fittings when clients are buying judgment.",
+      "Darkness treated as a failure, so every surface is lit and nothing stands out.",
+    ]);
+    assert.match(plan.intro.idea, /^Good night light comes in measured pools/);
+  });
+
+  it("leaves out the refusals frame for a brand that names none", () => {
+    const bare = structuredClone(brand);
+    bare.story!.refuses = "";
+    const parts = bookPlan(buildBundle(bare, files)).sections[0]!.frames.map((f) => f.kind);
+    assert.deepEqual(parts, ["overview", "idea"]);
+  });
+
+  it("draws each misuse the brand says how to draw, on its own ground, and leaves the rest to words", () => {
+    const cards = plan.logo.misuse;
+    assert.deepEqual(
+      cards.map((c) => [c.kind, c.ground, c.ink]),
+      [
+        ["typed", "Night", "Stone"],
+        ["beside", "Night", "Stone"],
+        ["colors", "Sodium", "Stone"],
+        ["glow", "Night", "Stone"],
+      ],
+    );
+    assert.equal(cards[0]?.text, "OKONKWO-MARCHETTI");
+    assert.equal(cards[3]?.glow, "Sodium");
+
+    const words = structuredClone(brand);
+    words.marks.misuse = ["Never outline the marks."];
+    const parts = bookPlan(buildBundle(words, files)).sections[1]!.frames.map((f) => f.kind);
+    assert.ok(!parts.includes("misuse"));
   });
 
   it("draws the symbol in the accent, captioned with what it represents", () => {
@@ -119,6 +199,28 @@ describe("bookPlan", () => {
     assert.equal(plan.palette.note, "CMYK and Pantone are approximate. Proof before print.");
     assert.equal(plan.scale[0]?.sample, "Okonkwo");
     assert.ok(!("use" in plan.palette.cards[0]!));
+  });
+
+  it("sets the scale in use with copy the brand wrote for a real surface", () => {
+    assert.deepEqual(plan.inUse, {
+      label: "Lighting by Okonkwo-Marchetti",
+      headline: "The bridge is lit from the handrail, so the river stays dark.",
+      body: brand.story!.mission,
+      figure: "Switch-on March 2027",
+    });
+    const bare = structuredClone(brand);
+    delete bare.device;
+    bare.notApplicable = { ...bare.notApplicable, imagery: "No device." };
+    assert.equal(bookPlan(buildBundle(bare, files)).inUse.headline, brand.positioning);
+  });
+
+  it("shows the device the right way, then each way the brand says never to draw it", () => {
+    assert.deepEqual(plan.device?.misuse.map((m) => m.show), ["crowded", "scattered", "glow", "contained"]);
+    assert.match(plan.device?.strip ?? "", /viewBox="0 300 2400 300"/);
+    const plain = structuredClone(brand);
+    delete plain.device!.misuse;
+    const kinds = bookPlan(buildBundle(plain, files)).sections.flatMap((s) => s.frames.map((f) => f.kind));
+    assert.ok(kinds.includes("device") && !kinds.includes("rhythm"));
   });
 
   it("keeps OpenType features in the style's description, since Figma styles can't hold them", () => {
