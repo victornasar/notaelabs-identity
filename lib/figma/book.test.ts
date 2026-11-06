@@ -113,13 +113,27 @@ describe("bookPlan", () => {
       ["03 Color", "03.1 Color · Palette", "03.2 Color · Pairs", "03.3 Color · Sodium"],
       ["04 Typography", "04.1 Typography · Typefaces", "04.2 Typography · Scale", "04.3 Typography · In use"],
       ["05 Visual Language", "05.1 Visual Language · Pool row", "05.2 Visual Language · Rules"],
+      ["06 Digital Applications", "06.1 Digital Applications · Website"],
+      ["07 Marketing Applications", "07.1 Marketing Applications · Signage", "07.2 Marketing Applications · Business card", "07.3 Marketing Applications · Social post"],
     ]);
     assert.deepEqual(
       plan.sections.flatMap((s) => s.frames.map((f) => f.page)),
-      ["02", "03", "04", "06", "07", "08", "09", "10", "12", "13", "14", "16", "17", "18", "20", "21"],
+      ["02", "03", "04", "06", "07", "08", "09", "10", "12", "13", "14", "16", "17", "18", "20", "21", "23", "25", "26", "27"],
     );
     assert.equal(plan.sections[2]?.frames[0]?.eyebrow, "03 · Color · Palette");
     assert.deepEqual(plan.display, { font: { family: "Big Shoulders", style: "ExtraBold" }, upper: true });
+  });
+
+  it("draws each application with its words by slot, website under Digital and the rest under Marketing", () => {
+    const { cards, handle, domain, category } = plan.applications;
+    assert.deepEqual(
+      cards.map((c) => [c.name, c.medium]),
+      [["Signage", "Print"], ["Business card", "Print"], ["Website", "Screen"], ["Social post", "Screen"]],
+    );
+    assert.deepEqual(cards[1]?.person, { name: "Adaeze Okonkwo", role: "Partner, lighting designer" });
+    assert.deepEqual([handle, domain, category], ["okonkwo-marchetti", "okonkwo-marchetti.com", brand.category.name]);
+    const frames = plan.sections.flatMap((s) => s.frames).filter((f) => f.kind === "application");
+    assert.deepEqual(frames.map((f) => cards[f.app!]?.kind), ["website", "signage", "business-card", "social-post"]);
   });
 
   it("shows the lockup on each approved ground, lightest first, with the accent eyebrow only on the brand's own", () => {

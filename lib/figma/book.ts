@@ -8,8 +8,9 @@
  * carries this out.
  */
 import { bestOn, contrast, luminance, wcagLevel } from "../brand/color";
+import { kindNames } from "../brand/labels";
+import { physicalKinds, type ApplicationKind, type DeviceMisuseKind, type MisuseShow } from "../brand/schema";
 import { strip } from "../brand/svg";
-import type { DeviceMisuseKind, MisuseShow } from "../brand/schema";
 import type { BundleFont, BundleIntro, BundleTextStyle, FigmaBundle, FontName } from "./bundle";
 
 /** The variable collection every brand color lives in. */
@@ -62,6 +63,22 @@ export type FaceCard = {
 /** The scale set as one sheet of real copy: a label, a headline, a paragraph and a figure. */
 export type InUse = { label: string; headline: string; body: string; figure?: string };
 
+/** An application drawn as the thing itself: its words by slot, what it is, and why the brand needs it. */
+export type AppCard = {
+  kind: ApplicationKind;
+  name: string;
+  medium: "Print" | "Screen";
+  why: string;
+  ground: string;
+  ink: string;
+  headline?: string;
+  person?: { name: string; role: string };
+  lines: string[];
+};
+
+/** Applications on screens the brand owns; the rest are marketing, in print and on others' screens. */
+const digitalKinds: ApplicationKind[] = ["website", "app-icon", "dashboard"];
+
 export type ScaleRow = { id: string; spec: string; style: string; sample: string };
 
 /** A frame that only names its section: "02" and "COLOR". The cover opens the first section instead. */
@@ -74,12 +91,14 @@ export type Divider = { name: string; number: string; title: string; cover: bool
  */
 export type ContentFrame = {
   name: string;
-  kind: "overview" | "refuses" | "idea" | "palette" | "pairs" | "roles" | "faces" | "scale" | "inUse" | "symbol" | "lockup" | "misuse" | "device" | "rhythm";
+  kind: "overview" | "refuses" | "idea" | "palette" | "pairs" | "roles" | "faces" | "scale" | "inUse" | "symbol" | "lockup" | "misuse" | "device" | "rhythm" | "application";
   eyebrow: string;
   page: string;
   ground: string;
   ink: string;
   tint: string;
+  /** Which of `applications.cards` an application frame draws. */
+  app?: number;
 };
 
 /** A misuse drawn on its ground and crossed out, over the rule it breaks. `glow` is the light it sits on. */
@@ -125,6 +144,17 @@ export type BookPlan = {
   logo: { symbol: Showcase; lockup: string; misuse: MisuseCard[] };
   /** The device, and the ways it is drawn wrong: the construction is the right way's caption. */
   device?: Showcase & { misuse: { rule: string; show: DeviceMisuseKind }[]; strip: string };
+  /** The device's applications, and the marks and names they carry. */
+  applications: {
+    cards: AppCard[];
+    lockup: string;
+    wordmark: string;
+    symbol: string;
+    domain?: string;
+    /** The account a post comes from: the domain's name, or the brand's own without one. */
+    handle: string;
+    category?: string;
+  };
   /** In reading order: one row on the canvas each. */
   sections: BookSection[];
 };
@@ -243,9 +273,29 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
     .filter((v, i) => variants.findIndex((w) => w.ground === v.ground) === i)
     .sort((a, b) => luminance(hexOf(b.ground)) - luminance(hexOf(a.ground)));
 
+  // The applications, each with its words by slot, as the page draws them.
+  const word = (value: string | string[] | undefined) => (typeof value === "string" ? value : undefined);
+  const apps = (bundle.device?.applications ?? []).map(({ kind, why, ground, ink, copy }): AppCard => {
+    const [headline, name, role] = [word(copy.headline), word(copy.name), word(copy.role)];
+    return {
+      kind,
+      name: kindNames[kind],
+      medium: physicalKinds.includes(kind) ? "Print" : "Screen",
+      why,
+      ground,
+      ink,
+      ...(headline ? { headline } : {}),
+      ...(name ? { person: { name, role: role ?? "" } } : {}),
+      lines: Array.isArray(copy.lines) ? copy.lines : [],
+    };
+  });
+  const appParts = (digital: boolean) =>
+    apps.flatMap((a, app): Part[] => (digitalKinds.includes(a.kind) === digital ? [{ kind: "application", part: a.name, app }] : []));
+  const primary = items.find((m) => m.role === "primary") ?? items[0]!;
+
   // The book's outline, as an agency sets out brand guidelines. A section is drawn once the brand has
   // what it shows, and numbers count only the drawn ones. Pages count dividers too.
-  type Part = { kind: ContentFrame["kind"]; part: string; ground?: string; ink?: string };
+  type Part = { kind: ContentFrame["kind"]; part: string; ground?: string; ink?: string; app?: number };
   const device = bundle.device;
   const outline: { title: string; parts: Part[] }[] = [
     {
@@ -292,8 +342,8 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
     { title: "Iconography & Illustration", parts: [] },
     { title: "Imagery & Art Direction", parts: [] },
     { title: "Layout & Composition", parts: [] },
-    { title: "Digital Applications", parts: [] },
-    { title: "Marketing Applications", parts: [] },
+    { title: "Digital Applications", parts: appParts(true) },
+    { title: "Marketing Applications", parts: appParts(false) },
     { title: "Brand Voice", parts: [] },
     { title: "Brand Guidelines", parts: [] },
   ];
@@ -305,7 +355,7 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
       page += 1;
       return {
         divider: n === 0 ? { name: "Cover", number, title, cover: true } : { name: `${number} ${title}`, number, title, cover: false },
-        frames: parts.map(({ kind, part, ...on }, i) => {
+        frames: parts.map(({ kind, part, app, ...on }, i) => {
           page += 1;
           const own = !on.ground || on.ground === ground.name;
           return {
@@ -316,6 +366,7 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
             ground: on.ground ?? ground.name,
             ink: on.ink ?? ink.name,
             tint: own ? accent.name : (on.ink ?? ink.name),
+            ...(app === undefined ? {} : { app }),
           };
         }),
       };
@@ -393,6 +444,15 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
           },
         }
       : {}),
+    applications: {
+      cards: apps,
+      lockup: (items.find((m) => m.role === "alternate") ?? primary).svg,
+      wordmark: primary.svg,
+      symbol: symbol.svg,
+      ...(bundle.domain ? { domain: bundle.domain } : {}),
+      handle: bundle.domain?.replace(/\..*$/, "") ?? bundle.name,
+      ...(bundle.category ? { category: bundle.category } : {}),
+    },
     sections,
   };
 }
