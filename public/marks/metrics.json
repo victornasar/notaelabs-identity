@@ -1,0 +1,25 @@
+{
+  "capHeight": 292,
+  "wordGap": 99.28,
+  "wordmark": {
+    "width": 2009.68,
+    "height": 312.8
+  },
+  "shortMark": {
+    "width": 1068.4,
+    "height": 297.6
+  },
+  "lockup": {
+    "width": 2445.12,
+    "height": 312.8
+  },
+  "logomark": {
+    "size": 64,
+    "stroke": 8
+  },
+  "clearSpaceEquals": "capital N height",
+  "minimums": {
+    "logomarkPx": 16,
+    "wordmarkHeightPx": 16
+  }
+}
