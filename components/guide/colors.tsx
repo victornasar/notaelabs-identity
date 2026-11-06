@@ -1,7 +1,8 @@
 import type { CSSProperties } from "react";
 import { bestOn, contrast, toOklch, toRgbString, wcagLevel } from "@/lib/brand/color";
-import { roleNames } from "@/lib/brand/labels";
+import { printNote, roleNames } from "@/lib/brand/labels";
 import { minimumContrast } from "@/lib/brand/schema";
+import { sectionTitle } from "@/lib/brand/sections";
 import styles from "./colors.module.css";
 import { CopyChip } from "./ui/copy-chip";
 import { Heading } from "./ui/heading";
@@ -22,7 +23,7 @@ export function Colors({ active, section }: SectionProps) {
 
   return (
     <section id="color" className={`${ui.container} ${ui.section}`} aria-labelledby="color-title">
-      <Heading section={section} title={active.brand.page?.titles?.color ?? `${colors.length} colors`}>
+      <Heading section={section} title={sectionTitle(active.brand, "color")}>
         Each card is as wide as the color’s share of a typical page.
       </Heading>
 
@@ -81,8 +82,7 @@ export function Colors({ active, section }: SectionProps) {
 
       {active.brand.printProfile && colors.some((c) => c.cmyk) ? (
         <p className={ui.footnote}>
-          CMYK converted from sRGB with {active.brand.printProfile}. Approximate: proof before print. Pantone
-          is matched by eye.
+          {printNote(active.brand.printProfile)}
         </p>
       ) : null}
     </section>

@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import { faceNames } from "@/lib/brand/labels";
 import type { Face, TypeStyle } from "@/lib/brand/schema";
+import { sectionTitle } from "@/lib/brand/sections";
 import { describeStep, stepStyle } from "@/lib/brand/type";
 import styles from "./type.module.css";
 import { Heading } from "./ui/heading";
@@ -31,7 +32,7 @@ export function Type({ active, section }: SectionProps) {
 
   return (
     <section id="type" className={`${ui.container} ${ui.section}`} aria-labelledby="type-title">
-      <Heading section={section} title={brand.page?.titles?.type ?? faces.map(([, f]) => f.family).join(" & ")}>
+      <Heading section={section} title={sectionTitle(brand, "type")}>
         {type.fit}
       </Heading>
 

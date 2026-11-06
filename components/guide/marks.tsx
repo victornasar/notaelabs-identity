@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import { Mark } from "@/components/shell/mark";
 import { contrast } from "@/lib/brand/color";
+import { sectionTitle } from "@/lib/brand/sections";
 import { aspect } from "@/lib/brand/svg";
 import styles from "./marks.module.css";
 import { Heading } from "./ui/heading";
@@ -32,7 +33,7 @@ export function Marks({ active, section }: SectionProps) {
 
   return (
     <section id="marks" className={`${ui.container} ${ui.section}`} aria-labelledby="marks-title">
-      <Heading section={section} title={brand.page?.titles?.marks ?? "Marks"}>
+      <Heading section={section} title={sectionTitle(brand, "marks")}>
         {marks.primary.use}
       </Heading>
 

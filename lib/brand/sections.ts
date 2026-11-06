@@ -24,6 +24,8 @@ type Section = {
   id: string;
   /** The nav label and the section's eyebrow. */
   label: string;
+  /** The headline, when the brand's `page.titles` doesn't give one. */
+  title: (brand: Brand) => string;
   /** In the nav, numbered. The cover is not. */
   nav: boolean;
   optional: boolean;
@@ -37,6 +39,7 @@ export const sections = [
   {
     id: "cover",
     label: "Cover",
+    title: (brand) => brand.name,
     nav: false,
     optional: false,
     has: () => true,
@@ -50,6 +53,7 @@ export const sections = [
   {
     id: "marks",
     label: "Marks",
+    title: () => "Marks",
     nav: true,
     optional: false,
     has: () => true,
@@ -69,6 +73,7 @@ export const sections = [
   {
     id: "color",
     label: "Color",
+    title: (brand) => `${brand.colors.length} colors`,
     nav: true,
     optional: false,
     has: () => true,
@@ -85,6 +90,7 @@ export const sections = [
   {
     id: "type",
     label: "Type",
+    title: ({ type }) => [type.display, type.text, type.mono].flatMap((f) => (f ? [f.family] : [])).join(" & "),
     nav: true,
     optional: false,
     has: () => true,
@@ -102,6 +108,7 @@ export const sections = [
   {
     id: "imagery",
     label: "Imagery",
+    title: (brand) => brand.device?.name ?? "Imagery",
     nav: true,
     optional: true,
     has: (brand) => Boolean(brand.device),
@@ -119,6 +126,7 @@ export const sections = [
   {
     id: "voice",
     label: "Voice",
+    title: () => "Write this, not that.",
     nav: true,
     optional: true,
     has: (brand) => Boolean(brand.voice),
@@ -159,6 +167,12 @@ export function completeness(brand: Brand): SectionReport[] {
     const missing = section.missing(brand);
     return missing.length ? { id, status: "missing", missing } : { id, status: "complete" };
   });
+}
+
+/** A section's headline: the brand's own, or the plain default. */
+export function sectionTitle(brand: Brand, id: SectionId): string {
+  const section = sections.find((s) => s.id === id)!;
+  return brand.page?.titles?.[id] ?? section.title(brand);
 }
 
 /** The sections a brand's page shows, numbered as the nav numbers them. */

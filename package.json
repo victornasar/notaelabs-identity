@@ -17,6 +17,7 @@
     "render-marks": "node --no-warnings --import ./scripts/lib/ts-paths.ts scripts/render-marks.ts",
     "check-route": "node --no-warnings --import ./scripts/lib/ts-paths.ts scripts/check-route.ts",
     "check-brand": "node --no-warnings --import ./scripts/lib/ts-paths.ts scripts/check-brand.ts",
+    "export-figma": "node --no-warnings --import ./scripts/lib/ts-paths.ts scripts/export-figma.ts",
     "oklch": "node --no-warnings --import ./scripts/lib/ts-paths.ts scripts/oklch.ts"
   },
   "dependencies": {
