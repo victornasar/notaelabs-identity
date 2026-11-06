@@ -1,0 +1,60 @@
+<!doctype html>
+<!-- The plugin's window: pick a brand's bundle, then read what was built or what's missing. -->
+<style>
+  body {
+    margin: 0;
+    padding: 16px;
+    font: 12px/1.5 system-ui, sans-serif;
+    color: var(--figma-color-text);
+    background: var(--figma-color-bg);
+  }
+  p {
+    margin: 0 0 12px;
+  }
+  button {
+    font: inherit;
+    padding: 8px 12px;
+    border: 0;
+    border-radius: 6px;
+    color: var(--figma-color-text-onbrand);
+    background: var(--figma-color-bg-brand);
+    cursor: pointer;
+  }
+  #log {
+    margin-top: 16px;
+    white-space: pre-wrap;
+  }
+  #log[data-kind="error"] {
+    color: var(--figma-color-text-danger);
+  }
+  code {
+    font-family: ui-monospace, monospace;
+    word-break: break-all;
+  }
+</style>
+<p>Pick the file <code>pnpm export-figma &lt;slug&gt;</code> wrote: <code>brands/&lt;slug&gt;/figma/&lt;slug&gt;.figma.json</code>.</p>
+<button id="pick">Choose file</button>
+<input id="file" type="file" accept=".json,application/json" hidden />
+<div id="log" aria-live="polite"></div>
+<script>
+  const file = document.getElementById("file");
+  const log = document.getElementById("log");
+  const show = (text, kind) => {
+    log.textContent = text;
+    log.dataset.kind = kind || "";
+  };
+
+  document.getElementById("pick").onclick = () => file.click();
+  file.onchange = async () => {
+    const picked = file.files[0];
+    file.value = "";
+    if (!picked) return;
+    show(`Building from ${picked.name}…`);
+    parent.postMessage({ pluginMessage: { type: "build", text: await picked.text() } }, "*");
+  };
+
+  onmessage = ({ data }) => {
+    const msg = data.pluginMessage;
+    if (msg) show(msg.text, msg.type);
+  };
+</script>

@@ -18,6 +18,7 @@
     "check-route": "node --no-warnings --import ./scripts/lib/ts-paths.ts scripts/check-route.ts",
     "check-brand": "node --no-warnings --import ./scripts/lib/ts-paths.ts scripts/check-brand.ts",
     "export-figma": "node --no-warnings --import ./scripts/lib/ts-paths.ts scripts/export-figma.ts",
+    "build-plugin": "node --no-warnings --import ./scripts/lib/ts-paths.ts scripts/build-plugin.ts",
     "oklch": "node --no-warnings --import ./scripts/lib/ts-paths.ts scripts/oklch.ts"
   },
   "dependencies": {
@@ -26,10 +27,12 @@
     "react-dom": "19.3.0"
   },
   "devDependencies": {
+    "@figma/plugin-typings": "^1.142.0",
     "@resvg/resvg-js": "^2.6.2",
     "@types/node": "^24.19.2",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "esbuild": "^0.28.2",
     "eslint": "^9",
     "eslint-config-next": "16.4.5",
     "opentype.js": "^2.0.0",

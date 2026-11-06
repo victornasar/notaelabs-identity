@@ -1,0 +1,106 @@
+import assert from "node:assert/strict";
+import { describe, it } from "node:test";
+import okonkwo from "@/brands/okonkwo/brand";
+import type { Brand } from "../brand/schema";
+import { buildBundle, type BundleFiles } from "./bundle";
+import { bookPlan, column, layout, missingFonts, nearFonts, shareWidths } from "./book";
+
+const brand = structuredClone(okonkwo) as Brand;
+const files: BundleFiles = {
+  marks: {},
+  graphics: {},
+  fonts: [
+    { face: "display", weight: 800, family: "Big Shoulders", style: "ExtraBold", file: "a.ttf" },
+    { face: "text", weight: 400, family: "Chivo", style: "Regular", file: "b.ttf" },
+    { face: "text", weight: 500, family: "Chivo", style: "Medium", file: "b.ttf" },
+  ],
+};
+const bundle = buildBundle(brand, files);
+const plan = bookPlan(bundle);
+
+describe("missingFonts", () => {
+  it("lists only the family and style Figma doesn't have", () => {
+    const missing = missingFonts(bundle, [
+      { family: "Chivo", style: "Regular" },
+      { family: "Chivo", style: "Medium" },
+      { family: "Big Shoulders", style: "Bold" },
+    ]);
+    assert.deepEqual(missing.map((f) => `${f.family} ${f.style}`), ["Big Shoulders ExtraBold"]);
+  });
+});
+
+describe("nearFonts", () => {
+  it("names what Figma has under the same first word, with its styles", () => {
+    const near = nearFonts({ family: "Big Shoulders", style: "ExtraBold" }, [
+      { family: "Big Shoulders Display", style: "Bold" },
+      { family: "Big Shoulders Display", style: "ExtraBold" },
+      { family: "Chivo", style: "Regular" },
+    ]);
+    assert.deepEqual(near, ["Big Shoulders Display: Bold, ExtraBold"]);
+  });
+});
+
+describe("shareWidths", () => {
+  it("gives a share too small for its labels the minimum, and the rest what's left", () => {
+    assert.deepEqual(shareWidths([56, 28, 16], 1200, 12, 280), [597, 298, 280]);
+  });
+});
+
+describe("bookPlan", () => {
+  it("loads each font once", () => {
+    assert.deepEqual(plan.fonts.map((f) => `${f.family} ${f.style}`), ["Big Shoulders ExtraBold", "Chivo Regular", "Chivo Medium"]);
+  });
+
+  it("sets the board in the ground color, with type in the ink", () => {
+    assert.equal(plan.ground, "Night");
+    assert.equal(plan.ink, "Stone");
+  });
+
+  it("gives each job the style the page uses for it", () => {
+    assert.deepEqual(plan.text, { heading: "Title", body: "Body", small: "Figure", label: "Label" });
+  });
+
+  it("sizes swatch cards by share, largest first, within the frame's margins", () => {
+    const { cards } = plan.palette;
+    assert.deepEqual(cards.map((c) => c.name), ["Night", "Sodium", "Stone"]);
+    const used = cards.reduce((sum, c) => sum + c.width, 0) + layout.gap * (cards.length - 1);
+    assert.ok(used <= column && used > column - cards.length);
+    assert.ok(cards.every((c) => c.width >= layout.minSwatch));
+  });
+
+  it("labels each swatch in its most legible color, and outlines the board's own", () => {
+    const sodium = plan.palette.cards.find((c) => c.name === "Sodium");
+    assert.equal(sodium?.ink, "Night");
+    assert.equal(sodium?.role, "Accent · 28%");
+    assert.deepEqual(sodium?.pills.map((p) => p.label), ["Hex", "RGB", "OKLCH", "CMYK", "Pantone"]);
+    assert.deepEqual(plan.palette.cards.filter((c) => c.edge).map((c) => c.name), ["Night"]);
+  });
+
+  it("leads the faces with an accent card set in the face's heaviest weight", () => {
+    const [display, text] = plan.faces;
+    assert.deepEqual([display?.glyphs, display?.family, display?.fill, display?.ink], ["AG", "BIG SHOULDERS", "Sodium", "Night"]);
+    assert.deepEqual(text?.font, { family: "Chivo", style: "Medium" });
+    assert.equal(text?.fill, null);
+  });
+
+  it("opens each section on a divider, then its frames, numbered in reading order", () => {
+    const names = plan.sections.map((s) => [s.divider.name, ...s.frames.map((f) => f.name)]);
+    assert.deepEqual(names, [
+      ["02 Color", "02.1 Color · Palette"],
+      ["03 Type", "03.1 Type · Typefaces", "03.2 Type · Scale"],
+    ]);
+    assert.deepEqual(plan.sections.flatMap((s) => s.frames.map((f) => f.page)), ["02", "04", "05"]);
+    assert.equal(plan.sections[0]?.frames[0]?.eyebrow, "02 · Color · Palette");
+    assert.deepEqual(plan.display, { font: { family: "Big Shoulders", style: "ExtraBold" }, upper: true });
+  });
+
+  it("keeps frames to labels and values, with one line on print", () => {
+    assert.equal(plan.palette.note, "CMYK and Pantone are approximate. Proof before print.");
+    assert.equal(plan.scale[0]?.sample, "Okonkwo");
+    assert.ok(!("use" in plan.palette.cards[0]!));
+  });
+
+  it("keeps OpenType features in the style's description, since Figma styles can't hold them", () => {
+    assert.match(plan.textStyles.find((t) => t.name === "Figure")?.description ?? "", /OpenType: tnum\./);
+  });
+});

@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import type { Case, TypeStyle } from "./schema";
+import type { Brand, Case, TypeStyle } from "./schema";
 
 /**
  * The CSS text-transform that sets a case. Sentence and title case are written,
@@ -37,4 +37,15 @@ export function describeStep(step: TypeStyle) {
   return [`${size} / ${step.lineHeight}`, String(step.weight), `tracking ${tracking}`, CASE_NAMES[step.case]]
     .concat(step.features?.length ? [step.features.join(", ")] : [])
     .join(" · ");
+}
+
+/**
+ * The words a scale step is shown with: the first display step sets the name's
+ * first word, later display steps the category, body the positioning, the rest
+ * what they are for.
+ */
+export function stepSample(brand: Brand, step: TypeStyle, index: number) {
+  if (step.face === "display") return index === 0 ? brand.name.split(/[\s-]/)[0]! : brand.category.name;
+  if (step.id === "body") return brand.positioning;
+  return step.use;
 }

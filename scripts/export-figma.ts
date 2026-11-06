@@ -7,7 +7,8 @@
  *   pnpm export-figma <slug> --check           builds and checks it, writes nothing (pnpm check runs this)
  *
  * Figma only sees fonts installed on the computer, so the export lists the
- * brand's fonts that aren't, and installs them only when asked.
+ * brand's fonts that aren't, and installs them only when asked. It also
+ * rebuilds the plugin, so the one command readies both.
  */
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
@@ -63,6 +64,7 @@ const out = join(folder, "figma", `${slug}.figma.json`);
 mkdirSync(join(folder, "figma"), { recursive: true });
 writeFileSync(out, `${JSON.stringify(bundle, null, 2)}\n`);
 console.log(`Wrote ${relative(root, out)}.`);
+await import("./build-plugin");
 
 // Installed fonts are matched by file name, the name Font Book and a copy both keep.
 const userFonts = join(homedir(), "Library", "Fonts");
@@ -82,3 +84,6 @@ if (!missing.length) {
   console.log(`Not installed, so Figma can't use them yet:\n${missing.map((f) => `   - ${f}`).join("\n")}`);
   console.log(`Run pnpm export-figma ${slug} --install-fonts, or open each file and choose Install.`);
 }
+console.log(
+  "\nIn the Figma desktop app: Plugins → Development → Import plugin from manifest → figma-plugin/manifest.json (once), then run Brand book and choose the file above.",
+);
