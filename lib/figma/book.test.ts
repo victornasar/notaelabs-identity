@@ -87,14 +87,14 @@ describe("bookPlan", () => {
     const names = plan.sections.map((s) => [s.divider.name, ...s.frames.map((f) => f.name)]);
     assert.deepEqual(names, [
       ["Cover", "01.1 Introduction · Overview", "01.2 Introduction · What we refuse", "01.3 Introduction · The idea"],
-      ["02 Logo", "02.1 Logo · Logo mark", "02.2 Logo · On Stone", "02.3 Logo · On Sodium", "02.4 Logo · On Night"],
+      ["02 Logo", "02.1 Logo · Logo mark", "02.2 Logo · On Stone", "02.3 Logo · On Sodium", "02.4 Logo · On Night", "02.5 Logo · Misuse"],
       ["03 Color", "03.1 Color · Palette"],
       ["04 Typography", "04.1 Typography · Typefaces", "04.2 Typography · Scale"],
       ["05 Visual Language", "05.1 Visual Language · Pool row"],
     ]);
     assert.deepEqual(
       plan.sections.flatMap((s) => s.frames.map((f) => f.page)),
-      ["02", "03", "04", "06", "07", "08", "09", "11", "13", "14", "16"],
+      ["02", "03", "04", "06", "07", "08", "09", "10", "12", "14", "15", "17"],
     );
     assert.equal(plan.sections[2]?.frames[0]?.eyebrow, "03 · Color · Palette");
     assert.deepEqual(plan.display, { font: { family: "Big Shoulders", style: "ExtraBold" }, upper: true });
@@ -130,6 +130,26 @@ describe("bookPlan", () => {
     bare.story!.refuses = "";
     const parts = bookPlan(buildBundle(bare, files)).sections[0]!.frames.map((f) => f.kind);
     assert.deepEqual(parts, ["overview", "idea"]);
+  });
+
+  it("draws each misuse the brand says how to draw, on its own ground, and leaves the rest to words", () => {
+    const cards = plan.logo.misuse;
+    assert.deepEqual(
+      cards.map((c) => [c.kind, c.ground, c.ink]),
+      [
+        ["typed", "Night", "Stone"],
+        ["beside", "Night", "Stone"],
+        ["colors", "Sodium", "Stone"],
+        ["glow", "Night", "Stone"],
+      ],
+    );
+    assert.equal(cards[0]?.text, "OKONKWO-MARCHETTI");
+    assert.equal(cards[3]?.glow, "Sodium");
+
+    const words = structuredClone(brand);
+    words.marks.misuse = ["Never outline the marks."];
+    const parts = bookPlan(buildBundle(words, files)).sections[1]!.frames.map((f) => f.kind);
+    assert.ok(!parts.includes("misuse"));
   });
 
   it("draws the symbol in the accent, captioned with what it represents", () => {

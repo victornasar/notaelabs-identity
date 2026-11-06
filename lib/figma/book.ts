@@ -8,6 +8,7 @@
  * carries this out.
  */
 import { bestOn, luminance } from "../brand/color";
+import type { MisuseShow } from "../brand/schema";
 import type { BundleFont, BundleIntro, BundleTextStyle, FigmaBundle, FontName } from "./bundle";
 
 /** The variable collection every brand color lives in. */
@@ -60,12 +61,23 @@ export type Divider = { name: string; number: string; title: string; cover: bool
  */
 export type ContentFrame = {
   name: string;
-  kind: "overview" | "refuses" | "idea" | "palette" | "faces" | "scale" | "symbol" | "lockup" | "device";
+  kind: "overview" | "refuses" | "idea" | "palette" | "faces" | "scale" | "symbol" | "lockup" | "misuse" | "device";
   eyebrow: string;
   page: string;
   ground: string;
   ink: string;
   tint: string;
+};
+
+/** A misuse drawn on its ground and crossed out, over the rule it breaks. `glow` is the light it sits on. */
+export type MisuseCard = {
+  rule: string;
+  kind: MisuseShow["kind"];
+  svg: string;
+  text?: string;
+  ground: string;
+  ink: string;
+  glow?: string;
 };
 
 /** A mark drawn large, with what it is in a caption at the bottom right. */
@@ -96,7 +108,7 @@ export type BookPlan = {
   faces: FaceCard[];
   scale: ScaleRow[];
   /** The symbol alone, then the lockup, which each `lockup` frame sets on its own ground. */
-  logo: { symbol: Showcase; lockup: string };
+  logo: { symbol: Showcase; lockup: string; misuse: MisuseCard[] };
   device?: Showcase;
   /** In reading order: one row on the canvas each. */
   sections: BookSection[];
@@ -170,6 +182,13 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
   const { items, variants, cover } = bundle.marks;
   const symbol = items.find((m) => m.role === "symbol") ?? items[0]!;
   const coverSvg = (items.find((m) => m.file === cover) ?? items[0]!).svg;
+  // Only the misuses a brand says how to draw; the rest are words, for the guidelines.
+  const misuse = bundle.marks.misuse.flatMap(({ rule, show }): MisuseCard[] => {
+    if (!show) return [];
+    const svg = items.find((m) => m.file === show.mark)?.svg ?? "";
+    const on = show.kind === "colors" ? { ground: show.ground, ink: show.ink } : { ground: ground.name, ink: ink.name };
+    return [{ rule, kind: show.kind, svg, ...("text" in show ? { text: show.text } : {}), ...on, ...(show.kind === "glow" ? { glow: accent.name } : {}) }];
+  });
   const onGround = variants.filter((v) => v.ground === ground.name);
   const symbolInk = (onGround.find((v) => v.ink === accent.name) ?? onGround[0])?.ink ?? ink.name;
   const hexOf = (name: string) => colors.find((c) => c.name === name)!.hex;
@@ -195,6 +214,7 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
       parts: [
         { kind: "symbol", part: "Logo mark" },
         ...grounds.map((v) => ({ kind: "lockup" as const, part: `On ${v.ground}`, ground: v.ground, ink: v.ink })),
+        ...(misuse.length ? [{ kind: "misuse" as const, part: "Misuse" }] : []),
       ],
     },
     { title: "Color", parts: [{ kind: "palette", part: "Palette" }] },
@@ -295,6 +315,7 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
     logo: {
       symbol: { svg: symbol.svg, name: symbol.name, caption: symbol.meaning ?? symbol.use, ink: symbolInk },
       lockup: coverSvg,
+      misuse,
     },
     ...(bundle.device
       ? { device: { svg: bundle.device.svg, name: bundle.device.name, caption: bundle.device.construction, ink: bundle.device.ink } }
