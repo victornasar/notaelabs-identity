@@ -133,7 +133,7 @@ export function shareWidths(shares: number[], total: number, gap: number, min: n
 }
 
 export function bookPlan(bundle: FigmaBundle): BookPlan {
-  const { colors, textStyles, fonts, frames } = bundle;
+  const { colors, textStyles, fonts } = bundle;
   const byRole = (role: string) => colors.find((c) => c.role === role);
   const ground = byRole("ground") ?? colors[0]!;
   const ink = byRole("ink") ?? colors[1] ?? ground;
@@ -169,49 +169,54 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
     .filter((v, i) => variants.findIndex((w) => w.ground === v.ground) === i)
     .sort((a, b) => luminance(hexOf(b.ground)) - luminance(hexOf(a.ground)));
 
-  // Sections in the bundle's order, each with the frames that show it. The book names two sections
-  // as a client would ask for them. Pages count dividers too.
+  // The book's outline, as an agency sets out brand guidelines. A section is drawn once the brand has
+  // what it shows, and numbers count only the drawn ones. Pages count dividers too.
   type Part = { kind: ContentFrame["kind"]; part: string; ground?: string; ink?: string };
-  const titles: Record<string, string> = { marks: "Logo", imagery: "Visual elements" };
-  const parts: Record<string, Part[]> = {
-    marks: [
-      { kind: "symbol", part: "Logo mark" },
-      ...grounds.map((v) => ({ kind: "lockup" as const, part: `On ${v.ground}`, ground: v.ground, ink: v.ink })),
-    ],
-    color: [{ kind: "palette", part: "Palette" }],
-    type: [
-      { kind: "faces", part: "Typefaces" },
-      { kind: "scale", part: "Scale" },
-    ],
-    ...(bundle.device
-      ? {
-          imagery: [
-            {
-              kind: "device" as const,
-              part: bundle.device.name,
-              ground: bundle.device.ground,
-              ink: nameOf(bestOn(hexOf(bundle.device.ground), hexes)),
-            },
-          ],
-        }
-      : {}),
-  };
+  const device = bundle.device;
+  const outline: { title: string; parts: Part[] }[] = [
+    { title: "Introduction", parts: [] },
+    {
+      title: "Logo",
+      parts: [
+        { kind: "symbol", part: "Logo mark" },
+        ...grounds.map((v) => ({ kind: "lockup" as const, part: `On ${v.ground}`, ground: v.ground, ink: v.ink })),
+      ],
+    },
+    { title: "Color", parts: [{ kind: "palette", part: "Palette" }] },
+    {
+      title: "Typography",
+      parts: [
+        { kind: "faces", part: "Typefaces" },
+        { kind: "scale", part: "Scale" },
+      ],
+    },
+    {
+      title: "Visual Language",
+      parts: device ? [{ kind: "device", part: device.name, ground: device.ground, ink: nameOf(bestOn(hexOf(device.ground), hexes)) }] : [],
+    },
+    { title: "Iconography & Illustration", parts: [] },
+    { title: "Imagery & Art Direction", parts: [] },
+    { title: "Layout & Composition", parts: [] },
+    { title: "Digital Applications", parts: [] },
+    { title: "Marketing Applications", parts: [] },
+    { title: "Brand Voice", parts: [] },
+    { title: "Brand Guidelines", parts: [] },
+  ];
   let page = 0;
-  const sections = frames
-    .filter((f) => parts[f.id])
-    .map((f): BookSection => {
-      const title = titles[f.id] ?? f.label;
-      const divider = { name: `${f.number} ${title}`, number: f.number, title };
+  const sections = outline
+    .filter((s) => s.parts.length)
+    .map(({ title, parts }, n): BookSection => {
+      const number = String(n + 1).padStart(2, "0");
       page += 1;
       return {
-        divider,
-        frames: parts[f.id]!.map(({ kind, part, ...on }, i) => {
+        divider: { name: `${number} ${title}`, number, title },
+        frames: parts.map(({ kind, part, ...on }, i) => {
           page += 1;
           const own = !on.ground || on.ground === ground.name;
           return {
-            name: `${f.number}.${i + 1} ${title} · ${part}`,
+            name: `${number}.${i + 1} ${title} · ${part}`,
             kind,
-            eyebrow: `${f.number} · ${title} · ${part}`,
+            eyebrow: `${number} · ${title} · ${part}`,
             page: String(page).padStart(2, "0"),
             ground: on.ground ?? ground.name,
             ink: on.ink ?? ink.name,

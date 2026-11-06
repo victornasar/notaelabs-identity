@@ -83,13 +83,13 @@ describe("bookPlan", () => {
     assert.equal(text?.fill, null);
   });
 
-  it("opens each section on a divider, then its frames, numbered in reading order", () => {
+  it("follows the outline, drawing only the sections the brand has, numbered without gaps", () => {
     const names = plan.sections.map((s) => [s.divider.name, ...s.frames.map((f) => f.name)]);
     assert.deepEqual(names, [
       ["01 Logo", "01.1 Logo · Logo mark", "01.2 Logo · On Stone", "01.3 Logo · On Sodium", "01.4 Logo · On Night"],
       ["02 Color", "02.1 Color · Palette"],
-      ["03 Type", "03.1 Type · Typefaces", "03.2 Type · Scale"],
-      ["04 Visual elements", "04.1 Visual elements · Pool row"],
+      ["03 Typography", "03.1 Typography · Typefaces", "03.2 Typography · Scale"],
+      ["04 Visual Language", "04.1 Visual Language · Pool row"],
     ]);
     assert.deepEqual(plan.sections.flatMap((s) => s.frames.map((f) => f.page)), ["02", "03", "04", "05", "07", "09", "10", "12"]);
     assert.equal(plan.sections[1]?.frames[0]?.eyebrow, "02 · Color · Palette");
