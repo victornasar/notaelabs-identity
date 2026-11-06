@@ -3,6 +3,7 @@ import { Mark } from "@/components/shell/mark";
 import type { ActiveBrand } from "@/lib/brand/active";
 import { bestOn, contrast, toOklch, toRgbString, wcagLevel } from "@/lib/brand/color";
 import { minimumContrast, type BrandColor, type Face, type TypeStyle } from "@/lib/brand/schema";
+import { aspect } from "@/lib/brand/svg";
 import { describeStep, textTransform } from "@/lib/brand/type";
 import { CopyChip } from "./copy-chip";
 import { stripOf } from "./imagery";
@@ -22,11 +23,6 @@ const FACE_FAMILY: Record<TypeStyle["face"], string> = {
   text: "var(--text)",
   mono: "var(--brand-mono, var(--mono))",
 };
-
-function aspect(svg: string) {
-  const [, , w, h] = svg.match(/viewBox="([^"]+)"/)![1].split(/\s+/).map(Number);
-  return w / h;
-}
 
 function Heading({
   id,
@@ -259,7 +255,7 @@ export function Colors({ active }: Props) {
   const ordered = [...colors].sort((a, b) => b.proportion - a.proportion);
 
   const pairs = colors
-    .flatMap((a, i) => colors.slice(i + 1).map((b) => (a.proportion >= b.proportion ? [a, b] : [b, a])))
+    .flatMap((a, i) => colors.slice(i + 1).map((b) => (a.proportion >= b.proportion ? ([a, b] as const) : ([b, a] as const))))
     .map(([back, fore]) => ({ back, fore, ratio: contrast(back.hex, fore.hex) }))
     .sort((x, y) => y.ratio - x.ratio);
 

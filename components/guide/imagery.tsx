@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import { Mark } from "@/components/shell/mark";
 import type { ActiveBrand } from "@/lib/brand/active";
 import { physicalKinds, type Application } from "@/lib/brand/schema";
+import { viewBox } from "@/lib/brand/svg";
 import styles from "./imagery.module.css";
 import guide from "./guide.module.css";
 
@@ -22,7 +23,7 @@ const KIND_NAMES: Record<string, string> = {
 
 /** The device's drawing, cut to the strip its shapes sit on, so a row stays low. */
 export function stripOf(source: string) {
-  const [x, y, w, h] = source.match(/viewBox="([^"]+)"/)![1].split(/\s+/).map(Number);
+  const { x, y, w, h } = viewBox(source);
   return { svg: source.replace(/viewBox="[^"]+"/, `viewBox="${x} ${y + h / 3} ${w} ${h / 3}"`), aspect: w / (h / 3) };
 }
 
@@ -58,10 +59,10 @@ export function Imagery({ active, number }: Props & { number: string }) {
   const { device, marks } = brand;
   if (!device?.applications.length) return null;
   const accent = active.byRole("accent") ?? active.byRole("ink")!;
-  const lockup = marks.alternates?.[0] ? svg(marks.alternates[0]) : svg(marks.primary);
+  const lockup = svg(marks.alternates?.[0] ?? marks.primary);
   const wordmark = svg(marks.primary);
   const symbol = marks.symbol ? svg(marks.symbol) : wordmark;
-  const handle = brand.name.split(" ")[0].toLowerCase();
+  const handle = brand.name.replace(/\s.*$/, "").toLowerCase();
 
   const scene = (app: Application) => {
     const surface = { background: color(app.ground).hex, color: color(app.ink).hex } as CSSProperties;

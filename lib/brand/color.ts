@@ -1,7 +1,10 @@
 /** Color math: hex in, every other notation and WCAG contrast out. */
 
-export function hexToRgb(hex: string): [number, number, number] {
+type Rgb = [number, number, number];
+
+export function hexToRgb(hex: string): Rgb {
   const value = hex.replace("#", "");
+  if (!/^([0-9a-f]{3}|[0-9a-f]{6})$/i.test(value)) throw new Error(`Not a hex color: ${hex}`);
   const full = value.length === 3 ? [...value].map((c) => c + c).join("") : value;
   const n = parseInt(full, 16);
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
@@ -12,13 +15,19 @@ const toLinear = (c: number) => {
   return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
 };
 
+const linearRgb = (hex: string): Rgb => {
+  const [r, g, b] = hexToRgb(hex);
+  return [toLinear(r), toLinear(g), toLinear(b)];
+};
+
 export function luminance(hex: string) {
-  const [r, g, b] = hexToRgb(hex).map(toLinear);
+  const [r, g, b] = linearRgb(hex);
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
 
 export function contrast(a: string, b: string) {
-  const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+  const [la, lb] = [luminance(a), luminance(b)];
+  const [hi, lo] = la >= lb ? [la, lb] : [lb, la];
   return (hi + 0.05) / (lo + 0.05);
 }
 
@@ -29,8 +38,9 @@ export function wcagLevel(ratio: number) {
   return null;
 }
 
-export function toOklch(hex: string) {
-  const [r, g, b] = hexToRgb(hex).map(toLinear);
+/** OKLCH as numbers: lightness 0–1, chroma, hue in degrees. */
+export function oklch(hex: string) {
+  const [r, g, b] = linearRgb(hex);
   const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
   const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
   const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
@@ -39,7 +49,12 @@ export function toOklch(hex: string) {
   const B = 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s;
   const C = Math.hypot(A, B);
   const H = C < 0.0001 ? 0 : ((Math.atan2(B, A) * 180) / Math.PI + 360) % 360;
-  return `oklch(${(L * 100).toFixed(2)}% ${C.toFixed(3)} ${H.toFixed(2)})`;
+  return { l: L, c: C, h: H };
+}
+
+export function toOklch(hex: string) {
+  const { l, c, h } = oklch(hex);
+  return `oklch(${(l * 100).toFixed(2)}% ${c.toFixed(3)} ${h.toFixed(2)})`;
 }
 
 export function toRgbString(hex: string) {
@@ -56,7 +71,11 @@ export function bestOn(hex: string, candidates: string[]) {
  * when sRGB can't show it, after clipping; pick a lower chroma instead.
  */
 export function oklchToHex(value: string) {
-  const [rawL, C, H] = value.replace(/oklch\(|\)|%/g, "").trim().split(/[\s,]+/).map(Number);
+  const parts = value.replace(/oklch\(|\)|%/g, "").trim().split(/[\s,]+/).map(Number);
+  const [rawL, C, H] = parts;
+  if (parts.length !== 3 || rawL === undefined || C === undefined || H === undefined || parts.some(Number.isNaN)) {
+    throw new Error(`Not an OKLCH color: ${value}`);
+  }
   const L = rawL > 1 ? rawL / 100 : rawL;
   const a = C * Math.cos((H * Math.PI) / 180);
   const b = C * Math.sin((H * Math.PI) / 180);

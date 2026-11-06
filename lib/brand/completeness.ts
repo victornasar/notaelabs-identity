@@ -1,34 +1,15 @@
 /**
- * Whether a brand is a complete brand book: each of the eight sections in
- * `parts` is either there in full or marked not applicable with a reason.
- * Node only: it reads the mockup library. Used by `pnpm check-brand`, the
- * last gate of /brand.
+ * Whether a brand is a complete brand book: each section in `parts` is either
+ * there in full or marked not applicable with a reason. Used by
+ * `pnpm check-brand`, the last gate of /brand.
  */
 
-import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
 import { parts, physicalKinds, type Brand, type Part } from "./schema";
 
 export type PartReport =
   | { part: Part; status: "complete" }
   | { part: Part; status: "missing"; missing: string[] }
   | { part: Part; status: "not applicable"; reason: string };
-
-/** A photo in `mockups/library.json`: a real surface with a blank area the marks go on. */
-export type MockupPhoto = {
-  id: string;
-  /** File name inside `mockups/`. */
-  file: string;
-  photographer: string;
-  source: string;
-  license: string;
-  /** The blank area's corners in image pixels: top left, top right, bottom right, bottom left. */
-  corners: [number, number][];
-  /** What the surface is and suits: "hoarding", "night", "architecture". */
-  tags: string[];
-};
-
-const root = process.cwd();
 
 // The least a professional book shows of each list.
 const least = { voiceLines: 3, misuse: 4, grounds: 2, scale: 4, physical: 2, digital: 2 };
@@ -76,22 +57,6 @@ const checks: Record<Part, (brand: Brand) => string[]> = {
     const kinds = new Set(device.applications.map((a) => a.kind));
     count(out, [...kinds].filter((k) => physicalKinds.includes(k)), least.physical, "device.applications (physical)");
     count(out, [...kinds].filter((k) => !physicalKinds.includes(k)), least.digital, "device.applications (digital)");
-    return out;
-  },
-
-  mockup(brand) {
-    const out: string[] = [];
-    const { mockup } = brand;
-    if (!mockup) return ["mockup: a photo from mockups/library.json and the mark placed on it."];
-    const libraryFile = join(root, "mockups", "library.json");
-    const library: MockupPhoto[] = existsSync(libraryFile) ? JSON.parse(readFileSync(libraryFile, "utf8")) : [];
-    const photo = library.find((p) => p.id === mockup.photo);
-    need(out, photo, `mockups/library.json entry "${mockup.photo}".`);
-    if (photo) {
-      need(out, existsSync(join(root, "mockups", photo.file)), `mockups/${photo.file}.`);
-      need(out, photo.photographer && photo.source && photo.license, `credit for mockup "${photo.id}".`);
-    }
-    need(out, existsSync(join(root, "brands", brand.slug, "marks", mockup.mark)), `marks/${mockup.mark}.`);
     return out;
   },
 

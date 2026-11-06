@@ -2,7 +2,7 @@
  * Renders every mark of a route (or any folder with a marks/ subfolder) to PNG,
  * so a person or an agent can look at what was drawn before anyone else does.
  *
- *   node scripts/render-marks.mjs brands/<slug>/work/routes/<a|b|c>
+ *   pnpm render-marks brands/<slug>/work/routes/<a|b|c>
  *
  * Writes renders/<mark>-16.png, -64.png and -512.png (black on white), and
  * renders/review.png: each mark at 16px enlarged 8× with hard pixels, then at
@@ -11,28 +11,29 @@
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { Resvg } from "@resvg/resvg-js";
+import { aspect, viewBox } from "../lib/brand/svg";
 
 const dir = process.argv[2];
 if (!dir) {
-  console.error("usage: node scripts/render-marks.mjs <folder with marks/>");
+  console.error("usage: pnpm render-marks <folder with marks/>");
   process.exit(1);
 }
 const marksDir = join(dir, "marks");
 const out = join(dir, "renders");
 mkdirSync(out, { recursive: true });
 
-const recolor = (svg, color) =>
+const recolor = (svg: string, color: string) =>
   svg.replace(/(fill|stroke)="(?!none)[^"]*"/g, `$1="${color}"`).replace(/currentColor/g, color);
 
 // Height-fitted render, so a wide wordmark is 16px tall, like it would be in a header.
-function png(svg, height, color = "#000", background = "#fff") {
+function png(svg: string, height: number, color = "#000", background = "#fff") {
   return new Resvg(recolor(svg, color), { fitTo: { mode: "height", value: height }, background })
     .render()
     .asPng();
 }
 
 const marks = readdirSync(marksDir).filter((f) => f.endsWith(".svg")).sort();
-const rows = [];
+const rows: { stem: string; svg: string }[] = [];
 for (const file of marks) {
   const svg = readFileSync(join(marksDir, file), "utf8");
   const stem = file.replace(/\.svg$/, "");
@@ -43,15 +44,15 @@ for (const file of marks) {
 // The review sheet: each mark gets two lines, light ground then dark ground.
 const SCALE = 8;
 const pad = 24;
-const items = [];
+const items: string[] = [];
 let y = pad;
 let width = 0;
 for (const { stem, svg } of rows) {
-  const [, , w, h] = svg.match(/viewBox="([^"]+)"/)[1].split(/\s+/).map(Number);
-  const ratio = w / h;
+  const ratio = aspect(svg);
+  const { h } = viewBox(svg);
   items.push(`<text x="${pad}" y="${y + 22}" font-family="monospace" font-size="24">${stem}: 16px ×${SCALE}, 64px, 128px</text>`);
   y += 40;
-  for (const [ground, ink] of [["#fff", "#000"], ["#111", "#fff"]]) {
+  for (const [ground, ink] of [["#fff", "#000"], ["#111", "#fff"]] as const) {
     let x = pad;
     const small = png(svg, 16, ink, ground).toString("base64");
     const sw = Math.round(16 * ratio) * SCALE;

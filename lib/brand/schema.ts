@@ -241,18 +241,6 @@ export type GraphicDevice = GraphicElement & {
   applications: Application[];
 };
 
-/** A photograph of a real surface from the mockup library, carrying the marks. */
-export type Mockup = {
-  /** The photo's id in `mockups/library.json`. */
-  photo: string;
-  /** The mark file placed on it, inside the brand's `marks/` folder. */
-  mark: string;
-  /** Color names: the ink the mark is printed in on the surface. */
-  ink: string;
-  /** Why this surface suits the brand. */
-  why: string;
-};
-
 /** A kind of real-world application the renderer can draw. */
 export type ApplicationKind =
   | "website"
@@ -280,13 +268,15 @@ export type Application = {
   copy: Record<string, string | string[]>;
 };
 
-/** The eight sections of a brand book, in presentation order. */
+/**
+ * The sections of a brand book, in presentation order. A photo mockup joins
+ * once the mockup library exists.
+ */
 export const parts = [
   "intro",
   "wordmark",
   "logo-mark",
   "graphic-device",
-  "mockup",
   "colors",
   "typography",
   "closing",
@@ -327,7 +317,6 @@ export type Brand = Strategy & {
   colorModes?: ColorMode[];
   type: TypeSystem;
   device?: GraphicDevice;
-  mockup?: Mockup;
   /** Parts of the book this brand doesn't need, each with the reason. */
   notApplicable?: Partial<Record<Part, string>>;
   reveal: {
@@ -472,7 +461,7 @@ function bookProblems(brand: Brand): string[] {
     if (Math.round(total) !== 100) out.push(`${where} proportions sum to ${total}, not 100.`);
   }
 
-  const { device, mockup } = brand;
+  const { device } = brand;
   if (device) {
     color("device", device.ground);
     color("device", device.ink);
@@ -491,7 +480,6 @@ function bookProblems(brand: Brand): string[] {
     }
   }
 
-  if (mockup) color("mockup", mockup.ink);
   return out.map((problem) => `${brand.slug}: ${problem}`);
 }
 

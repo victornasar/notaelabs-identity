@@ -5,7 +5,7 @@
  *   node brands/okonkwo/work/routes/b/build.mjs
  */
 import { writeFileSync } from "node:fs";
-import { bounds, loadFont, moveBy, setText, shapes, toSvg } from "../../../../../scripts/lib/outline.mjs";
+import { bounds, loadFont, moveBy, setText, shapes, toSvg } from "../../../../../scripts/lib/outline.ts";
 
 const here = new URL(".", import.meta.url).pathname;
 const fonts = here + "../../../fonts/";

@@ -9,9 +9,13 @@
  *   writeFileSync("marks/wordmark.svg", toSvg(run));
  */
 import { readFileSync } from "node:fs";
-import { parse } from "opentype.js/dist/opentype.mjs";
+import { parse, type Font, type PathCommand } from "opentype.js/dist/opentype.mjs";
 
-export function loadFont(path, axes = {}) {
+export type { PathCommand };
+export type Point = [number, number];
+export type Run = { glyphs: { char: string | undefined; commands: PathCommand[]; x: number }[]; size: number; capHeight: number; xHeight: number };
+
+export function loadFont(path: string, axes: Record<string, number> = {}) {
   const bytes = readFileSync(path);
   const font = parse(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength));
   if (Object.keys(axes).length) {
@@ -26,7 +30,11 @@ export function loadFont(path, axes = {}) {
  * units scaled to `size`, with y pointing down and the baseline at y = 0.
  * `tracking` is in em, like CSS letter-spacing.
  */
-export function setText(font, text, { size = 1000, tracking = 0, kerning = true, features = {} } = {}) {
+export function setText(
+  font: Font,
+  text: string,
+  { size = 1000, tracking = 0, kerning = true, features = {} as Record<string, boolean> } = {},
+): Run {
   const scale = size / font.unitsPerEm;
   // opentype.js takes features as { liga: true }; only Latin ones are applied.
   const options = { ...font.defaultRenderOptions, kerning, features: { liga: true, rlig: true, ...features } };
@@ -53,55 +61,64 @@ export function setText(font, text, { size = 1000, tracking = 0, kerning = true,
   return { glyphs: out, size, capHeight, xHeight };
 }
 
-const KEYS = [
-  ["x", "y"],
-  ["x1", "y1"],
-  ["x2", "y2"],
-];
-
 /** Applies `fn([x, y]) => [x, y]` to every point of a path. */
-export function mapPoints(commands, fn) {
-  return commands.map((command) => {
-    const next = { ...command };
-    for (const [kx, ky] of KEYS) {
-      if (kx in next) [next[kx], next[ky]] = fn([next[kx], next[ky]]);
+export function mapPoints(commands: PathCommand[], fn: (point: Point) => Point): PathCommand[] {
+  return commands.map((c) => {
+    switch (c.type) {
+      case "M":
+      case "L": {
+        const [x, y] = fn([c.x, c.y]);
+        return { ...c, x, y };
+      }
+      case "Q": {
+        const [x1, y1] = fn([c.x1, c.y1]);
+        const [x, y] = fn([c.x, c.y]);
+        return { ...c, x1, y1, x, y };
+      }
+      case "C": {
+        const [x1, y1] = fn([c.x1, c.y1]);
+        const [x2, y2] = fn([c.x2, c.y2]);
+        const [x, y] = fn([c.x, c.y]);
+        return { ...c, x1, y1, x2, y2, x, y };
+      }
+      case "Z":
+        return c;
     }
-    return next;
   });
 }
 
-export const moveBy = (commands, dx, dy = 0) => mapPoints(commands, ([x, y]) => [x + dx, y + dy]);
+export const moveBy = (commands: PathCommand[], dx: number, dy = 0) =>
+  mapPoints(commands, ([x, y]) => [x + dx, y + dy]);
 
-export function bounds(commands) {
+export function bounds(commands: PathCommand[]) {
   const box = { x1: Infinity, y1: Infinity, x2: -Infinity, y2: -Infinity };
-  for (const command of commands) {
-    for (const [kx, ky] of KEYS) {
-      if (!(kx in command)) continue;
-      box.x1 = Math.min(box.x1, command[kx]);
-      box.y1 = Math.min(box.y1, command[ky]);
-      box.x2 = Math.max(box.x2, command[kx]);
-      box.y2 = Math.max(box.y2, command[ky]);
-    }
-  }
+  // Every control point counts, as it always has: the box is a safe outer bound.
+  mapPoints(commands, ([x, y]) => {
+    box.x1 = Math.min(box.x1, x);
+    box.y1 = Math.min(box.y1, y);
+    box.x2 = Math.max(box.x2, x);
+    box.y2 = Math.max(box.y2, y);
+    return [x, y];
+  });
   return box;
 }
 
-const n = (value) => Number(value.toFixed(2));
+const n = (value: number) => Number(value.toFixed(2));
 
 /** SVG path data. Quadratic curves become cubics so the output has one curve type. */
-export function pathData(commands) {
+export function pathData(commands: PathCommand[]) {
   let d = "";
-  let current = [0, 0];
+  let current: Point = [0, 0];
   for (const c of commands) {
     if (c.type === "M" || c.type === "L") d += `${c.type}${n(c.x)} ${n(c.y)}`;
     else if (c.type === "C") d += `C${n(c.x1)} ${n(c.y1)} ${n(c.x2)} ${n(c.y2)} ${n(c.x)} ${n(c.y)}`;
     else if (c.type === "Q") {
       const [x0, y0] = current;
-      const c1 = [x0 + (2 / 3) * (c.x1 - x0), y0 + (2 / 3) * (c.y1 - y0)];
-      const c2 = [c.x + (2 / 3) * (c.x1 - c.x), c.y + (2 / 3) * (c.y1 - c.y)];
-      d += `C${n(c1[0])} ${n(c1[1])} ${n(c2[0])} ${n(c2[1])} ${n(c.x)} ${n(c.y)}`;
+      const [c1x, c1y] = [x0 + (2 / 3) * (c.x1 - x0), y0 + (2 / 3) * (c.y1 - y0)];
+      const [c2x, c2y] = [c.x + (2 / 3) * (c.x1 - c.x), c.y + (2 / 3) * (c.y1 - c.y)];
+      d += `C${n(c1x)} ${n(c1y)} ${n(c2x)} ${n(c2y)} ${n(c.x)} ${n(c.y)}`;
     } else if (c.type === "Z") d += "Z";
-    if ("x" in c) current = [c.x, c.y];
+    if (c.type !== "Z") current = [c.x, c.y];
   }
   return d;
 }
@@ -111,7 +128,7 @@ export function pathData(commands) {
  * path command arrays (for symbols drawn in code). Fills are black; the shell
  * and the /routes page recolor them.
  */
-export function toSvg(art, { pad = 0 } = {}) {
+export function toSvg(art: Run | PathCommand[][], { pad = 0 } = {}) {
   const paths = Array.isArray(art) ? art : art.glyphs.map((g) => g.commands);
   const box = bounds(paths.flat());
   const d = paths.map((p) => pathData(moveBy(p, pad - box.x1, pad - box.y1))).join("");
@@ -122,7 +139,7 @@ export function toSvg(art, { pad = 0 } = {}) {
 
 /** Path commands for shapes drawn in code, in the same format glyphs use. */
 export const shapes = {
-  rect: (x, y, w, h) => [
+  rect: (x: number, y: number, w: number, h: number): PathCommand[] => [
     { type: "M", x, y },
     { type: "L", x: x + w, y },
     { type: "L", x: x + w, y: y + h },
@@ -130,7 +147,7 @@ export const shapes = {
     { type: "Z" },
   ],
   /** A circle from four cubic arcs. `clockwise: false` cuts a hole in a nonzero fill. */
-  circle: (cx, cy, r, { clockwise = true } = {}) => {
+  circle: (cx: number, cy: number, r: number, { clockwise = true } = {}): PathCommand[] => {
     const k = 0.5522847498 * r;
     const s = clockwise ? 1 : -1;
     return [
@@ -142,8 +159,8 @@ export const shapes = {
       { type: "Z" },
     ];
   },
-  polygon: (points) => [
-    ...points.map(([x, y], i) => ({ type: i === 0 ? "M" : "L", x, y })),
+  polygon: (points: Point[]): PathCommand[] => [
+    ...points.map(([x, y], i): PathCommand => ({ type: i === 0 ? "M" : "L", x, y })),
     { type: "Z" },
   ],
 };
