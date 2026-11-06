@@ -7,7 +7,7 @@
  * style descriptions and on the web page. `figma-plugin/src/code.ts` only
  * carries this out.
  */
-import { bestOn } from "../brand/color";
+import { bestOn, luminance } from "../brand/color";
 import type { BundleFont, BundleTextStyle, FigmaBundle, FontName } from "./bundle";
 
 /** The variable collection every brand color lives in. */
@@ -53,8 +53,23 @@ export type ScaleRow = { id: string; spec: string; style: string; sample: string
 /** A frame that only names its section: "02" and "COLOR". */
 export type Divider = { name: string; number: string; title: string };
 
-/** A landscape frame showing one part of a section. `page` is its place in the book. */
-export type ContentFrame = { name: string; kind: "palette" | "faces" | "scale"; eyebrow: string; page: string };
+/**
+ * A landscape frame showing one part of a section. `page` is its place in the
+ * book. It is filled with `ground`, its type is set in `ink`, and its eyebrow
+ * in `tint`: the accent on the brand's ground, the ink on any other.
+ */
+export type ContentFrame = {
+  name: string;
+  kind: "palette" | "faces" | "scale" | "symbol" | "lockup" | "device";
+  eyebrow: string;
+  page: string;
+  ground: string;
+  ink: string;
+  tint: string;
+};
+
+/** A mark drawn large, with what it is in a caption at the bottom right. */
+export type Showcase = { svg: string; name: string; caption: string; ink: string };
 
 export type BookSection = { divider: Divider; frames: ContentFrame[] };
 
@@ -74,6 +89,9 @@ export type BookPlan = {
   palette: { cards: SwatchCard[]; note?: string };
   faces: FaceCard[];
   scale: ScaleRow[];
+  /** The symbol alone, then the lockup, which each `lockup` frame sets on its own ground. */
+  logo: { symbol: Showcase; lockup: string };
+  device?: Showcase;
   /** In reading order: one row on the canvas each. */
   sections: BookSection[];
 };
@@ -115,7 +133,7 @@ export function shareWidths(shares: number[], total: number, gap: number, min: n
 }
 
 export function bookPlan(bundle: FigmaBundle): BookPlan {
-  const { colors, textStyles, fonts, frames } = bundle;
+  const { colors, textStyles, fonts } = bundle;
   const byRole = (role: string) => colors.find((c) => c.role === role);
   const ground = byRole("ground") ?? colors[0]!;
   const ink = byRole("ink") ?? colors[1] ?? ground;
@@ -140,29 +158,69 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
   const ordered = [...colors].sort((a, b) => b.proportion - a.proportion);
   const widths = shareWidths(ordered.map((c) => c.proportion), column, layout.gap, layout.minSwatch);
 
-  // Sections in the bundle's order, each with the frames that show it. Pages count dividers too.
-  const parts: Record<string, [ContentFrame["kind"], string][]> = {
-    color: [["palette", "Palette"]],
-    type: [
-      ["faces", "Typefaces"],
-      ["scale", "Scale"],
-    ],
-  };
+  // The marks: the symbol (or the primary mark, when there is none) in the accent if it may sit on the
+  // ground that way, then the cover's mark on each ground it is approved for, one ink each, lightest first.
+  const { items, variants, cover } = bundle.marks;
+  const symbol = items.find((m) => m.role === "symbol") ?? items[0]!;
+  const onGround = variants.filter((v) => v.ground === ground.name);
+  const symbolInk = (onGround.find((v) => v.ink === accent.name) ?? onGround[0])?.ink ?? ink.name;
+  const hexOf = (name: string) => colors.find((c) => c.name === name)!.hex;
+  const grounds = variants
+    .filter((v, i) => variants.findIndex((w) => w.ground === v.ground) === i)
+    .sort((a, b) => luminance(hexOf(b.ground)) - luminance(hexOf(a.ground)));
+
+  // The book's outline, as an agency sets out brand guidelines. A section is drawn once the brand has
+  // what it shows, and numbers count only the drawn ones. Pages count dividers too.
+  type Part = { kind: ContentFrame["kind"]; part: string; ground?: string; ink?: string };
+  const device = bundle.device;
+  const outline: { title: string; parts: Part[] }[] = [
+    { title: "Introduction", parts: [] },
+    {
+      title: "Logo",
+      parts: [
+        { kind: "symbol", part: "Logo mark" },
+        ...grounds.map((v) => ({ kind: "lockup" as const, part: `On ${v.ground}`, ground: v.ground, ink: v.ink })),
+      ],
+    },
+    { title: "Color", parts: [{ kind: "palette", part: "Palette" }] },
+    {
+      title: "Typography",
+      parts: [
+        { kind: "faces", part: "Typefaces" },
+        { kind: "scale", part: "Scale" },
+      ],
+    },
+    {
+      title: "Visual Language",
+      parts: device ? [{ kind: "device", part: device.name, ground: device.ground, ink: nameOf(bestOn(hexOf(device.ground), hexes)) }] : [],
+    },
+    { title: "Iconography & Illustration", parts: [] },
+    { title: "Imagery & Art Direction", parts: [] },
+    { title: "Layout & Composition", parts: [] },
+    { title: "Digital Applications", parts: [] },
+    { title: "Marketing Applications", parts: [] },
+    { title: "Brand Voice", parts: [] },
+    { title: "Brand Guidelines", parts: [] },
+  ];
   let page = 0;
-  const sections = frames
-    .filter((f) => parts[f.id])
-    .map((f): BookSection => {
-      const divider = { name: `${f.number} ${f.label}`, number: f.number, title: f.label };
+  const sections = outline
+    .filter((s) => s.parts.length)
+    .map(({ title, parts }, n): BookSection => {
+      const number = String(n + 1).padStart(2, "0");
       page += 1;
       return {
-        divider,
-        frames: parts[f.id]!.map(([kind, part], i) => {
+        divider: { name: `${number} ${title}`, number, title },
+        frames: parts.map(({ kind, part, ...on }, i) => {
           page += 1;
+          const own = !on.ground || on.ground === ground.name;
           return {
-            name: `${f.number}.${i + 1} ${f.label} · ${part}`,
+            name: `${number}.${i + 1} ${title} · ${part}`,
             kind,
-            eyebrow: `${f.number} · ${f.label} · ${part}`,
+            eyebrow: `${number} · ${title} · ${part}`,
             page: String(page).padStart(2, "0"),
+            ground: on.ground ?? ground.name,
+            ink: on.ink ?? ink.name,
+            tint: own ? accent.name : (on.ink ?? ink.name),
           };
         }),
       };
@@ -216,6 +274,13 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
       ];
     }),
     scale: textStyles.map((t) => ({ id: t.id, spec: t.spec, style: t.name, sample: t.sample })),
+    logo: {
+      symbol: { svg: symbol.svg, name: symbol.name, caption: symbol.meaning ?? symbol.use, ink: symbolInk },
+      lockup: (items.find((m) => m.file === cover) ?? items[0]!).svg,
+    },
+    ...(bundle.device
+      ? { device: { svg: bundle.device.svg, name: bundle.device.name, caption: bundle.device.construction, ink: bundle.device.ink } }
+      : {}),
     sections,
   };
 }

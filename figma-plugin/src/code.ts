@@ -16,6 +16,7 @@ import {
   type BookPlan,
   type ContentFrame,
   type Paint,
+  type Showcase,
 } from "../../lib/figma/book";
 
 figma.showUI(__html__, { width: 360, height: 320, themeColors: true });
@@ -166,6 +167,19 @@ async function drawPage(plan: BookPlan, variables: Map<string, Variable>, styles
     return node;
   };
 
+  /** An SVG mark in one brand color, scaled to fit `width` and `height`. */
+  const vector = (name: string, svg: string, color: string, { width = Infinity, height = Infinity }: { width?: number; height?: number }) => {
+    const node = figma.createNodeFromSvg(svg);
+    node.name = name;
+    node.fills = [];
+    node.clipsContent = true;
+    for (const shape of node.findAll((n) => n.type !== "FRAME" && n.type !== "GROUP")) {
+      if ("fills" in shape) shape.fills = [paint({ color })];
+    }
+    node.rescale(Math.min(width / node.width, height / node.height));
+    return node;
+  };
+
   const add = <T extends SceneNode>(parent: FrameNode, child: T) => {
     parent.appendChild(child);
     return child;
@@ -195,8 +209,8 @@ async function drawPage(plan: BookPlan, variables: Map<string, Variable>, styles
   };
 
   /** A landscape frame at its place on the canvas: one row per section, frames left to right. */
-  const landscape = (name: string, row: number, place: number) => {
-    const frame = box(name, "VERTICAL", { pad: layout.pad, width: layout.width, height: layout.height, fill: { color: ground } });
+  const landscape = (name: string, row: number, place: number, fill = ground) => {
+    const frame = box(name, "VERTICAL", { pad: layout.pad, width: layout.width, height: layout.height, fill: { color: fill } });
     frame.clipsContent = true;
     frame.x = place * (layout.width + layout.spacing);
     frame.y = row * (layout.height + layout.spacing);
@@ -209,15 +223,17 @@ async function drawPage(plan: BookPlan, variables: Map<string, Variable>, styles
     const frame = landscape(name, row, 0);
     frame.primaryAxisAlignItems = "SPACE_BETWEEN";
     add(frame, await text(number, role.heading, { color: accent }));
-    add(frame, glyphs(plan.display.upper ? title.toUpperCase() : title, plan.display.font, 400, { color: ink }));
+    const big = add(frame, glyphs(plan.display.upper ? title.toUpperCase() : title, plan.display.font, 400, { color: ink }));
+    // A long name, such as two words, shrinks to the frame's width.
+    if (big.width > column) big.fontSize = Math.floor((400 * column) / big.width);
     return frame;
   };
 
   /** A small eyebrow, content filling the middle, and a footer with the brand and the page number. */
-  const content = async ({ name, eyebrow, page: number }: ContentFrame, row: number, place: number) => {
-    const frame = landscape(name, row, place);
+  const content = async ({ name, eyebrow, page: number, ground: fill, ink, tint }: ContentFrame, row: number, place: number) => {
+    const frame = landscape(name, row, place, fill);
     frame.itemSpacing = 48;
-    add(frame, await text(eyebrow, role.label, { color: accent }, { stretch: true }));
+    add(frame, await text(eyebrow, role.label, { color: tint }, { stretch: true }));
     const middle = grow(add(frame, box("Content", "VERTICAL", { gap: 24, stretch: true })));
     const foot = add(frame, box("Footer", "HORIZONTAL", { stretch: true }));
     foot.primaryAxisAlignItems = "SPACE_BETWEEN";
@@ -312,14 +328,53 @@ async function drawPage(plan: BookPlan, variables: Map<string, Variable>, styles
     }
   };
 
-  const draw = { palette, faces, scale };
+  /** What a mark is, in the reading text at the bottom right. */
+  const caption = async (area: FrameNode, { name, caption: words }: Showcase, color: string) => {
+    const row = add(area, box("Caption", "HORIZONTAL", { stretch: true }));
+    row.primaryAxisAlignItems = "MAX";
+    const about = add(row, box(name, "VERTICAL", { gap: 12, width: 560 }));
+    add(about, await text(name, role.label, quiet(color), { stretch: true }));
+    add(about, await text(words, role.body, quiet(color), { stretch: true }));
+  };
+
+  /** A space in the middle of the frame with one mark centered in it. */
+  const stage = (area: FrameNode, mark: FrameNode) => {
+    const space = grow(add(area, box("Stage", "VERTICAL", { stretch: true })));
+    space.primaryAxisAlignItems = space.counterAxisAlignItems = "CENTER";
+    add(space, mark);
+  };
+
+  const symbol = async (area: FrameNode, { ink }: ContentFrame) => {
+    const mark = plan.logo.symbol;
+    stage(area, vector(mark.name, mark.svg, mark.ink, { height: 480 }));
+    await caption(area, mark, ink);
+  };
+
+  const lockup = async (area: FrameNode, { ink }: ContentFrame) => {
+    stage(area, vector("Lockup", plan.logo.lockup, ink, { width: 1200, height: 520 }));
+  };
+
+  const device = async (area: FrameNode, { ink }: ContentFrame) => {
+    // The device runs off both edges, so it sits across the whole frame, outside the margins.
+    const graphic = plan.device!;
+    const frame = area.parent as FrameNode;
+    const row = vector(graphic.name, graphic.svg, graphic.ink, { width: layout.width });
+    frame.appendChild(row);
+    row.layoutPositioning = "ABSOLUTE";
+    row.x = 0;
+    row.y = Math.round((layout.height - row.height) / 2);
+    area.primaryAxisAlignItems = "MAX";
+    await caption(area, graphic, ink);
+  };
+
+  const draw = { palette, faces, scale, symbol, lockup, device };
   const drawn: FrameNode[] = [];
   for (const [row, section] of plan.sections.entries()) {
     const { name, number, title } = section.divider;
     drawn.push(await divider(name, number, title, row));
     for (const [i, spec] of section.frames.entries()) {
       const area = await content(spec, row, i + 1);
-      await draw[spec.kind](area);
+      await draw[spec.kind](area, spec);
       drawn.push(area.parent as FrameNode);
     }
   }
