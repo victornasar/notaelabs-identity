@@ -7,11 +7,12 @@
  * Values are already in Figma's units (0–1 RGB, percent line height and
  * letter spacing, Figma's text case names), so the plugin only places them.
  */
-import { hexToRgb } from "../brand/color";
-import { printNote } from "../brand/labels";
+import { hexToRgb, toOklch, toRgbString } from "../brand/color";
+import { faceNames, printNote, roleNames } from "../brand/labels";
 import type { Application, Brand, ColorRole, TypeStyle } from "../brand/schema";
-import { completeness, sectionTitle, sections, type SectionId } from "../brand/sections";
+import { completeness, pageSections, sectionTitle, sections, type SectionId } from "../brand/sections";
 import { viewBox } from "../brand/svg";
+import { describeStep, stepSample } from "../brand/type";
 
 /** Bumped when the plugin can no longer read an older bundle. */
 export const bundleFormat = 1;
@@ -34,6 +35,12 @@ export type BundleColor = {
   hex: string;
   rgb: { r: number; g: number; b: number };
   proportion: number;
+  /** The role as the book names it: "Accent". */
+  roleName: string;
+  /** Where the color belongs, in one line. */
+  use: string;
+  /** Every notation, as the page's value pills show them. */
+  values: { label: string; value: string }[];
   /** The variable's description: every notation, then the print caveat. */
   description: string;
 };
@@ -50,7 +57,14 @@ export type BundleTextStyle = {
   textCase: "ORIGINAL" | "UPPER" | "LOWER" | "TITLE";
   features: string[];
   description: string;
+  /** Its settings in a line, and what it is for. */
+  spec: string;
+  use: string;
+  /** The words it is shown with. */
+  sample: string;
 };
+
+export type BundleFace = { face: TypeStyle["face"]; kind: string; family: string; role: string; weights: number[] };
 
 export type BundleMark = {
   /** The file name in `marks/`; components are named after `name`. */
@@ -64,6 +78,8 @@ export type BundleMark = {
 
 export type BundleFrame = {
   id: SectionId;
+  /** As the page's nav numbers it, such as "02"; empty for the cover. */
+  number: string;
   label: string;
   title: string;
   /** What the frame shows, by name, so a check can prove each one exists. */
@@ -78,6 +94,9 @@ export type FigmaBundle = {
   fonts: BundleFont[];
   colors: BundleColor[];
   textStyles: BundleTextStyle[];
+  type: { fit: string; faces: BundleFace[] };
+  /** The caveat beside print values, when the brand has them. */
+  printNote?: string;
   marks: {
     items: BundleMark[];
     /** Each ground and the ink the marks take on it: one component variant each. */
@@ -173,7 +192,7 @@ const clean = (svg: string) => svg.replace(/<\?xml[^>]*\?>\s*/, "").trim();
 export function buildBundle(brand: Brand, files: BundleFiles): FigmaBundle {
   const fontFor = (step: TypeStyle) => files.fonts.find((f) => f.face === step.face && f.weight === step.weight);
 
-  const textStyles = brand.type.scale.steps.map((step): BundleTextStyle => {
+  const textStyles = brand.type.scale.steps.map((step, index): BundleTextStyle => {
     const font = fontFor(step);
     const mobile = step.mobileSize ? ` ${step.mobileSize} px at phone width.` : "";
     return {
@@ -188,10 +207,21 @@ export function buildBundle(brand: Brand, files: BundleFiles): FigmaBundle {
       textCase: textCases[step.case],
       features: step.features ?? [],
       description: `${step.use}${mobile}`,
+      spec: describeStep(step),
+      use: step.use,
+      sample: stepSample(brand, step, index),
     };
   });
 
-  const { device } = brand;
+  const { device, type } = brand;
+  const numbers = new Map(pageSections(brand).map((s) => [s.id as SectionId, s.number]));
+  const values = (c: Brand["colors"][number]) => [
+    { label: "Hex", value: c.hex.toUpperCase() },
+    { label: "RGB", value: toRgbString(c.hex) },
+    { label: "OKLCH", value: toOklch(c.hex) },
+    ...(c.cmyk ? [{ label: "CMYK", value: c.cmyk }] : []),
+    ...(c.pantone ? [{ label: "Pantone", value: c.pantone }] : []),
+  ];
 
   return {
     format: bundleFormat,
@@ -207,10 +237,21 @@ export function buildBundle(brand: Brand, files: BundleFiles): FigmaBundle {
         hex: c.hex.toUpperCase(),
         rgb: { r: round(r / 255), g: round(g / 255), b: round(b / 255) },
         proportion: c.proportion,
+        roleName: roleNames[c.role],
+        use: c.use,
+        values: values(c),
         description: colorDescription(brand, c),
       };
     }),
     textStyles,
+    type: {
+      fit: type.fit ?? "",
+      faces: (["display", "text", "mono"] as const).flatMap((face) => {
+        const spec = type[face];
+        return spec ? [{ face, kind: faceNames[face], family: spec.family, role: spec.role, weights: spec.weights }] : [];
+      }),
+    },
+    ...(brand.printProfile && brand.colors.some((c) => c.cmyk) ? { printNote: printNote(brand.printProfile) } : {}),
     marks: {
       items: markList(brand).map((m) => ({
         file: m.file,
@@ -240,6 +281,7 @@ export function buildBundle(brand: Brand, files: BundleFiles): FigmaBundle {
       .filter((s) => s.has(brand))
       .map((s) => ({
         id: s.id,
+        number: numbers.get(s.id) ?? "",
         label: s.label,
         title: sectionTitle(brand, s.id),
         uses: frameUses(brand, s.id, textStyles.map((t) => t.id)),

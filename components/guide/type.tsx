@@ -2,7 +2,7 @@ import type { CSSProperties } from "react";
 import { faceNames } from "@/lib/brand/labels";
 import type { Face, TypeStyle } from "@/lib/brand/schema";
 import { sectionTitle } from "@/lib/brand/sections";
-import { describeStep, stepStyle } from "@/lib/brand/type";
+import { describeStep, stepSample, stepStyle } from "@/lib/brand/type";
 import styles from "./type.module.css";
 import { Heading } from "./ui/heading";
 import type { SectionProps } from "./ui/types";
@@ -23,12 +23,6 @@ export function Type({ active, section }: SectionProps) {
   const faces = (["display", "text", "mono"] as const)
     .map((key) => [key, type[key]] as const)
     .filter((entry): entry is readonly [TypeStyle["face"], Face] => entry[1] !== undefined);
-
-  const sample = (step: TypeStyle, i: number) => {
-    if (step.face === "display") return i === 0 ? brand.name.split(/[\s-]/)[0] : brand.category.name;
-    if (step.id === "body") return brand.positioning;
-    return step.use;
-  };
 
   return (
     <section id="type" className={`${ui.container} ${ui.section}`} aria-labelledby="type-title">
@@ -84,7 +78,7 @@ export function Type({ active, section }: SectionProps) {
                 } as CSSProperties
               }
             >
-              {sample(step, i)}
+              {stepSample(brand, step, i)}
             </p>
           </li>
         ))}

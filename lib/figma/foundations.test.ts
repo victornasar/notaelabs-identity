@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 import okonkwo from "@/brands/okonkwo/brand";
 import type { Brand } from "../brand/schema";
 import { buildBundle, type BundleFiles } from "./bundle";
-import { board, foundationsPlan, missingFonts, nearFonts } from "./foundations";
+import { foundationsPlan, layout, missingFonts, nearFonts, shareWidths } from "./foundations";
 
 const brand = structuredClone(okonkwo) as Brand;
 const files: BundleFiles = {
@@ -40,6 +40,12 @@ describe("nearFonts", () => {
   });
 });
 
+describe("shareWidths", () => {
+  it("gives a share too small for its labels the minimum, and the rest what's left", () => {
+    assert.deepEqual(shareWidths([56, 28, 16], 1200, 12, 280), [597, 298, 280]);
+  });
+});
+
 describe("foundationsPlan", () => {
   it("loads each font once", () => {
     assert.deepEqual(plan.fonts.map((f) => `${f.family} ${f.style}`), ["Big Shoulders ExtraBold", "Chivo Regular", "Chivo Medium"]);
@@ -50,17 +56,37 @@ describe("foundationsPlan", () => {
     assert.equal(plan.ink, "Stone");
   });
 
-  it("heads with the largest style that fits, and labels with the label step", () => {
-    assert.equal(plan.heading, "Title");
-    assert.equal(plan.label, "Label");
+  it("gives each job the style the page uses for it", () => {
+    assert.deepEqual(plan.text, { heading: "Title", body: "Body", small: "Figure", label: "Label" });
   });
 
-  it("fits the swatches inside the board, each labelled in its most legible color", () => {
-    const inner = board.width - board.padding * 2;
-    assert.ok(plan.swatches.reduce((sum, s) => sum + s.width, 0) <= inner);
-    assert.equal(plan.swatches.find((s) => s.color === "Sodium")?.ink, "Night");
-    assert.deepEqual(plan.swatches.filter((s) => s.edge).map((s) => s.color), ["Night"]);
-    assert.deepEqual(plan.swatches.find((s) => s.color === "Sodium")?.lines.slice(0, 3), ["Sodium", "accent · 28%", "HEX #FF5A1F"]);
+  it("sizes swatch cards by share, largest first, within the column", () => {
+    const { cards } = plan.color;
+    assert.deepEqual(cards.map((c) => c.name), ["Night", "Sodium", "Stone"]);
+    const used = cards.reduce((sum, c) => sum + c.width, 0) + layout.gap * (cards.length - 1);
+    assert.ok(used <= layout.column && used > layout.column - cards.length);
+    assert.ok(cards.every((c) => c.width >= layout.minSwatch));
+  });
+
+  it("labels each swatch in its most legible color, and outlines the board's own", () => {
+    const sodium = plan.color.cards.find((c) => c.name === "Sodium");
+    assert.equal(sodium?.ink, "Night");
+    assert.equal(sodium?.role, "Accent · 28%");
+    assert.deepEqual(sodium?.pills.map((p) => p.label), ["Hex", "RGB", "OKLCH", "CMYK", "Pantone"]);
+    assert.deepEqual(plan.color.cards.filter((c) => c.edge).map((c) => c.name), ["Night"]);
+  });
+
+  it("leads the faces with an accent card set in the face's heaviest weight", () => {
+    const [display, text] = plan.type.faces;
+    assert.deepEqual([display?.glyphs, display?.family, display?.fill, display?.ink], ["AG", "BIG SHOULDERS", "Sodium", "Night"]);
+    assert.deepEqual(text?.font, { family: "Chivo", style: "Medium" });
+    assert.equal(text?.fill, null);
+  });
+
+  it("titles sections as the page does", () => {
+    assert.equal(plan.color.eyebrow, "02 · Color");
+    assert.equal(plan.color.title, "Three colors. Night carries the page.");
+    assert.equal(plan.type.scale[0]?.sample, "Okonkwo");
   });
 
   it("keeps OpenType features in the style's description, since Figma styles can't hold them", () => {
