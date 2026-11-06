@@ -38,6 +38,18 @@ export function missingFonts(bundle: FigmaBundle, available: FontName[]): Bundle
   return bundle.fonts.filter((font) => !available.some((a) => sameFont(a, font)));
 }
 
+/**
+ * What Figma has under a missing font's first word, such as "Big Shoulders
+ * Display" for "Big Shoulders", since its built-in Google Fonts can name a
+ * family differently from the file.
+ */
+export function nearFonts(font: FontName, available: FontName[]): string[] {
+  const first = font.family.split(" ")[0]!.toLowerCase();
+  const near = available.filter((a) => a.family.toLowerCase().split(" ")[0] === first);
+  const families = [...new Set(near.map((a) => a.family))];
+  return families.map((family) => `${family}: ${near.filter((a) => a.family === family).map((a) => a.style).join(", ")}`);
+}
+
 export function foundationsPlan(bundle: FigmaBundle): FoundationsPlan {
   const { colors, textStyles } = bundle;
   const named = (role: string) => colors.find((c) => c.role === role) ?? colors[0]!;

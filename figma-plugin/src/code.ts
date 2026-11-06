@@ -5,7 +5,7 @@
  * page, so a file can be rebuilt after the brand changes.
  */
 import { bundleFormat, type FigmaBundle } from "../../lib/figma/bundle";
-import { board, collectionName, foundationsPlan, missingFonts, pageName, type FoundationsPlan } from "../../lib/figma/foundations";
+import { board, collectionName, foundationsPlan, missingFonts, nearFonts, pageName, type FoundationsPlan } from "../../lib/figma/foundations";
 
 figma.showUI(__html__, { width: 360, height: 320, themeColors: true });
 
@@ -29,7 +29,12 @@ async function build(bundle: FigmaBundle) {
   const available = (await figma.listAvailableFontsAsync()).map((f) => f.fontName);
   const missing = missingFonts(bundle, available);
   if (missing.length) {
-    const list = missing.map((f) => `• ${f.family} ${f.style}\n  ${f.file}`).join("\n");
+    const list = missing
+      .map((f) => {
+        const near = nearFonts(f, available);
+        return `• ${f.family} ${f.style}\n  ${f.file}${near.length ? `\n  Figma has ${near.join("; ")}` : ""}`;
+      })
+      .join("\n");
     say(
       "error",
       `Figma can't see these fonts:\n${list}\n\nRun pnpm export-figma ${bundle.slug} --install-fonts, restart Figma, then run the plugin again.`,

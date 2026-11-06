@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 import okonkwo from "@/brands/okonkwo/brand";
 import type { Brand } from "../brand/schema";
 import { buildBundle, type BundleFiles } from "./bundle";
-import { board, foundationsPlan, missingFonts } from "./foundations";
+import { board, foundationsPlan, missingFonts, nearFonts } from "./foundations";
 
 const brand = structuredClone(okonkwo) as Brand;
 const files: BundleFiles = {
@@ -26,6 +26,17 @@ describe("missingFonts", () => {
       { family: "Big Shoulders", style: "Bold" },
     ]);
     assert.deepEqual(missing.map((f) => `${f.family} ${f.style}`), ["Big Shoulders ExtraBold"]);
+  });
+});
+
+describe("nearFonts", () => {
+  it("names what Figma has under the same first word, with its styles", () => {
+    const near = nearFonts({ family: "Big Shoulders", style: "ExtraBold" }, [
+      { family: "Big Shoulders Display", style: "Bold" },
+      { family: "Big Shoulders Display", style: "ExtraBold" },
+      { family: "Chivo", style: "Regular" },
+    ]);
+    assert.deepEqual(near, ["Big Shoulders Display: Bold, ExtraBold"]);
   });
 });
 
