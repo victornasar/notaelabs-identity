@@ -1,5 +1,5 @@
 {
-  "about": "Curated typefaces the brand generator may use. Every family is OFL or Apache, fetched from its source with its license file, so it can ship in client downloads. `character`, `why` and `caution` are editorial judgments, not facts. Run `pnpm fonts fetch` to download and verify, `pnpm fonts specimen` to review.",
+  "about": "Curated typefaces the brand generator may use. Every family is OFL or Apache, fetched from its source with its license file, so it can ship in client downloads. `character`, `why` and `caution` are editorial judgments, not facts. Only `approved` families may be used. `pnpm fonts add <id> <slug>` copies one into brands/<slug>/fonts/<id>/, checked against its pinned sha256.",
   "google": {
     "repo": "google/fonts",
     "commit": "24ddc1f324cac5d9f5aedca126d298f56e3f1640"
