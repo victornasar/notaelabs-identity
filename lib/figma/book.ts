@@ -91,7 +91,7 @@ export type Divider = { name: string; number: string; title: string; cover: bool
  */
 export type ContentFrame = {
   name: string;
-  kind: "overview" | "refuses" | "idea" | "palette" | "pairs" | "roles" | "faces" | "scale" | "inUse" | "symbol" | "lockup" | "misuse" | "device" | "rhythm" | "application";
+  kind: "overview" | "refuses" | "idea" | "palette" | "pairs" | "roles" | "faces" | "scale" | "inUse" | "symbol" | "lockup" | "misuse" | "device" | "rhythm" | "application" | "traits" | "lines" | "rewrites" | "signoff";
   eyebrow: string;
   page: string;
   ground: string;
@@ -155,6 +155,8 @@ export type BookPlan = {
     handle: string;
     category?: string;
   };
+  /** How the brand writes: its traits, lines to write and not, rewrites, and the last line. */
+  voice: { traits: { trait: string; means: string; doesNotMean: string }[]; lines: { do: string; dont: string }[]; rewrites: { before: string; after: string }[]; signoff?: string };
   /** In reading order: one row on the canvas each. */
   sections: BookSection[];
 };
@@ -293,6 +295,13 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
     apps.flatMap((a, app): Part[] => (digitalKinds.includes(a.kind) === digital ? [{ kind: "application", part: a.name, app }] : []));
   const primary = items.find((m) => m.role === "primary") ?? items[0]!;
 
+  const voice = {
+    traits: bundle.voice?.traits ?? [],
+    lines: bundle.voice?.lines ?? [],
+    rewrites: bundle.voice?.rewrites ?? [],
+    ...(bundle.voice?.signoff ? { signoff: bundle.voice.signoff } : {}),
+  };
+
   // The book's outline, as an agency sets out brand guidelines. A section is drawn once the brand has
   // what it shows, and numbers count only the drawn ones. Pages count dividers too.
   type Part = { kind: ContentFrame["kind"]; part: string; ground?: string; ink?: string; app?: number };
@@ -344,7 +353,15 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
     { title: "Layout & Composition", parts: [] },
     { title: "Digital Applications", parts: appParts(true) },
     { title: "Marketing Applications", parts: appParts(false) },
-    { title: "Brand Voice", parts: [] },
+    {
+      title: "Brand Voice",
+      parts: [
+        ...(voice.traits.length ? [{ kind: "traits" as const, part: "Traits" }] : []),
+        ...(voice.lines.length ? [{ kind: "lines" as const, part: "Write this" }] : []),
+        ...(voice.rewrites.length ? [{ kind: "rewrites" as const, part: "Rewrites" }] : []),
+        ...(voice.signoff ? [{ kind: "signoff" as const, part: "Sign-off" }] : []),
+      ],
+    },
     { title: "Brand Guidelines", parts: [] },
   ];
   let page = 0;
@@ -453,6 +470,7 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
       handle: bundle.domain?.replace(/\..*$/, "") ?? bundle.name,
       ...(bundle.category ? { category: bundle.category } : {}),
     },
+    voice,
     sections,
   };
 }

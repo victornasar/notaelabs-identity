@@ -115,10 +115,11 @@ describe("bookPlan", () => {
       ["05 Visual Language", "05.1 Visual Language · Pool row", "05.2 Visual Language · Rules"],
       ["06 Digital Applications", "06.1 Digital Applications · Website"],
       ["07 Marketing Applications", "07.1 Marketing Applications · Signage", "07.2 Marketing Applications · Business card", "07.3 Marketing Applications · Social post"],
+      ["08 Brand Voice", "08.1 Brand Voice · Traits", "08.2 Brand Voice · Write this", "08.3 Brand Voice · Rewrites", "08.4 Brand Voice · Sign-off"],
     ]);
     assert.deepEqual(
       plan.sections.flatMap((s) => s.frames.map((f) => f.page)),
-      ["02", "03", "04", "06", "07", "08", "09", "10", "12", "13", "14", "16", "17", "18", "20", "21", "23", "25", "26", "27"],
+      ["02", "03", "04", "06", "07", "08", "09", "10", "12", "13", "14", "16", "17", "18", "20", "21", "23", "25", "26", "27", "29", "30", "31", "32"],
     );
     assert.equal(plan.sections[2]?.frames[0]?.eyebrow, "03 · Color · Palette");
     assert.deepEqual(plan.display, { font: { family: "Big Shoulders", style: "ExtraBold" }, upper: true });
@@ -134,6 +135,16 @@ describe("bookPlan", () => {
     assert.deepEqual([handle, domain, category], ["okonkwo-marchetti", "okonkwo-marchetti.com", brand.category.name]);
     const frames = plan.sections.flatMap((s) => s.frames).filter((f) => f.kind === "application");
     assert.deepEqual(frames.map((f) => cards[f.app!]?.kind), ["website", "signage", "business-card", "social-post"]);
+  });
+
+  it("carries the voice as the brand writes it, and leaves out what a brand doesn't say", () => {
+    assert.deepEqual(plan.voice.traits.map((t) => t.trait), ["Warm", "Exacting"]);
+    assert.equal(plan.voice.lines.length, 3);
+    assert.equal(plan.voice.signoff, "As much light as the place needs, and no more.");
+    const quiet = structuredClone(brand);
+    quiet.voice = { lines: [] };
+    const parts = bookPlan(buildBundle(quiet, files)).sections.find((s) => s.divider.title === "Brand Voice");
+    assert.equal(parts, undefined);
   });
 
   it("shows the lockup on each approved ground, lightest first, with the accent eyebrow only on the brand's own", () => {

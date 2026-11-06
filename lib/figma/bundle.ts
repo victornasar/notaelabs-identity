@@ -109,6 +109,8 @@ export type FigmaBundle = {
   /** What the brand is, as a post's account line names it. */
   category?: string;
   intro: BundleIntro;
+  /** How the brand writes, when it says. */
+  voice?: NonNullable<Brand["voice"]>;
   fonts: BundleFont[];
   colors: BundleColor[];
   textStyles: BundleTextStyle[];
@@ -259,6 +261,7 @@ export function buildBundle(brand: Brand, files: BundleFiles): FigmaBundle {
       personality: story?.personality ?? [],
       values: story?.values ?? [],
     },
+    ...(brand.voice ? { voice: brand.voice } : {}),
     fonts: files.fonts,
     colors: brand.colors.map((c) => {
       const [r, g, b] = hexToRgb(c.hex);
