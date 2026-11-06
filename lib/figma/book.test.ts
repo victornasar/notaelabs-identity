@@ -76,6 +76,18 @@ describe("bookPlan", () => {
     assert.deepEqual(plan.palette.cards.filter((c) => c.edge).map((c) => c.name), ["Night"]);
   });
 
+  it("shows each approved pairing with its contrast and level", () => {
+    assert.deepEqual(
+      plan.palette.pairs.map((p) => [`${p.ink} on ${p.ground}`, p.use, p.level]),
+      [
+        ["Night on Sodium", "Text", "AA"],
+        ["Stone on Night", "Text", "AAA"],
+        ["Sodium on Night", "Text", "AA"],
+      ],
+    );
+    assert.match(plan.palette.pairs[0]!.ratio, /^\d+\.\d\d:1$/);
+  });
+
   it("leads the faces with an accent card set in the face's heaviest weight", () => {
     const [display, text] = plan.faces;
     assert.deepEqual([display?.glyphs, display?.family, display?.fill, display?.ink], ["AG", "BIG SHOULDERS", "Sodium", "Night"]);
@@ -88,13 +100,13 @@ describe("bookPlan", () => {
     assert.deepEqual(names, [
       ["Cover", "01.1 Introduction · Overview", "01.2 Introduction · What we refuse", "01.3 Introduction · The idea"],
       ["02 Logo", "02.1 Logo · Logo mark", "02.2 Logo · On Stone", "02.3 Logo · On Sodium", "02.4 Logo · On Night", "02.5 Logo · Misuse"],
-      ["03 Color", "03.1 Color · Palette"],
+      ["03 Color", "03.1 Color · Palette", "03.2 Color · Pairs"],
       ["04 Typography", "04.1 Typography · Typefaces", "04.2 Typography · Scale"],
       ["05 Visual Language", "05.1 Visual Language · Pool row"],
     ]);
     assert.deepEqual(
       plan.sections.flatMap((s) => s.frames.map((f) => f.page)),
-      ["02", "03", "04", "06", "07", "08", "09", "10", "12", "14", "15", "17"],
+      ["02", "03", "04", "06", "07", "08", "09", "10", "12", "13", "15", "16", "18"],
     );
     assert.equal(plan.sections[2]?.frames[0]?.eyebrow, "03 · Color · Palette");
     assert.deepEqual(plan.display, { font: { family: "Big Shoulders", style: "ExtraBold" }, upper: true });

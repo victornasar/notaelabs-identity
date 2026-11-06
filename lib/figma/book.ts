@@ -7,7 +7,7 @@
  * style descriptions and on the web page. `figma-plugin/src/code.ts` only
  * carries this out.
  */
-import { bestOn, luminance } from "../brand/color";
+import { bestOn, contrast, luminance, wcagLevel } from "../brand/color";
 import type { MisuseShow } from "../brand/schema";
 import type { BundleFont, BundleIntro, BundleTextStyle, FigmaBundle, FontName } from "./bundle";
 
@@ -37,6 +37,9 @@ export type SwatchCard = {
   pills: { label: string; value: string }[];
 };
 
+/** A color on a ground it is approved on: what for, and how far apart they are. */
+export type PairCard = { ink: string; ground: string; use: string; ratio: string; level: string };
+
 export type FaceCard = {
   kind: string;
   glyphs: string;
@@ -61,7 +64,7 @@ export type Divider = { name: string; number: string; title: string; cover: bool
  */
 export type ContentFrame = {
   name: string;
-  kind: "overview" | "refuses" | "idea" | "palette" | "faces" | "scale" | "symbol" | "lockup" | "misuse" | "device";
+  kind: "overview" | "refuses" | "idea" | "palette" | "pairs" | "faces" | "scale" | "symbol" | "lockup" | "misuse" | "device";
   eyebrow: string;
   page: string;
   ground: string;
@@ -104,7 +107,7 @@ export type BookPlan = {
   cover: { edition: string; svg: string };
   /** `refuses` as its separate sentences, one line each. */
   intro: Omit<BundleIntro, "refuses"> & { refuses: string[] };
-  palette: { cards: SwatchCard[]; note?: string };
+  palette: { cards: SwatchCard[]; note?: string; pairs: PairCard[] };
   faces: FaceCard[];
   scale: ScaleRow[];
   /** The symbol alone, then the lockup, which each `lockup` frame sets on its own ground. */
@@ -157,6 +160,7 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
   const ink = byRole("ink") ?? colors[1] ?? ground;
   const accent = byRole("accent") ?? ink;
   const nameOf = (hex: string) => colors.find((c) => c.hex === hex)!.name;
+  const hexOf = (name: string) => colors.find((c) => c.name === name)!.hex;
   const hexes = colors.map((c) => c.hex);
 
   // Which style does which job, by size, so a brand's own step names don't matter.
@@ -175,6 +179,13 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
 
   // Cards run largest share first, as the page does.
   const ordered = [...colors].sort((a, b) => b.proportion - a.proportion);
+  const uses = { text: "Text", large: "Large text", graphic: "Graphics" };
+  const pairs = colors.flatMap((c) =>
+    c.pairs.map((p): PairCard => {
+      const ratio = contrast(c.hex, hexOf(p.on));
+      return { ink: c.name, ground: p.on, use: uses[p.as], ratio: `${ratio.toFixed(2)}:1`, level: wcagLevel(ratio) ?? "Below AA" };
+    }),
+  );
   const widths = shareWidths(ordered.map((c) => c.proportion), column, layout.gap, layout.minSwatch);
 
   // The marks: the symbol (or the primary mark, when there is none) in the accent if it may sit on the
@@ -191,7 +202,6 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
   });
   const onGround = variants.filter((v) => v.ground === ground.name);
   const symbolInk = (onGround.find((v) => v.ink === accent.name) ?? onGround[0])?.ink ?? ink.name;
-  const hexOf = (name: string) => colors.find((c) => c.name === name)!.hex;
   const grounds = variants
     .filter((v, i) => variants.findIndex((w) => w.ground === v.ground) === i)
     .sort((a, b) => luminance(hexOf(b.ground)) - luminance(hexOf(a.ground)));
@@ -217,7 +227,7 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
         ...(misuse.length ? [{ kind: "misuse" as const, part: "Misuse" }] : []),
       ],
     },
-    { title: "Color", parts: [{ kind: "palette", part: "Palette" }] },
+    { title: "Color", parts: [{ kind: "palette", part: "Palette" }, ...(pairs.length ? [{ kind: "pairs" as const, part: "Pairs" }] : [])] },
     {
       title: "Typography",
       parts: [
@@ -294,6 +304,7 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
       })),
       // The full caveat is in each variable's description; the frame keeps one line.
       ...(bundle.printNote ? { note: "CMYK and Pantone are approximate. Proof before print." } : {}),
+      pairs,
     },
     faces: bundle.type.faces.flatMap((face, i) => {
       const font = heaviest(face.face);

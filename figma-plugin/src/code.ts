@@ -278,6 +278,34 @@ async function drawPage(plan: BookPlan, variables: Map<string, Variable>, styles
     if (plan.palette.note) add(area, await text(plan.palette.note, role.small, quiet(ink), { stretch: true }));
   };
 
+  const pairs = async (area: FrameNode, { ground: own }: ContentFrame) => {
+    // A card per approved pairing: the ground, the color on it, and how far apart they are.
+    const row = grow(add(area, box("Pairs", "HORIZONTAL", { gap: layout.gap, stretch: true })));
+    const list = plan.palette.pairs;
+    const width = Math.floor((column - layout.gap * (list.length - 1)) / list.length);
+    for (const pair of list) {
+      const card = fullHeight(
+        add(
+          row,
+          box(`${pair.ink} on ${pair.ground}`, "VERTICAL", {
+            pad: 44,
+            width,
+            radius: layout.radius,
+            fill: { color: pair.ground },
+            ...(pair.ground === own ? { stroke: hairline(pair.ink) } : {}),
+          }),
+        ),
+      );
+      card.primaryAxisAlignItems = "SPACE_BETWEEN";
+      add(card, await text(`${pair.ink} on ${pair.ground}`, role.label, quiet(pair.ink), { stretch: true }));
+      add(card, glyphs(plan.display.upper ? "AA" : "Aa", plan.display.font, 240, { color: pair.ink }));
+      const pills = add(card, box("Values", "HORIZONTAL", { gap: 8, stretch: true }));
+      pills.layoutWrap = "WRAP";
+      pills.counterAxisSpacing = 8;
+      for (const words of [pair.ratio, pair.level, pair.use]) await pill(pills, words, pair.ink);
+    }
+  };
+
   const faces = async (area: FrameNode) => {
     // A card per face, led by the accent.
     const row = grow(add(area, box("Faces", "HORIZONTAL", { gap: layout.gap, stretch: true })));
@@ -502,7 +530,7 @@ async function drawPage(plan: BookPlan, variables: Map<string, Variable>, styles
     await caption(area, graphic, ink);
   };
 
-  const draw = { overview, refuses, idea, palette, faces, scale, symbol, lockup, misuse, device };
+  const draw = { overview, refuses, idea, palette, pairs, faces, scale, symbol, lockup, misuse, device };
 
   /** The edition over the cover's mark, in place of the first section's divider. */
   const cover = async (name: string, row: number) => {
