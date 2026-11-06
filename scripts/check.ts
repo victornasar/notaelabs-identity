@@ -30,6 +30,7 @@ const steps: Step[] = [
   { name: "tests", command: "pnpm", args: ["run", "--silent", "test"] },
   ...routed.map((slug) => ({ name: `routes: ${slug}`, command: "node", args: [...ts, "scripts/check-route.ts", slug] })),
   ...brands.map((slug) => ({ name: `book: ${slug}`, command: "node", args: [...ts, "scripts/check-brand.ts", slug] })),
+  ...brands.map((slug) => ({ name: `figma: ${slug}`, command: "node", args: [...ts, "scripts/export-figma.ts", slug, "--check"] })),
   // Builds each brand for production, then looks at the page at two widths.
   { name: "build and shots", command: "node", args: [...ts, "scripts/shots.ts"] },
 ];

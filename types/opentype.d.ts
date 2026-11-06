@@ -25,7 +25,10 @@ declare module "opentype.js/dist/opentype.mjs" {
     variation?: { set(axes: Record<string, number>): void };
     tables: {
       os2?: { usWeightClass?: number; sCapHeight?: number; sxHeight?: number };
-      fvar?: { axes: { tag: string; minValue: number; maxValue: number }[] };
+      fvar?: {
+        axes: { tag: string; minValue: number; defaultValue: number; maxValue: number }[];
+        instances: { name: { en?: string }; coordinates: Record<string, number> }[];
+      };
     };
     stringToGlyphs(text: string, options: RenderOptions): Glyph[];
     charToGlyph(char: string): Glyph;

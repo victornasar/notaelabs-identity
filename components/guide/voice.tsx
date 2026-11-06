@@ -1,3 +1,4 @@
+import { sectionTitle } from "@/lib/brand/sections";
 import styles from "./voice.module.css";
 import { Heading } from "./ui/heading";
 import type { SectionProps } from "./ui/types";
@@ -5,12 +6,12 @@ import ui from "./ui/ui.module.css";
 
 /** How the brand writes: three lines it would write, and the ones it wouldn't. */
 export function Voice({ active, section }: SectionProps) {
-  const { voice, page } = active.brand;
+  const { voice } = active.brand;
   if (!voice) return null;
 
   return (
     <section id="voice" className={`${ui.container} ${ui.section}`} aria-labelledby="voice-title">
-      <Heading section={section} title={page?.titles?.voice ?? "Write this, not that."}>
+      <Heading section={section} title={sectionTitle(active.brand, "voice")}>
         {voice.traits?.map((t) => `${t.trait}: ${t.means.charAt(0).toLowerCase()}${t.means.slice(1)}`).join(" ")}
       </Heading>
 

@@ -87,4 +87,4 @@ One device that works across real life and screens. It is built from the strateg
 
 ## Gate 8: Figma file
 
-Run `pnpm check` and fix what it lists. Only optional sections (imagery, voice) can be left out: each goes in `notApplicable` with the reason, and the user agrees to it. When it passes, run `pnpm export-figma <slug>`, then ask the user to build the file with the plugin in `figma-plugin/` and save a local copy: that `.fig` is the deliverable. The exporter and plugin are not built yet; say so and stop here until they are.
+Run `pnpm check` and fix what it lists. Only optional sections (imagery, voice) can be left out: each goes in `notApplicable` with the reason, and the user agrees to it. When it passes, run `pnpm export-figma <slug>`. It writes `brands/<slug>/figma/<slug>.figma.json` and lists the brand's fonts that aren't installed; with the user's go-ahead, `--install-fonts` installs them. Then ask the user to build the file with the plugin in `figma-plugin/` and save a local copy: that `.fig` is the deliverable. The plugin is not built yet; say so and stop here until it is.

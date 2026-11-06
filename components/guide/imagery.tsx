@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import { Mark } from "@/components/shell/mark";
 import { kindNames } from "@/lib/brand/labels";
 import { physicalKinds, type Application } from "@/lib/brand/schema";
+import { sectionTitle } from "@/lib/brand/sections";
 import styles from "./imagery.module.css";
 import { DeviceRow } from "./ui/device-row";
 import { Heading } from "./ui/heading";
@@ -117,7 +118,7 @@ export function Imagery({ active, section }: SectionProps) {
 
   return (
     <section id="imagery" className={`${ui.container} ${ui.section}`} aria-labelledby="imagery-title">
-      <Heading section={section} title={brand.page?.titles?.imagery ?? device.name}>
+      <Heading section={section} title={sectionTitle(brand, "imagery")}>
         {device.use}
       </Heading>
 

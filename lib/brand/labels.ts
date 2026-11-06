@@ -26,3 +26,7 @@ export const kindNames: Record<ApplicationKind, string> = {
   "app-icon": "App icon",
   dashboard: "Dashboard",
 };
+
+/** The caveat beside print values: CMYK is converted, Pantone is chosen by eye. */
+export const printNote = (profile: string) =>
+  `CMYK converted from sRGB with ${profile}. Approximate: proof before print. Pantone is matched by eye.`;

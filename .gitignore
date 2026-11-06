@@ -46,3 +46,6 @@ next-env.d.ts
 
 # pnpm shots
 /.shots/
+
+# pnpm export-figma: rebuilt from brand.ts, so never committed
+/brands/*/figma/
