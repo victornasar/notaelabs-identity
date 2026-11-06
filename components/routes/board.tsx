@@ -308,9 +308,11 @@ function ScoreCard({ r }: { r: BoardRoute }) {
     );
   }
   const { rows, strongest, weakest } = r.scores;
-  const total = rows.reduce((sum, row) => sum + (row.score ?? 0), 0);
+  // A criterion the brief gave no evidence for is shown but left out of the total.
+  const scored = rows.filter((row) => row.score !== null);
+  const total = scored.reduce((sum, row) => sum + row.score!, 0);
   return (
-    <Cell label={`${ROWS[6]} · ${total}/${rows.length * 3}`}>
+    <Cell label={`${ROWS[6]} · ${total}/${scored.length * 3}`}>
       <table className={styles.scores}>
         <tbody>
           {rows.map((row) => (

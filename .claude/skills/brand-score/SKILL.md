@@ -20,7 +20,7 @@ Each criterion is scored 0–3. Evidence names the file, field or render the sco
 5. **Small sizes.** 0: fails at 16px. 1: reads at 16px but loses its idea. 2: the symbol or short form keeps its silhouette and idea at 16px and on the app tile. 3: as 2, and the mark was shaped for small sizes rather than surviving them.
 6. **Product layer (C5).** 0: brand colors only. 1: the text face works at UI sizes. 2: the palette has room for functional colors (success, warning, error) without clashing, and a mono or UI face where the audience needs one. 3: the route shows a product surface.
 7. **Motion (C6).** 0: nothing would move. 1: a motion is possible. 2: the route states one signature motion that comes from a primitive. 3: as 2, and it would also carry loading or state change in the product.
-8. **Distinct from the three competitors.** 0: could be mistaken for one. 1: differs in color only. 2: differs in mark and color. 3: differs in idea. Use the brief's descriptions of competitors; where the brief doesn't describe one, write "not described" and score from the others.
+8. **Distinct from the three competitors.** 0: could be mistaken for one. 1: differs in color only. 2: differs in mark and color. 3: differs in idea. Use the brief's descriptions of competitors; where the brief doesn't describe one, write "not described" and score from the others. If none is described, the score is `–` and the criterion is left out of the total.
 
 ## scores.md
 
