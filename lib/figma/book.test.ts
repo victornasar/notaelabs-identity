@@ -86,12 +86,33 @@ describe("bookPlan", () => {
   it("opens each section on a divider, then its frames, numbered in reading order", () => {
     const names = plan.sections.map((s) => [s.divider.name, ...s.frames.map((f) => f.name)]);
     assert.deepEqual(names, [
+      ["01 Logo", "01.1 Logo · Logo mark", "01.2 Logo · On Stone", "01.3 Logo · On Sodium", "01.4 Logo · On Night"],
       ["02 Color", "02.1 Color · Palette"],
       ["03 Type", "03.1 Type · Typefaces", "03.2 Type · Scale"],
+      ["04 Visual elements", "04.1 Visual elements · Pool row"],
     ]);
-    assert.deepEqual(plan.sections.flatMap((s) => s.frames.map((f) => f.page)), ["02", "04", "05"]);
-    assert.equal(plan.sections[0]?.frames[0]?.eyebrow, "02 · Color · Palette");
+    assert.deepEqual(plan.sections.flatMap((s) => s.frames.map((f) => f.page)), ["02", "03", "04", "05", "07", "09", "10", "12"]);
+    assert.equal(plan.sections[1]?.frames[0]?.eyebrow, "02 · Color · Palette");
     assert.deepEqual(plan.display, { font: { family: "Big Shoulders", style: "ExtraBold" }, upper: true });
+  });
+
+  it("shows the lockup on each approved ground, lightest first, with the accent eyebrow only on the brand's own", () => {
+    const lockups = plan.sections[0]!.frames.filter((f) => f.kind === "lockup");
+    assert.deepEqual(
+      lockups.map((f) => [f.ground, f.ink, f.tint]),
+      [
+        ["Stone", "Night", "Night"],
+        ["Sodium", "Night", "Night"],
+        ["Night", "Stone", "Sodium"],
+      ],
+    );
+  });
+
+  it("draws the symbol in the accent, captioned with what it represents", () => {
+    assert.equal(plan.logo.symbol.name, "Lamp");
+    assert.equal(plan.logo.symbol.ink, "Sodium");
+    assert.match(plan.logo.symbol.caption, /^A streetlamp seen side on/);
+    assert.equal(plan.device?.ink, "Sodium");
   });
 
   it("keeps frames to labels and values, with one line on print", () => {
