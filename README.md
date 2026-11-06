@@ -15,7 +15,7 @@ Open the local address Next prints. `/` shows the first brand. Every brand has i
 BRAND=okonkwo pnpm build
 ```
 
-A build needs `BRAND`. It includes that one brand and nothing else, so no client's data ships in another client's site. `pnpm lint` runs ESLint.
+A build needs `BRAND`. It includes that one brand and nothing else, so no client's data ships in another client's site. `pnpm check` runs every check (see [Checks](#checks)).
 
 ## Add a brand
 
@@ -32,18 +32,19 @@ brands/<slug>/
 - **`brand.ts`** exports `defineBrand({...})`. The types in `lib/brand/schema.ts` list every field. The build fails if a required piece is missing: color proportions must sum to 100, and there must be a ground and an ink color.
 - **`fonts.ts`** loads two local fonts with `next/font/local`, using `--brand-display` and `--brand-text` as their variables. Give each font constant a name unique to the brand, such as `acmeDisplay`, then export them as `display` and `text`. Next names the font family after the constant, and dev loads every brand at once.
 - **Marks** are drawn in one color. The shell recolors them, so you do not need reversed versions.
+- **The page** opens on `cover.mark` and takes its section headlines from `page.titles`. Imagery and voice are optional: leave one out with a reason in `notApplicable`.
 
 `brands/okonkwo` is the reference brand. Okonkwo-Marchetti Architectural Lighting Studio is invented: it exists to test the generator end to end (its `work/` folder holds a complete run) and to catch anything the shell assumes, such as a very long name.
 
 ## Generate a brand
 
-The generator runs from chat. In Claude Code, type `/brand <slug>`; in Cursor, ask it to follow `AGENTS.md`. It works in nine gates, each waiting for your approval: interview, strategy, three routes, pick, build-out, book copy, graphic device, mockup and the Figma file. Every gate's result is committed in `brands/<slug>/work/`, so any session can resume it. The skills live in `.claude/skills/`.
+The generator runs from chat. In Claude Code, type `/brand <slug>`; in Cursor, ask it to follow `AGENTS.md`. It works in eight gates, each waiting for your approval: interview, strategy, three routes, pick, build-out, book copy, graphic device and the Figma file. Every gate's result is committed in `brands/<slug>/work/`, so any session can resume it. The skills live in `.claude/skills/`.
 
 - `pnpm fonts add <id> <slug>` copies an approved family from `fonts/library.json` into the brand.
 - `pnpm oklch "Name=L% C H" ...` turns OKLCH picks into hex and lists every contrast pair.
 - `pnpm render-marks <route folder>` renders marks to PNG, with a review sheet.
 - `pnpm check-route <slug>` lists everything that sends a route back.
-- `pnpm check-brand <slug>` checks the brand against the book's sections (intro, wordmark, logo mark, graphic device, colors, typography, closing) and lists what each lacks.
+- `pnpm check-brand <slug>` checks the brand against the book's sections (cover, marks, color, type, imagery, voice) and lists what each lacks.
 - `/routes/<slug>` (dev only) shows the three routes side by side. Run `pnpm brands` after adding a route.
 
 ## Checks
@@ -63,9 +64,9 @@ The generator runs from chat. In Claude Code, type `/brand <slug>`; in Cursor, a
 
 ## Status
 
-Built so far: the opening Reveal and the Color section.
+Built: the guidelines page (cover, marks, color, type, imagery, voice, closing), generator gates 1 to 7, and the checks.
 
-Still to build: Story, Voice, Logo, Type, Applications, and Downloads. Downloads will generate PNGs, favicons, a zip of every file, `brand.css`, `tokens.json`, and a `BRAND.md` for agents. After that come private hosted links for each client.
+Still to build: the Figma export and plugin (gate 8), a photo mockup library, and Downloads (PNGs, favicons, a zip of every file, `brand.css`, `tokens.json`, and a `BRAND.md` for agents). After that come private hosted links for each client.
 
 ## License
 
