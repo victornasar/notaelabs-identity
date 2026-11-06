@@ -13,6 +13,7 @@
     "fonts": "node scripts/fonts.mjs",
     "render-marks": "node scripts/render-marks.mjs",
     "check-route": "node --no-warnings --import ./scripts/lib/ts-paths.mjs scripts/check-route.ts",
+    "check-brand": "node --no-warnings --import ./scripts/lib/ts-paths.mjs scripts/check-brand.ts",
     "oklch": "node --no-warnings --import ./scripts/lib/ts-paths.mjs scripts/oklch.ts"
   },
   "dependencies": {

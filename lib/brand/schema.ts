@@ -42,11 +42,16 @@ export type Convention = {
   why: string;
 };
 
+/** How a competitor's identity looks, so the brand can be told apart from it. */
+export type CompetitorIdentity = { name: string; identity: string };
+
 export type Category = {
   /** Cited as `category.name`. */
   name: string;
   /** The three competitors named in the interview. */
   competitors: string[];
+  /** Each competitor's identity, described. Names match `competitors`. */
+  identities?: CompetitorIdentity[];
   conventions: Convention[];
 };
 
@@ -137,6 +142,10 @@ export type Marks = {
   /** Clear space as a fraction of the primary mark's height. */
   clearSpace: { ratio: number; basis: string };
   minimumSize: { screen: string; print?: string };
+  /** The grounds the marks may sit on, and the ink they take there. Color names. */
+  on?: { ground: string; ink: string }[];
+  /** Things never to do to the marks, one per line: "Never outline the wordmark". */
+  misuse?: string[];
 };
 
 export type Face = Cited & {
@@ -193,6 +202,87 @@ export type TypeSystem = {
 
 export type VoiceTrait = { trait: string; means: string; doesNotMean: string };
 
+/**
+ * A second arrangement of the palette, such as day and night: which color is
+ * the ground, which is the ink, and each color's share of a layout in it.
+ */
+export type ColorMode = {
+  name: string;
+  ground: string;
+  ink: string;
+  /** Color name to percent. Sums to 100. */
+  proportions: Record<string, number>;
+  /** Where this mode is used. */
+  use: string;
+};
+
+/** A supporting shape, pattern or device, built from the strategy's primitives. */
+export type GraphicElement = Cited & {
+  name: string;
+  /** The shape and how it is built: "Sodium half-ellipses, 3:1, one width apart". */
+  construction: string;
+  use: string;
+};
+
+export type GraphicLanguage = {
+  elements: GraphicElement[];
+  /** Layout principles, one per line: grid, margins, where fields stop. */
+  layout: string[];
+};
+
+export type Photography = Cited & {
+  /** The style in a sentence. */
+  style: string;
+  subjects: string[];
+  lighting: string;
+  composition: string;
+  /** Color and grading applied to images. */
+  treatment: string;
+  cropping: string;
+  /** What never to show. */
+  avoid: string[];
+  /** File names in the brand's `images/` folder; each needs an entry in `images/credits.json`. */
+  references: string[];
+};
+
+/** A kind of real-world application the renderer can draw. */
+export type ApplicationKind =
+  | "website"
+  | "business-card"
+  | "letterhead"
+  | "email-signature"
+  | "social-post"
+  | "deck"
+  | "signage"
+  | "poster"
+  | "app-icon"
+  | "dashboard";
+
+export type Application = {
+  kind: ApplicationKind;
+  /** Why the client needs it, from the brief. */
+  why: string;
+  /** Color names. */
+  ground: string;
+  ink: string;
+  /** The words drawn on it, by slot: `headline`, `name`, `lines`. */
+  copy: Record<string, string | string[]>;
+};
+
+/** The nine parts of a complete brand book, in presentation order. */
+export const parts = [
+  "strategy",
+  "creative-direction",
+  "logo",
+  "type",
+  "color",
+  "graphic-language",
+  "photography",
+  "applications",
+  "guidelines",
+] as const;
+export type Part = (typeof parts)[number];
+
 export type Brand = Strategy & {
   slug: string;
   name: string;
@@ -200,9 +290,16 @@ export type Brand = Strategy & {
   edition: string;
   positioning: string;
   story?: {
+    /** What the company does and for whom, today. */
+    mission?: string;
+    /** What it is working toward. */
+    vision?: string;
+    values?: { value: string; means: string }[];
     audience: string;
     personality: string[];
     refuses: string;
+    /** Only when the client asked for one. */
+    archetype?: string;
   };
   voice?: {
     traits: VoiceTrait[];
@@ -211,7 +308,14 @@ export type Brand = Strategy & {
   };
   marks: Marks;
   colors: BrandColor[];
+  /** Other arrangements of the palette, such as a day mode beside the default. */
+  colorModes?: ColorMode[];
   type: TypeSystem;
+  graphicLanguage?: GraphicLanguage;
+  photography?: Photography;
+  applications?: Application[];
+  /** Parts of the book this brand doesn't need, each with the reason. */
+  notApplicable?: Partial<Record<Part, string>>;
   reveal: {
     /** Which mark opens the site. */
     mark: "primary" | "symbol" | string;
@@ -321,9 +425,64 @@ export function problems(label: string, strategy: Strategy, choices: VisualChoic
   return out.map((problem) => `${label}: ${problem}`);
 }
 
+/**
+ * Checks for the parts a route doesn't have: the colors that mark grounds,
+ * modes and applications name exist and pass contrast, mode proportions sum to
+ * 100, and graphic elements and photography cite the strategy.
+ */
+function bookProblems(brand: Brand): string[] {
+  const out: string[] = [];
+  const color = (where: string, name: string) => {
+    const found = brand.colors.find((c) => c.name === name);
+    if (!found) out.push(`${where} uses "${name}", which is not a color.`);
+    return found;
+  };
+
+  for (const { name } of brand.category.identities ?? []) {
+    if (!brand.category.competitors.includes(name)) out.push(`category.identities names "${name}", who is not a competitor.`);
+  }
+
+  for (const { ground, ink } of brand.marks.on ?? []) {
+    const [g, i] = [color("marks.on", ground), color("marks.on", ink)];
+    if (g && i && contrast(g.hex, i.hex) < minimumContrast.graphic) {
+      out.push(`marks on ${ground} in ${ink} are ${contrast(g.hex, i.hex).toFixed(2)}:1, under ${minimumContrast.graphic}:1.`);
+    }
+  }
+
+  for (const mode of brand.colorModes ?? []) {
+    const where = `colorModes.${mode.name}`;
+    color(where, mode.ground);
+    color(where, mode.ink);
+    for (const name of Object.keys(mode.proportions)) color(where, name);
+    const total = Object.values(mode.proportions).reduce((sum, n) => sum + n, 0);
+    if (Math.round(total) !== 100) out.push(`${where} proportions sum to ${total}, not 100.`);
+  }
+
+  const valid = citable(brand);
+  const cited: [string, Cited][] = [
+    ...(brand.graphicLanguage?.elements ?? []).map((e): [string, Cited] => [`graphicLanguage.${e.name}`, e]),
+    ...(brand.photography ? [["photography", brand.photography] as [string, Cited]] : []),
+  ];
+  for (const [where, choice] of cited) {
+    if (choice.cites.length === 0) out.push(`${where} cites nothing.`);
+    for (const cite of choice.cites) {
+      if (!valid.has(cite)) out.push(`${where} cites "${cite}", which is not in the strategy.`);
+    }
+  }
+
+  for (const app of brand.applications ?? []) {
+    const where = `applications.${app.kind}`;
+    const [ground, ink] = [color(where, app.ground), color(where, app.ink)];
+    if (ground && ink && !ink.pairs?.some((p) => p.on === ground.name)) {
+      out.push(`${where} sets ${ink.name} on ${ground.name}, a pairing the palette doesn't list.`);
+    }
+  }
+  return out.map((problem) => `${brand.slug}: ${problem}`);
+}
+
 export function defineBrand<const B extends Brand>(brand: B): B {
   defineStrategy(brand);
-  const found = problems(brand.slug, brand, brand);
+  const found = [...problems(brand.slug, brand, brand), ...bookProblems(brand)];
   for (const key of ["ground", "ink"] as const) {
     if (!brand.colors.some((color) => color.name === brand.reveal[key])) {
       found.push(`${brand.slug}: reveal.${key} "${brand.reveal[key]}" is not a color.`);

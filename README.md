@@ -43,6 +43,7 @@ The generator runs from chat. In Claude Code, type `/brand <slug>`; in Cursor, a
 - `pnpm oklch "Name=L% C H" ...` turns OKLCH picks into hex and lists every contrast pair.
 - `pnpm render-marks <route folder>` renders marks to PNG, with a review sheet.
 - `pnpm check-route <slug>` lists everything that sends a route back.
+- `pnpm check-brand <slug>` checks the brand against the nine parts of a complete brand book and lists what each part lacks.
 - `/routes/<slug>` (dev only) shows the three routes side by side. Run `pnpm brands` after adding a route.
 
 ## How it works
