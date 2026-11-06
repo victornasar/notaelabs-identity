@@ -691,7 +691,7 @@ async function drawPage(plan: BookPlan, variables: Map<string, Variable>, styles
   };
 
   /** Lines stacked tight, as an address block. */
-  const lines = (list: string[], size: number, color: Paint) => {
+  const stack = (list: string[], size: number, color: Paint) => {
     const block = box("Lines", "VERTICAL", { gap: 4 });
     for (const words of list) add(block, line(words, size, color));
     return block;
@@ -761,7 +761,7 @@ async function drawPage(plan: BookPlan, variables: Map<string, Variable>, styles
         add(hoarding, vector("Lockup", lockupSvg, on, { width: 520, height: 52 }));
         const words = add(hoarding, box("Words", "VERTICAL", { gap: 24 }));
         add(words, headline(app.headline ?? plan.brand, 76, on, 1000));
-        add(words, lines(app.lines, 20, { color: on }));
+        add(words, stack(app.lines, 20, { color: on }));
         return hoarding;
       }
       case "business-card": {
@@ -777,7 +777,7 @@ async function drawPage(plan: BookPlan, variables: Map<string, Variable>, styles
           add(name, headline(app.person.name, 36, on, 520));
           add(name, line(app.person.role, 17, quiet(on)));
         }
-        add(who, lines(app.lines, 15, { color: on }));
+        add(who, stack(app.lines, 15, { color: on }));
         return pair;
       }
       default: {
@@ -805,7 +805,110 @@ async function drawPage(plan: BookPlan, variables: Map<string, Variable>, styles
     await caption(area, { name: `${card.name} · ${card.medium}`, caption: card.why }, ink);
   };
 
-  const draw = { overview, refuses, idea, palette, pairs, roles, faces, scale, inUse, symbol, lockup, misuse, device, rhythm, application };
+  /** A sentence in the text face at `size`, wrapped at `width`. */
+  const sentence = (words: string, size: number, color: Paint, width: number) => {
+    const node = line(words, size, color);
+    node.lineHeight = { unit: "PERCENT", value: 122 };
+    node.resize(width, node.height);
+    node.textAutoResize = "HEIGHT";
+    return node;
+  };
+
+  /** A rule across a list, between its rows. */
+  const divide = (parent: FrameNode, color: string) => {
+    const node = figma.createRectangle();
+    node.name = "Rule";
+    node.resize(column, 1);
+    node.fills = [paint(hairline(color))];
+    add(parent, node).layoutAlign = "STRETCH";
+  };
+
+  const traits = async (area: FrameNode, { ink }: ContentFrame) => {
+    // A card per trait: its name, what it means, and what it doesn't.
+    const list = plan.voice.traits;
+    const row = grow(add(area, box("Traits", "HORIZONTAL", { gap: layout.gap, stretch: true })));
+    const width = Math.floor((column - layout.gap * (list.length - 1)) / list.length);
+    for (const { trait, means, doesNotMean } of list) {
+      const card = fullHeight(add(row, box(trait, "VERTICAL", { pad: 56, width, radius: layout.radius, stroke: hairline(ink) })));
+      card.primaryAxisAlignItems = "SPACE_BETWEEN";
+      const top = add(card, box("Means", "VERTICAL", { gap: 32, stretch: true }));
+      add(top, headline(trait, 120, accent, width - 112));
+      add(top, sentence(means, 40, { color: ink }, width - 112));
+      const not = add(card, box("Not", "VERTICAL", { gap: 10, stretch: true }));
+      add(not, await text("Not", role.label, quiet(ink), { stretch: true }));
+      add(not, await text(doesNotMean, role.body, quiet(ink), { stretch: true }));
+    }
+  };
+
+  /** One row of two columns: the right way with a tick, the wrong with a cross, quieter. */
+  const versus = (parent: FrameNode, right: string, wrong: string, color: string, size: number) => {
+    const row = add(parent, box("Row", "HORIZONTAL", { gap: 64, stretch: true }));
+    row.paddingTop = row.paddingBottom = 32;
+    const half = Math.floor((column - 64) / 2);
+    for (const [words, good] of [[right, true], [wrong, false]] as const) {
+      const cell = add(row, box(good ? "Write" : "Not", "HORIZONTAL", { gap: 28, width: half }));
+      add(cell, good ? tick(color) : cross(color));
+      add(cell, sentence(words, size, good ? { color } : quiet(color), half - 56));
+    }
+  };
+
+  /** Column heads over a two-column list. */
+  const heads = async (parent: FrameNode, left: string, right: string, color: string) => {
+    const row = add(parent, box("Heads", "HORIZONTAL", { gap: 64, stretch: true }));
+    const half = Math.floor((column - 64) / 2);
+    add(row, await text(left, role.label, { color: accent }, { width: half }));
+    add(row, await text(right, role.label, quiet(color), { width: half }));
+  };
+
+  const lines = async (area: FrameNode, { ink }: ContentFrame) => {
+    const list = grow(add(area, box("Lines", "VERTICAL", { stretch: true })));
+    list.primaryAxisAlignItems = "CENTER";
+    await heads(list, "Write", "Not", ink);
+    for (const { do: right, dont } of plan.voice.lines) {
+      divide(list, ink);
+      versus(list, right, dont, ink, 36);
+    }
+  };
+
+  const rewrites = async (area: FrameNode, { ink }: ContentFrame) => {
+    const list = grow(add(area, box("Rewrites", "VERTICAL", { stretch: true })));
+    list.primaryAxisAlignItems = "CENTER";
+    await heads(list, "After", "Before", ink);
+    for (const { before, after } of plan.voice.rewrites) {
+      divide(list, ink);
+      versus(list, after, before, ink, 44);
+    }
+  };
+
+  const signoff = async (area: FrameNode, { ink }: ContentFrame) => {
+    // The book's last line, large, signed with the symbol.
+    const space = grow(add(area, box("Sign-off", "VERTICAL", { gap: 64, stretch: true })));
+    space.primaryAxisAlignItems = "CENTER";
+    add(space, headline(plan.voice.signoff!, 140, ink, 1500));
+    add(space, vector(plan.logo.symbol.name, plan.logo.symbol.svg, accent, { height: 72 }));
+  };
+
+  const draw = {
+    overview,
+    refuses,
+    idea,
+    palette,
+    pairs,
+    roles,
+    faces,
+    scale,
+    inUse,
+    symbol,
+    lockup,
+    misuse,
+    device,
+    rhythm,
+    application,
+    traits,
+    lines,
+    rewrites,
+    signoff,
+  };
 
   /** The edition over the cover's mark, in place of the first section's divider. */
   const cover = async (name: string, row: number) => {
