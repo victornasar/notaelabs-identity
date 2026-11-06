@@ -53,7 +53,7 @@ Okonkwo-Marchetti is an invented client, kept to test the generator and the rend
 
 ## Round 2
 
-Added 2026-11-05, after the core grew to cover a complete brand book. Rounds 1 answers stand; this round asks only what the brand book needs and the brief lacks.
+Added 2026-11-05, after the core grew to cover a complete brand book. Round 1's answers stand; this round asks only what the brand book needs and the brief lacks.
 
 1. **[Mission and vision]** What does the studio do today, and what is it working toward?
    *Proposed:* Mission: we light buildings and streets for the people who use them after dark, with as much light as the place needs and no more. Vision: a city where the walk home at night is as good as the walk in daylight.
