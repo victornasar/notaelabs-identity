@@ -10,7 +10,9 @@
     "lint": "eslint",
     "marks": "node scripts/build-marks.mjs",
     "brands": "node scripts/brands.mjs",
-    "fonts": "node scripts/fonts.mjs"
+    "fonts": "node scripts/fonts.mjs",
+    "render-marks": "node scripts/render-marks.mjs",
+    "check-route": "node --no-warnings --import ./scripts/lib/ts-paths.mjs scripts/check-route.ts"
   },
   "dependencies": {
     "next": "16.4.5",
