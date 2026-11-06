@@ -6,9 +6,14 @@
 :root {
   --gutter: clamp(20px, 4vw, 56px);
   --column-gap: clamp(12px, 1.6vw, 24px);
+  --card-gap: clamp(10px, 1.2vw, 16px);
+  --radius: clamp(20px, 2.2vw, 30px);
   --hairline: color-mix(in oklch, var(--ink) 14%, transparent);
+  --hairline-strong: color-mix(in oklch, var(--ink) 32%, transparent);
+  --raised: color-mix(in oklch, var(--ink) 4%, transparent);
+  --raised-solid: color-mix(in oklch, var(--ink) 4%, var(--ground));
   --quiet: color-mix(in oklch, var(--ink) 62%, var(--ground));
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --display: var(--brand-display), Georgia, serif;
   --text: var(--brand-text), system-ui, sans-serif;
   --mono: var(--shell), ui-monospace, monospace;
@@ -24,7 +29,7 @@ html {
   background: var(--ground);
   color: var(--ink);
   -webkit-text-size-adjust: 100%;
-  scroll-padding-top: 64px;
+  scroll-padding-top: 72px;
 }
 
 body {
@@ -83,6 +88,11 @@ a {
   grid-template-columns: repeat(12, minmax(0, 1fr));
   column-gap: var(--column-gap);
   padding-inline: var(--gutter);
+}
+
+/* A tile in the page's own ground needs an edge to read as a tile. */
+[data-edge] {
+  box-shadow: inset 0 0 0 1px var(--hairline);
 }
 
 .visually-hidden {

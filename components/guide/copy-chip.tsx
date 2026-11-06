@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import styles from "./color-section.module.css";
+import styles from "./guide.module.css";
 
-/** One color value. Click to copy; the label confirms in place. */
-export function CopyValue({ label, value }: { label: string; value: string }) {
+/** One value as a pill. Click to copy; the pill confirms in place. */
+export function CopyChip({ label, value }: { label: string; value: string }) {
   const [copied, setCopied] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
@@ -22,16 +22,16 @@ export function CopyValue({ label, value }: { label: string; value: string }) {
   }
 
   return (
-    <button type="button" className={styles.value} onClick={copy}>
-      <span className={`label ${styles.valueLabel}`}>
+    <button type="button" className={styles.chip} onClick={copy} title={`Copy ${label}`}>
+      <span className={styles.chipLabel}>{label}</span>
+      <span className={styles.chipValue}>
         <span className={styles.swap} data-hidden={copied || undefined}>
-          {label}
+          {value}
         </span>
         <span className={styles.swap} data-hidden={!copied || undefined} aria-hidden={!copied}>
           Copied
         </span>
       </span>
-      <span className={styles.valueText}>{value}</span>
       <span className="visually-hidden" aria-live="polite">
         {copied ? `${label} copied` : ""}
       </span>

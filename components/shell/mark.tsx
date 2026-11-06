@@ -6,14 +6,16 @@ export function Mark({
   svg,
   label,
   className,
+  style,
   align = "xMinYMax",
 }: {
   svg: string;
   label: string;
   className?: string;
+  style?: React.CSSProperties;
   align?: "xMinYMax" | "xMidYMid" | "xMinYMid";
 }) {
   const html = svg.replace("<svg ", `<svg preserveAspectRatio="${align} meet" `);
   const a11y = label ? { role: "img", "aria-label": label } : { "aria-hidden": true };
-  return <span {...a11y} className={className} dangerouslySetInnerHTML={{ __html: html }} />;
+  return <span {...a11y} className={className} style={style} dangerouslySetInnerHTML={{ __html: html }} />;
 }
