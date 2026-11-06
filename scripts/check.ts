@@ -34,6 +34,7 @@ const steps: Step[] = [
   // wrote; a running `next dev` keeps its own in .next/dev, which this skips.
   { name: "types", command: "pnpm", args: ["exec", "tsc", "--noEmit", "-p", "tsconfig.check.json"] },
   { name: "lint", command: "pnpm", args: ["exec", "eslint", "--max-warnings", "0"] },
+  { name: "tests", command: "pnpm", args: ["run", "--silent", "test"] },
   ...routed.map((slug) => ({ name: `routes: ${slug}`, command: "node", args: [...ts, "scripts/check-route.ts", slug] })),
   ...brands.map((slug) => ({ name: `book: ${slug}`, command: "node", args: [...ts, "scripts/check-brand.ts", slug] })),
   ...brands.map((slug) => ({
