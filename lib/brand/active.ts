@@ -31,5 +31,11 @@ export function getBrand(slug: string) {
     return source;
   };
 
-  return { slug, brand, fonts: entry.fonts, color, byRole, mark, svg };
+  const graphic = (file: string) => {
+    const source = (entry.graphics as Record<string, string>)[file];
+    if (!source) throw new Error(`${slug}: graphics/${file} is missing.`);
+    return source;
+  };
+
+  return { slug, brand, fonts: entry.fonts, color, byRole, mark, svg, graphic };
 }

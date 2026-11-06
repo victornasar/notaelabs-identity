@@ -122,6 +122,16 @@ export function ColorSection({ active, number }: { active: ActiveBrand; number: 
         ))}
       </ul>
 
+      {active.brand.printProfile && colors.some((c) => c.cmyk) ? (
+        <p className={`grid ${styles.never}`}>
+          <span className={`label ${styles.neverLabel}`}>Print</span>
+          <span className={styles.neverList}>
+            CMYK converted from sRGB with {active.brand.printProfile}. Approximate: proof before
+            print. Pantone values are matched by eye.
+          </span>
+        </p>
+      ) : null}
+
       {failing.length ? (
         <p className={`grid ${styles.never}`}>
           <span className={`label ${styles.neverLabel}`}>Never for text</span>

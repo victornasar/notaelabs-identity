@@ -1,4 +1,5 @@
 import { ColorSection } from "@/components/shell/color-section";
+import { GraphicsSection } from "@/components/shell/graphics-section";
 import { IndexBar, type Section } from "@/components/shell/index-bar";
 import { LogoSection } from "@/components/shell/logo-section";
 import { Mark } from "@/components/shell/mark";
@@ -18,6 +19,7 @@ export default async function BrandPage({ params }: PageProps<"/[brand]">) {
     { id: "logo", label: "Logo" },
     { id: "type", label: "Type" },
     { id: "color", label: "Color" },
+    ...(brand.graphicLanguage ? [{ id: "graphics", label: "Graphics" }] : []),
     ...(brand.voice ? [{ id: "voice", label: "Voice" }] : []),
   ];
   const number = (id: string) => sections.findIndex((s) => s.id === id) + 1;
@@ -39,6 +41,7 @@ export default async function BrandPage({ params }: PageProps<"/[brand]">) {
         <LogoSection active={active} number={number("logo")} />
         <TypeSection active={active} number={number("type")} />
         <ColorSection active={active} number={number("color")} />
+        <GraphicsSection active={active} number={number("graphics")} />
         <VoiceSection active={active} number={number("voice")} />
       </main>
     </>

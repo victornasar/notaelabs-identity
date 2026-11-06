@@ -7,7 +7,7 @@ disable-model-invocation: true
 
 # /brand <slug>
 
-Generates a brand identity in five gates. Each gate ends with the user's approval, given in chat. Every result is a committed file in `brands/<slug>/work/`, so any session (Claude Code or Cursor) can pick up where the last one stopped.
+Generates a complete brand book in nine gates. Each gate ends with the user's approval, given in chat. Every result is a committed file in `brands/<slug>/work/`, so any session (Claude Code or Cursor) can pick up where the last one stopped.
 
 | Gate | File | Done when |
 |---|---|---|
@@ -16,6 +16,10 @@ Generates a brand identity in five gates. Each gate ends with the user's approva
 | 3. Routes | `work/routes/a/`, `b/`, `c/` + `work/scores.md` | all three pass `pnpm check-route <slug>`, scored, shown on `/routes/<slug>` |
 | 4. Pick | `work/scores.md` frontmatter `picked:` | the user names a route and its changes |
 | 5. Build-out | `brands/<slug>/brand.ts`, `fonts.ts`, `marks/` | `BRAND=<slug> pnpm build` passes |
+| 6. Graphic language | `graphics/` + `brand.ts` `graphicLanguage` | `work/book.md` records the user's approval under `## Graphic language` |
+| 7. Photography | `images/` + `images/credits.json` + `brand.ts` `photography` | `work/book.md` records approval under `## Photography` |
+| 8. Applications | `brand.ts` `applications` | `work/book.md` records approval under `## Applications` |
+| 9. Completeness | none | `pnpm check-brand <slug>` passes |
 
 ## Steps
 
@@ -59,4 +63,32 @@ Record the pick in `scores.md` frontmatter (`picked: b`) and the requested chang
 
 ## Gate 5: Build-out
 
-Turn the picked route into the brand: `brand.ts` spreads `strategy.ts` (`...strategy`) and takes the route's marks, colors and type; `fonts.ts` loads the faces from `fonts/<id>/` with `next/font/local` (see the README's "Add a brand"); copy the route's marks into `marks/`. Story and voice come from the brief. Leave the earlier `brand.ts` choices in git history, not in comments. Run `BRAND=<slug> pnpm build` and `pnpm lint`, then show the guidelines page. Then run `pnpm check-brand <slug>` and show the user which of the nine parts are still missing; a part the brand doesn't need goes in `notApplicable` with the reason.
+Turn the picked route into the brand: `brand.ts` spreads `strategy.ts` (`...strategy`) and takes the route's marks, colors and type; `fonts.ts` loads the faces from `fonts/<id>/` with `next/font/local` (see the README's "Add a brand"); copy the route's marks into `marks/`. Story and voice come from the brief. Leave the earlier `brand.ts` choices in git history, not in comments. Run `BRAND=<slug> pnpm build` and `pnpm lint`, then show the guidelines page. Then run `pnpm check-brand <slug>` and show the user which of the nine parts are still missing.
+
+The gates after build-out fill the rest of the brand book. Each records its approval in `work/book.md`, one `##` heading per gate, with the user's words and the date. Story, mission, values and applications come from the brief; if the brief lacks them, run a `brand-interview` round for the missing items first.
+
+## Gate 6: Graphic language
+
+The devices that make the identity more than a logo with colors: patterns, supporting shapes, layout rules. Each is built from the strategy's primitives, never invented beside them.
+
+- Write `brands/<slug>/graphics/build.mjs`, which draws 2–5 single-color SVGs in code. Each takes a construction from a primitive (its proportions, angle or spacing), so the device and the marks share their geometry.
+- In `brand.ts`, `graphicLanguage.elements` lists each file with its ground and ink (palette colors), its construction in words someone could redraw from, where it's used, and `cites`. `graphicLanguage.layout` holds 3–6 layout rules: where the accent goes, how fields end, spacing, what never happens.
+- Run `pnpm brands` and look at the Graphics section before showing it. A device that reads as something else (a hat, a warning sign, a generic icon) is redrawn first, as a mark would be.
+
+## Gate 7: Photography
+
+How images look, shown with real reference photographs.
+
+- Choose 6–12 reference photographs by hand, from a source whose license allows the use (Unsplash, Pexels, or the client's own). Save them in `brands/<slug>/images/` and record each in `images/credits.json` as `{ file, photographer, source, license }`. They are references, never presented as the client's work.
+- In `brand.ts`, `photography` sets the style, subjects, lighting, composition, treatment, cropping and what to avoid, citing the strategy (category conventions kept or rejected often decide it).
+
+## Gate 8: Applications
+
+The identity at work, on the pieces from the brief's applications answer.
+
+- In `brand.ts`, `applications` lists each piece: its kind, why the client needs it, its ground and ink, and its copy, written in the brand's voice. Every application uses only the palette, the type scale, the marks and the graphic language.
+- The renderer draws each kind from `components/applications/`. A kind it can't draw yet is built there first, for every brand, not for this one.
+
+## Gate 9: Completeness
+
+Run `pnpm check-brand <slug>` and fix what it lists. A part the brand genuinely doesn't need goes in `notApplicable` with the reason, and the user agrees to it. When it passes, show the finished page.

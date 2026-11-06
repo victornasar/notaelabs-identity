@@ -37,7 +37,7 @@ brands/<slug>/
 
 ## Generate a brand
 
-The generator runs from chat. In Claude Code, type `/brand <slug>`; in Cursor, ask it to follow `AGENTS.md`. It works in five gates, each waiting for your approval: interview, strategy, three routes, pick, build-out. Every gate's result is committed in `brands/<slug>/work/`, so any session can resume it. The skills live in `.claude/skills/`.
+The generator runs from chat. In Claude Code, type `/brand <slug>`; in Cursor, ask it to follow `AGENTS.md`. It works in nine gates, each waiting for your approval: interview, strategy, three routes, pick, build-out, graphic language, photography, applications and a completeness check. Every gate's result is committed in `brands/<slug>/work/`, so any session can resume it. The skills live in `.claude/skills/`.
 
 - `pnpm fonts add <id> <slug>` copies an approved family from `fonts/library.json` into the brand.
 - `pnpm oklch "Name=L% C H" ...` turns OKLCH picks into hex and lists every contrast pair.

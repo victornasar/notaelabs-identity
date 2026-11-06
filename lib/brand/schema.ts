@@ -219,6 +219,11 @@ export type ColorMode = {
 /** A supporting shape, pattern or device, built from the strategy's primitives. */
 export type GraphicElement = Cited & {
   name: string;
+  /** Single-color SVG in the brand's `graphics/` folder, drawn in code from the primitives. */
+  file: string;
+  /** Color names: the field it is shown on, and the color it is drawn in. */
+  ground: string;
+  ink: string;
   /** The shape and how it is built: "Sodium half-ellipses, 3:1, one width apart". */
   construction: string;
   use: string;
@@ -308,6 +313,8 @@ export type Brand = Strategy & {
   };
   marks: Marks;
   colors: BrandColor[];
+  /** The print profile `cmyk` values were converted with, such as "Coated FOGRA39L (VIGC 300)". */
+  printProfile?: string;
   /** Other arrangements of the palette, such as a day mode beside the default. */
   colorModes?: ColorMode[];
   type: TypeSystem;
@@ -456,6 +463,11 @@ function bookProblems(brand: Brand): string[] {
     for (const name of Object.keys(mode.proportions)) color(where, name);
     const total = Object.values(mode.proportions).reduce((sum, n) => sum + n, 0);
     if (Math.round(total) !== 100) out.push(`${where} proportions sum to ${total}, not 100.`);
+  }
+
+  for (const element of brand.graphicLanguage?.elements ?? []) {
+    color(`graphicLanguage.${element.name}`, element.ground);
+    color(`graphicLanguage.${element.name}`, element.ink);
   }
 
   const valid = citable(brand);

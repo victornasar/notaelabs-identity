@@ -27,10 +27,11 @@ if (production && !selected) {
 
 const slugs = production ? [selected] : all;
 
-// Marks are single-color drawings. Their color comes from CSS, so every fill and
-// stroke becomes currentColor.
-function readMarks(slug) {
-  const dir = new URL(`${slug}/marks/`, root);
+// Marks and graphics are single-color drawings. Their color comes from CSS, so
+// every fill and stroke becomes currentColor.
+function readSvgs(slug, folder) {
+  const dir = new URL(`${slug}/${folder}/`, root);
+  if (!existsSync(dir)) return {};
   return Object.fromEntries(
     readdirSync(dir)
       .filter((file) => file.endsWith(".svg"))
@@ -57,7 +58,7 @@ const lines = [
   "export const brands = {",
   ...slugs.map(
     (slug) =>
-      `  ${JSON.stringify(slug)}: { brand: brand_${ident(slug)}, fonts: fonts_${ident(slug)}, marks: ${JSON.stringify(readMarks(slug))} as Record<string, string> },`,
+      `  ${JSON.stringify(slug)}: { brand: brand_${ident(slug)}, fonts: fonts_${ident(slug)}, marks: ${JSON.stringify(readSvgs(slug, "marks"))} as Record<string, string>, graphics: ${JSON.stringify(readSvgs(slug, "graphics"))} as Record<string, string> },`,
   ),
   "};",
   "",
