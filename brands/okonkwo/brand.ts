@@ -100,10 +100,22 @@ export default defineBrand({
       { ground: "Stone", ink: "Night" },
     ],
     misuse: [
-      "Never replace the beam with a typed hyphen.",
-      "Never set “Architectural Lighting Studio” on the wordmark’s line; it sits below or beside, in the label style.",
-      "Never put the marks in Stone on Sodium (2.45:1).",
-      "Never set the marks over a photograph’s light; place them on a Night or Sodium field cut into the image.",
+      {
+        rule: "Never replace the beam with a typed hyphen.",
+        show: { kind: "typed", mark: "wordmark.svg", text: "OKONKWO-MARCHETTI" },
+      },
+      {
+        rule: "Never set “Architectural Lighting Studio” on the wordmark’s line; it sits below or beside, in the label style.",
+        show: { kind: "beside", mark: "wordmark.svg", text: "Architectural Lighting Studio" },
+      },
+      {
+        rule: "Never put the marks in Stone on Sodium (2.45:1).",
+        show: { kind: "colors", mark: "lockup.svg", ground: "Sodium", ink: "Stone" },
+      },
+      {
+        rule: "Never set the marks over a photograph’s light; place them on a Night or Sodium field cut into the image.",
+        show: { kind: "glow", mark: "symbol.svg" },
+      },
     ],
   },
   colors: [

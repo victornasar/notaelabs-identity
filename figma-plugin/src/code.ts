@@ -15,6 +15,7 @@ import {
   pageName,
   type BookPlan,
   type ContentFrame,
+  type MisuseCard,
   type Paint,
   type Showcase,
 } from "../../lib/figma/book";
@@ -277,6 +278,34 @@ async function drawPage(plan: BookPlan, variables: Map<string, Variable>, styles
     if (plan.palette.note) add(area, await text(plan.palette.note, role.small, quiet(ink), { stretch: true }));
   };
 
+  const pairs = async (area: FrameNode, { ground: own }: ContentFrame) => {
+    // A card per approved pairing: the ground, the color on it, and how far apart they are.
+    const row = grow(add(area, box("Pairs", "HORIZONTAL", { gap: layout.gap, stretch: true })));
+    const list = plan.palette.pairs;
+    const width = Math.floor((column - layout.gap * (list.length - 1)) / list.length);
+    for (const pair of list) {
+      const card = fullHeight(
+        add(
+          row,
+          box(`${pair.ink} on ${pair.ground}`, "VERTICAL", {
+            pad: 44,
+            width,
+            radius: layout.radius,
+            fill: { color: pair.ground },
+            ...(pair.ground === own ? { stroke: hairline(pair.ink) } : {}),
+          }),
+        ),
+      );
+      card.primaryAxisAlignItems = "SPACE_BETWEEN";
+      add(card, await text(`${pair.ink} on ${pair.ground}`, role.label, quiet(pair.ink), { stretch: true }));
+      add(card, glyphs(plan.display.upper ? "AA" : "Aa", plan.display.font, 240, { color: pair.ink }));
+      const pills = add(card, box("Values", "HORIZONTAL", { gap: 8, stretch: true }));
+      pills.layoutWrap = "WRAP";
+      pills.counterAxisSpacing = 8;
+      for (const words of [pair.ratio, pair.level, pair.use]) await pill(pills, words, pair.ink);
+    }
+  };
+
   const faces = async (area: FrameNode) => {
     // A card per face, led by the accent.
     const row = grow(add(area, box("Faces", "HORIZONTAL", { gap: layout.gap, stretch: true })));
@@ -417,6 +446,77 @@ async function drawPage(plan: BookPlan, variables: Map<string, Variable>, styles
     stage(area, vector("Lockup", plan.logo.lockup, ink, { width: 1200, height: 520 }));
   };
 
+  /** The wrong version itself, on nothing: the card it sits on supplies the ground. */
+  const wrong = async (card: MisuseCard, width: number) => {
+    switch (card.kind) {
+      case "typed": {
+        const typed = glyphs(card.text ?? "", plan.display.font, 96, { color: card.ink });
+        if (typed.width > width) typed.fontSize = Math.floor((96 * width) / typed.width);
+        return typed;
+      }
+      case "beside": {
+        const line = box("Beside", "HORIZONTAL", { gap: 24 });
+        line.counterAxisAlignItems = "CENTER";
+        add(line, vector("Mark", card.svg, card.ink, { height: 48, width: width * 0.7 }));
+        add(line, await text(card.text ?? "", role.label, { color: card.ink }));
+        return line;
+      }
+      case "colors":
+        return vector("Mark", card.svg, card.ink, { width: width * 0.8, height: 140 });
+      case "glow": {
+        // A light behind the mark: a soft pool of the glow color, which the brand's light never is.
+        const light = figma.createFrame();
+        light.name = "Over a light";
+        light.fills = [];
+        light.resize(480, 240);
+        const pool = figma.createEllipse();
+        pool.resize(360, 160);
+        pool.x = 60;
+        pool.y = 40;
+        pool.fills = [paint({ color: card.glow ?? accent })];
+        pool.effects = [{ type: "LAYER_BLUR", radius: 60, visible: true } as BlurEffect];
+        light.appendChild(pool);
+        const mark = vector("Mark", card.svg, card.ink, { height: 140 });
+        mark.x = (480 - mark.width) / 2;
+        mark.y = (240 - mark.height) / 2;
+        light.appendChild(mark);
+        return light;
+      }
+    }
+  };
+
+  /** Two strokes crossing, in the corner of a card that shows what not to do. */
+  const cross = (color: string) => {
+    const mark = figma.createVector();
+    mark.name = "Never";
+    mark.vectorPaths = [{ windingRule: "NONZERO", data: "M 0 0 L 28 28 M 28 0 L 0 28" }];
+    mark.strokes = [paint({ color })];
+    mark.strokeWeight = 3;
+    mark.strokeCap = "ROUND";
+    return mark;
+  };
+
+  const misuse = async (area: FrameNode, { ground: own }: ContentFrame) => {
+    // Two by two: each wrong version on its ground, crossed out, over the rule it breaks.
+    const cards = plan.logo.misuse;
+    const width = Math.floor((column - layout.gap) / 2);
+    for (let i = 0; i < cards.length; i += 2) {
+      const row = grow(add(area, box("Row", "HORIZONTAL", { gap: layout.gap, stretch: true })));
+      for (const card of cards.slice(i, i + 2)) {
+        const cell = fullHeight(add(row, box(card.kind, "VERTICAL", { gap: 16, width })));
+        const panel = grow(
+          add(cell, box("Example", "VERTICAL", { stretch: true, radius: layout.radius, fill: { color: card.ground }, ...(card.ground === own ? { stroke: hairline(card.ink) } : {}) })),
+        );
+        panel.primaryAxisAlignItems = panel.counterAxisAlignItems = "CENTER";
+        add(panel, await wrong(card, width - 160));
+        const x = add(panel, cross(card.ink));
+        x.layoutPositioning = "ABSOLUTE";
+        x.x = x.y = 32;
+        add(cell, await text(card.rule, role.body, quiet(ink), { stretch: true }));
+      }
+    }
+  };
+
   const device = async (area: FrameNode, { ink }: ContentFrame) => {
     // The device runs off both edges, so it sits across the whole frame, outside the margins.
     const graphic = plan.device!;
@@ -430,7 +530,7 @@ async function drawPage(plan: BookPlan, variables: Map<string, Variable>, styles
     await caption(area, graphic, ink);
   };
 
-  const draw = { overview, refuses, idea, palette, faces, scale, symbol, lockup, device };
+  const draw = { overview, refuses, idea, palette, pairs, faces, scale, symbol, lockup, misuse, device };
 
   /** The edition over the cover's mark, in place of the first section's divider. */
   const cover = async (name: string, row: number) => {

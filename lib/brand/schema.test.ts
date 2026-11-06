@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import okonkwo from "@/brands/okonkwo/brand";
-import { citable, problems, type Brand } from "./schema";
+import { citable, defineBrand, problems, type Brand } from "./schema";
 
 // A copy of a real brand to break one thing at a time.
 const copy = (): Brand => structuredClone(okonkwo) as Brand;
@@ -50,5 +50,13 @@ describe("citable", () => {
     assert.ok(ids.has("category.conventions.dark-and-glow"));
     assert.ok(ids.has("equity.assets.sodium"));
     assert.ok(!ids.has("concept.primitives.neon"));
+  });
+});
+
+describe("defineBrand", () => {
+  it("catches a drawn misuse that names a mark or color the brand lacks", () => {
+    const brand = copy();
+    brand.marks.misuse = [{ rule: "Never.", show: { kind: "colors", mark: "logo.svg", ground: "Teal", ink: "Stone" } }];
+    assert.throws(() => defineBrand(brand), /shows logo\.svg, which is not one of the brand's marks[\s\S]*"Teal", which is not a color/);
   });
 });

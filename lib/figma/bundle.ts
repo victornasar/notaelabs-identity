@@ -9,13 +9,13 @@
  */
 import { hexToRgb, toOklch, toRgbString } from "../brand/color";
 import { faceNames, printNote, roleNames } from "../brand/labels";
-import type { Application, Brand, ColorRole, TypeStyle } from "../brand/schema";
+import { misuseRule, type Application, type Brand, type ColorRole, type ColorUse, type MisuseShow, type TypeStyle } from "../brand/schema";
 import { completeness, pageSections, sectionTitle, sections, type SectionId } from "../brand/sections";
 import { viewBox } from "../brand/svg";
 import { describeStep, stepSample } from "../brand/type";
 
 /** Bumped when the plugin can no longer read an older bundle. */
-export const bundleFormat = 2;
+export const bundleFormat = 3;
 
 /** A font as Figma names it: the family and the style it lists. */
 export type FontName = { family: string; style: string };
@@ -43,6 +43,8 @@ export type BundleColor = {
   values: { label: string; value: string }[];
   /** The variable's description: every notation, then the print caveat. */
   description: string;
+  /** The grounds the color is approved on, and for what. */
+  pairs: ColorUse[];
 };
 
 export type BundleTextStyle = {
@@ -114,6 +116,8 @@ export type FigmaBundle = {
     /** Each ground and the ink the marks take on it: one component variant each. */
     variants: { ground: string; ink: string }[];
     cover: string;
+    /** Things never to do to the marks; `show` says how to draw one. */
+    misuse: { rule: string; show?: MisuseShow }[];
   };
   device?: {
     name: string;
@@ -261,6 +265,7 @@ export function buildBundle(brand: Brand, files: BundleFiles): FigmaBundle {
         use: c.use,
         values: values(c),
         description: colorDescription(brand, c),
+        pairs: c.pairs ?? [],
       };
     }),
     textStyles,
@@ -283,6 +288,7 @@ export function buildBundle(brand: Brand, files: BundleFiles): FigmaBundle {
       })),
       variants: brand.marks.on ?? [],
       cover: coverFile(brand),
+      misuse: (brand.marks.misuse ?? []).map((m) => (typeof m === "string" ? { rule: misuseRule(m) } : m)),
     },
     ...(device
       ? {

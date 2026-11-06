@@ -7,7 +7,8 @@
  * style descriptions and on the web page. `figma-plugin/src/code.ts` only
  * carries this out.
  */
-import { bestOn, luminance } from "../brand/color";
+import { bestOn, contrast, luminance, wcagLevel } from "../brand/color";
+import type { MisuseShow } from "../brand/schema";
 import type { BundleFont, BundleIntro, BundleTextStyle, FigmaBundle, FontName } from "./bundle";
 
 /** The variable collection every brand color lives in. */
@@ -36,6 +37,9 @@ export type SwatchCard = {
   pills: { label: string; value: string }[];
 };
 
+/** A color on a ground it is approved on: what for, and how far apart they are. */
+export type PairCard = { ink: string; ground: string; use: string; ratio: string; level: string };
+
 export type FaceCard = {
   kind: string;
   glyphs: string;
@@ -60,12 +64,23 @@ export type Divider = { name: string; number: string; title: string; cover: bool
  */
 export type ContentFrame = {
   name: string;
-  kind: "overview" | "refuses" | "idea" | "palette" | "faces" | "scale" | "symbol" | "lockup" | "device";
+  kind: "overview" | "refuses" | "idea" | "palette" | "pairs" | "faces" | "scale" | "symbol" | "lockup" | "misuse" | "device";
   eyebrow: string;
   page: string;
   ground: string;
   ink: string;
   tint: string;
+};
+
+/** A misuse drawn on its ground and crossed out, over the rule it breaks. `glow` is the light it sits on. */
+export type MisuseCard = {
+  rule: string;
+  kind: MisuseShow["kind"];
+  svg: string;
+  text?: string;
+  ground: string;
+  ink: string;
+  glow?: string;
 };
 
 /** A mark drawn large, with what it is in a caption at the bottom right. */
@@ -92,11 +107,11 @@ export type BookPlan = {
   cover: { edition: string; svg: string };
   /** `refuses` as its separate sentences, one line each. */
   intro: Omit<BundleIntro, "refuses"> & { refuses: string[] };
-  palette: { cards: SwatchCard[]; note?: string };
+  palette: { cards: SwatchCard[]; note?: string; pairs: PairCard[] };
   faces: FaceCard[];
   scale: ScaleRow[];
   /** The symbol alone, then the lockup, which each `lockup` frame sets on its own ground. */
-  logo: { symbol: Showcase; lockup: string };
+  logo: { symbol: Showcase; lockup: string; misuse: MisuseCard[] };
   device?: Showcase;
   /** In reading order: one row on the canvas each. */
   sections: BookSection[];
@@ -145,6 +160,7 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
   const ink = byRole("ink") ?? colors[1] ?? ground;
   const accent = byRole("accent") ?? ink;
   const nameOf = (hex: string) => colors.find((c) => c.hex === hex)!.name;
+  const hexOf = (name: string) => colors.find((c) => c.name === name)!.hex;
   const hexes = colors.map((c) => c.hex);
 
   // Which style does which job, by size, so a brand's own step names don't matter.
@@ -163,6 +179,13 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
 
   // Cards run largest share first, as the page does.
   const ordered = [...colors].sort((a, b) => b.proportion - a.proportion);
+  const uses = { text: "Text", large: "Large text", graphic: "Graphics" };
+  const pairs = colors.flatMap((c) =>
+    c.pairs.map((p): PairCard => {
+      const ratio = contrast(c.hex, hexOf(p.on));
+      return { ink: c.name, ground: p.on, use: uses[p.as], ratio: `${ratio.toFixed(2)}:1`, level: wcagLevel(ratio) ?? "Below AA" };
+    }),
+  );
   const widths = shareWidths(ordered.map((c) => c.proportion), column, layout.gap, layout.minSwatch);
 
   // The marks: the symbol (or the primary mark, when there is none) in the accent if it may sit on the
@@ -170,9 +193,15 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
   const { items, variants, cover } = bundle.marks;
   const symbol = items.find((m) => m.role === "symbol") ?? items[0]!;
   const coverSvg = (items.find((m) => m.file === cover) ?? items[0]!).svg;
+  // Only the misuses a brand says how to draw; the rest are words, for the guidelines.
+  const misuse = bundle.marks.misuse.flatMap(({ rule, show }): MisuseCard[] => {
+    if (!show) return [];
+    const svg = items.find((m) => m.file === show.mark)?.svg ?? "";
+    const on = show.kind === "colors" ? { ground: show.ground, ink: show.ink } : { ground: ground.name, ink: ink.name };
+    return [{ rule, kind: show.kind, svg, ...("text" in show ? { text: show.text } : {}), ...on, ...(show.kind === "glow" ? { glow: accent.name } : {}) }];
+  });
   const onGround = variants.filter((v) => v.ground === ground.name);
   const symbolInk = (onGround.find((v) => v.ink === accent.name) ?? onGround[0])?.ink ?? ink.name;
-  const hexOf = (name: string) => colors.find((c) => c.name === name)!.hex;
   const grounds = variants
     .filter((v, i) => variants.findIndex((w) => w.ground === v.ground) === i)
     .sort((a, b) => luminance(hexOf(b.ground)) - luminance(hexOf(a.ground)));
@@ -195,9 +224,10 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
       parts: [
         { kind: "symbol", part: "Logo mark" },
         ...grounds.map((v) => ({ kind: "lockup" as const, part: `On ${v.ground}`, ground: v.ground, ink: v.ink })),
+        ...(misuse.length ? [{ kind: "misuse" as const, part: "Misuse" }] : []),
       ],
     },
-    { title: "Color", parts: [{ kind: "palette", part: "Palette" }] },
+    { title: "Color", parts: [{ kind: "palette", part: "Palette" }, ...(pairs.length ? [{ kind: "pairs" as const, part: "Pairs" }] : [])] },
     {
       title: "Typography",
       parts: [
@@ -274,6 +304,7 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
       })),
       // The full caveat is in each variable's description; the frame keeps one line.
       ...(bundle.printNote ? { note: "CMYK and Pantone are approximate. Proof before print." } : {}),
+      pairs,
     },
     faces: bundle.type.faces.flatMap((face, i) => {
       const font = heaviest(face.face);
@@ -295,6 +326,7 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
     logo: {
       symbol: { svg: symbol.svg, name: symbol.name, caption: symbol.meaning ?? symbol.use, ink: symbolInk },
       lockup: coverSvg,
+      misuse,
     },
     ...(bundle.device
       ? { device: { svg: bundle.device.svg, name: bundle.device.name, caption: bundle.device.construction, ink: bundle.device.ink } }
