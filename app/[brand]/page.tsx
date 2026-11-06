@@ -1,20 +1,25 @@
 import { Imagery } from "@/components/guide/imagery";
-import { Nav, type Section } from "@/components/guide/nav";
+import { Nav } from "@/components/guide/nav";
 import { Band, Closing, Colors, Hero, Marks, Type, Voice } from "@/components/guide/sections";
 import { Mark } from "@/components/shell/mark";
-import { getBrand } from "@/lib/brand/active";
+import { getBrand, type ActiveBrand } from "@/lib/brand/active";
+import { pageSections, type NavSectionId, type PageSection } from "@/lib/brand/sections";
+
+type Body = (props: { active: ActiveBrand; section: PageSection }) => React.ReactNode;
+
+// Each nav section's component. The cover and closing frame every page.
+const bodies: Record<NavSectionId, Body> = {
+  marks: Marks,
+  color: Colors,
+  type: Type,
+  imagery: Imagery,
+  voice: Voice,
+};
 
 export default async function BrandPage({ params }: PageProps<"/[brand]">) {
   const active = getBrand((await params).brand);
   const { brand, svg } = active;
-
-  const sections: Section[] = [
-    { id: "marks", label: "Marks" },
-    { id: "color", label: "Color" },
-    { id: "type", label: "Type" },
-    ...(brand.device?.applications.length ? [{ id: "imagery", label: "Imagery" }] : []),
-    ...(brand.voice ? [{ id: "voice", label: "Voice" }] : []),
-  ];
+  const sections = pageSections(brand);
 
   return (
     <>
@@ -26,11 +31,10 @@ export default async function BrandPage({ params }: PageProps<"/[brand]">) {
       <main>
         <Hero active={active} />
         <Band active={active} />
-        <Marks active={active} />
-        <Colors active={active} />
-        <Type active={active} />
-        <Imagery active={active} number="04" />
-        <Voice active={active} />
+        {sections.map((section) => {
+          const Body = bodies[section.id];
+          return <Body key={section.id} active={active} section={section} />;
+        })}
       </main>
       <Closing active={active} />
     </>

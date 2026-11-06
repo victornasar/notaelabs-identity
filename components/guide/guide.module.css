@@ -233,7 +233,7 @@
   animation: enter 600ms var(--ease-out) 500ms both;
 }
 
-/* The lockup is revealed once, bottom up, the way a lamp's light lands. */
+/* The cover mark is revealed once, bottom up. */
 .heroLockup {
   align-self: center;
   margin: clamp(48px, 8vh, 96px) auto;

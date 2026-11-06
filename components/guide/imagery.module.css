@@ -113,7 +113,7 @@
   line-height: 1.35;
 }
 
-.hoarding,
+.signage,
 .post,
 .site,
 .card {
@@ -122,7 +122,7 @@
   container-type: inline-size;
 }
 
-.hoarding svg,
+.signage svg,
 .post svg,
 .site svg,
 .card svg {
@@ -131,9 +131,9 @@
   height: 100%;
 }
 
-/* ---------- Hoarding ---------- */
+/* ---------- Signage ---------- */
 
-.hoarding {
+.signage {
   width: 100%;
   aspect-ratio: 3 / 1;
   display: grid;
@@ -145,20 +145,20 @@
   box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.7);
 }
 
-.hoardingMark {
+.signageMark {
   grid-column: 1 / -1;
   display: block;
   height: 2.6cqw;
   width: 20cqw;
 }
 
-.hoarding .headline {
+.signage .headline {
   margin-top: 3cqw;
   font-size: 4.6cqw;
   max-width: 15ch;
 }
 
-.hoarding .small {
+.signage .small {
   align-self: start;
   margin-top: 3.4cqw;
   font-size: 1.1cqw;
@@ -355,22 +355,22 @@
     grid-column: 1 / -1;
   }
 
-  .hoarding {
+  .signage {
     aspect-ratio: 5 / 4;
     grid-template-rows: auto auto auto;
   }
 
-  .hoardingMark {
+  .signageMark {
     width: 44cqw;
     height: 6cqw;
   }
 
-  .hoarding .headline {
+  .signage .headline {
     margin-top: 4cqw;
     font-size: 7.6cqw;
   }
 
-  .hoarding .small {
+  .signage .small {
     grid-column: 1 / -1;
     font-size: 2.6cqw;
     text-align: left;

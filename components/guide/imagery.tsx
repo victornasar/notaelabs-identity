@@ -3,6 +3,8 @@ import { Mark } from "@/components/shell/mark";
 import type { ActiveBrand } from "@/lib/brand/active";
 import { physicalKinds, type Application } from "@/lib/brand/schema";
 import { viewBox } from "@/lib/brand/svg";
+import type { PageSection } from "@/lib/brand/sections";
+import { Heading } from "./heading";
 import styles from "./imagery.module.css";
 import guide from "./guide.module.css";
 
@@ -15,7 +17,7 @@ const KIND_NAMES: Record<string, string> = {
   "email-signature": "Email signature",
   "social-post": "Social post",
   deck: "Deck",
-  signage: "Hoarding",
+  signage: "Signage",
   poster: "Poster",
   "app-icon": "App icon",
   dashboard: "Dashboard",
@@ -54,7 +56,7 @@ const text = (copy: Application["copy"], key: string) => {
 const lines = (copy: Application["copy"]) => (Array.isArray(copy.lines) ? copy.lines : []);
 
 /** The identity at work: each of the device's applications, drawn as the thing itself. */
-export function Imagery({ active, number }: Props & { number: string }) {
+export function Imagery({ active, section }: Props & { section: PageSection }) {
   const { brand, color, svg } = active;
   const { device, marks } = brand;
   if (!device?.applications.length) return null;
@@ -62,7 +64,8 @@ export function Imagery({ active, number }: Props & { number: string }) {
   const lockup = svg(marks.alternates?.[0] ?? marks.primary);
   const wordmark = svg(marks.primary);
   const symbol = marks.symbol ? svg(marks.symbol) : wordmark;
-  const handle = brand.name.replace(/\s.*$/, "").toLowerCase();
+  // The social handle is the domain's name, or the brand's own name without one.
+  const handle = brand.domain?.replace(/\..*$/, "") ?? brand.name;
 
   const scene = (app: Application) => {
     const surface = { background: color(app.ground).hex, color: color(app.ink).hex } as CSSProperties;
@@ -71,8 +74,8 @@ export function Imagery({ active, number }: Props & { number: string }) {
     switch (app.kind) {
       case "signage":
         return (
-          <div className={styles.hoarding} style={surface}>
-            <Mark className={styles.hoardingMark} svg={lockup} label="" align="xMinYMid" />
+          <div className={styles.signage} style={surface}>
+            <Mark className={styles.signageMark} svg={lockup} label="" align="xMinYMid" />
             <p className={styles.headline}>{headline}</p>
             <ul className={styles.small}>
               {lines(app.copy).map((l) => (
@@ -110,7 +113,7 @@ export function Imagery({ active, number }: Props & { number: string }) {
               <span />
               <span />
               <span />
-              <p>{handle}.com</p>
+              {brand.domain ? <p>{brand.domain}</p> : null}
             </div>
             <div className={styles.site} style={surface}>
               <div className={styles.siteNav}>
@@ -135,7 +138,7 @@ export function Imagery({ active, number }: Props & { number: string }) {
               </span>
               <p>
                 {handle}
-                <span>Lighting studio</span>
+                <span>{brand.category.name}</span>
               </p>
             </div>
             <p className={styles.headline}>{headline}</p>
@@ -155,13 +158,9 @@ export function Imagery({ active, number }: Props & { number: string }) {
 
   return (
     <section id="imagery" className={guide.section} aria-labelledby="imagery-title">
-      <header className={guide.heading}>
-        <p className={guide.eyebrow}>{number} · Brand imagery</p>
-        <h2 id="imagery-title" className={guide.title}>
-          The walk home, at work.
-        </h2>
-        <p className={guide.lede}>{device.use}</p>
-      </header>
+      <Heading section={section} title={brand.page?.titles?.imagery ?? device.name}>
+        {device.use}
+      </Heading>
 
       <ul className={styles.grid}>
         {device.applications.map((app) => (
