@@ -7,3 +7,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+## Brand generator
+
+To create or continue a brand identity (`/brand <slug>`, or any work in `brands/<slug>/work/`), follow `.claude/skills/brand/SKILL.md`. It calls the skills beside it: `brand-interview`, `wordmark`, `symbol` and `brand-score`.
