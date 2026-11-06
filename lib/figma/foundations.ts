@@ -14,7 +14,8 @@ export const pageName = "Foundations";
 /** The board's width, and its padding on each side. */
 export const board = { width: 1920, padding: 120 };
 
-export type Swatch = { color: string; ink: string; width: number; lines: string[] };
+/** `edge` outlines the swatch that is the board's own color, so it doesn't vanish into it. */
+export type Swatch = { color: string; ink: string; width: number; edge: boolean; lines: string[] };
 export type Specimen = { style: string; ink: string; sample: string; caption: string };
 
 export type FoundationsPlan = {
@@ -86,6 +87,7 @@ export function foundationsPlan(bundle: FigmaBundle): FoundationsPlan {
       color: c.name,
       ink: nameOf(bestOn(c.hex, hexes)),
       width: swatchWidth,
+      edge: c.name === ground.name,
       lines: [c.name, `${c.role} · ${c.proportion}%`, ...c.description.split("\n")[0]!.split(" · ")],
     })),
     specimens: textStyles.map((t) => ({

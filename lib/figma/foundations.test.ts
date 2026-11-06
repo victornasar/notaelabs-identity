@@ -59,6 +59,7 @@ describe("foundationsPlan", () => {
     const inner = board.width - board.padding * 2;
     assert.ok(plan.swatches.reduce((sum, s) => sum + s.width, 0) <= inner);
     assert.equal(plan.swatches.find((s) => s.color === "Sodium")?.ink, "Night");
+    assert.deepEqual(plan.swatches.filter((s) => s.edge).map((s) => s.color), ["Night"]);
     assert.deepEqual(plan.swatches.find((s) => s.color === "Sodium")?.lines.slice(0, 3), ["Sodium", "accent · 28%", "HEX #FF5A1F"]);
   });
 

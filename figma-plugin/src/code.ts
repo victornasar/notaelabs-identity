@@ -140,6 +140,11 @@ async function drawPage(plan: FoundationsPlan, variables: Map<string, Variable>,
     card.primaryAxisAlignItems = "MAX";
     card.paddingLeft = card.paddingRight = card.paddingTop = card.paddingBottom = 32;
     card.fills = [fill(swatch.color)];
+    if (swatch.edge) {
+      card.strokes = [fill(swatch.ink)];
+      card.strokeWeight = 1;
+      card.strokeAlign = "INSIDE";
+    }
     row.appendChild(card);
     for (const line of swatch.lines) card.appendChild(await text(line, plan.label, swatch.ink));
   }
