@@ -86,18 +86,22 @@ describe("bookPlan", () => {
   it("follows the outline, drawing only the sections the brand has, numbered without gaps", () => {
     const names = plan.sections.map((s) => [s.divider.name, ...s.frames.map((f) => f.name)]);
     assert.deepEqual(names, [
-      ["01 Logo", "01.1 Logo · Logo mark", "01.2 Logo · On Stone", "01.3 Logo · On Sodium", "01.4 Logo · On Night"],
-      ["02 Color", "02.1 Color · Palette"],
-      ["03 Typography", "03.1 Typography · Typefaces", "03.2 Typography · Scale"],
-      ["04 Visual Language", "04.1 Visual Language · Pool row"],
+      ["01 Introduction", "01.1 Introduction · Overview", "01.2 Introduction · Concept", "01.3 Introduction · Vision"],
+      ["02 Logo", "02.1 Logo · Logo mark", "02.2 Logo · On Stone", "02.3 Logo · On Sodium", "02.4 Logo · On Night"],
+      ["03 Color", "03.1 Color · Palette"],
+      ["04 Typography", "04.1 Typography · Typefaces", "04.2 Typography · Scale"],
+      ["05 Visual Language", "05.1 Visual Language · Pool row"],
     ]);
-    assert.deepEqual(plan.sections.flatMap((s) => s.frames.map((f) => f.page)), ["02", "03", "04", "05", "07", "09", "10", "12"]);
-    assert.equal(plan.sections[1]?.frames[0]?.eyebrow, "02 · Color · Palette");
+    assert.deepEqual(
+      plan.sections.flatMap((s) => s.frames.map((f) => f.page)),
+      ["02", "03", "04", "06", "07", "08", "09", "11", "13", "14", "16"],
+    );
+    assert.equal(plan.sections[2]?.frames[0]?.eyebrow, "03 · Color · Palette");
     assert.deepEqual(plan.display, { font: { family: "Big Shoulders", style: "ExtraBold" }, upper: true });
   });
 
   it("shows the lockup on each approved ground, lightest first, with the accent eyebrow only on the brand's own", () => {
-    const lockups = plan.sections[0]!.frames.filter((f) => f.kind === "lockup");
+    const lockups = plan.sections.flatMap((s) => s.frames).filter((f) => f.kind === "lockup");
     assert.deepEqual(
       lockups.map((f) => [f.ground, f.ink, f.tint]),
       [
@@ -106,6 +110,20 @@ describe("bookPlan", () => {
         ["Night", "Stone", "Sodium"],
       ],
     );
+  });
+
+  it("opens on the cover's mark, then introduces the company in its own words", () => {
+    assert.equal(plan.cover.edition, "Brand guidelines · Edition 2 · November 2026");
+    assert.deepEqual(plan.statement, { family: "Chivo", style: "Regular" });
+    assert.match(plan.intro.idea, /^Good night light comes in measured pools/);
+    assert.deepEqual(plan.intro.personality, ["Warm", "Exacting", "Nocturnal", "Generous"]);
+  });
+
+  it("leaves the Vision frame out of a brand without a vision", () => {
+    const bare = structuredClone(brand);
+    delete bare.story!.vision;
+    const parts = bookPlan(buildBundle(bare, files)).sections[0]!.frames.map((f) => f.kind);
+    assert.deepEqual(parts, ["overview", "concept"]);
   });
 
   it("draws the symbol in the accent, captioned with what it represents", () => {

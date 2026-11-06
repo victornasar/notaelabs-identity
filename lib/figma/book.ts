@@ -8,7 +8,7 @@
  * carries this out.
  */
 import { bestOn, luminance } from "../brand/color";
-import type { BundleFont, BundleTextStyle, FigmaBundle, FontName } from "./bundle";
+import type { BundleFont, BundleIntro, BundleTextStyle, FigmaBundle, FontName } from "./bundle";
 
 /** The variable collection every brand color lives in. */
 export const collectionName = "Colors";
@@ -60,7 +60,7 @@ export type Divider = { name: string; number: string; title: string };
  */
 export type ContentFrame = {
   name: string;
-  kind: "palette" | "faces" | "scale" | "symbol" | "lockup" | "device";
+  kind: "overview" | "concept" | "vision" | "palette" | "faces" | "scale" | "symbol" | "lockup" | "device";
   eyebrow: string;
   page: string;
   ground: string;
@@ -85,7 +85,12 @@ export type BookPlan = {
   text: { heading: string; body: string; small: string; label: string };
   /** Dividers set their names in the display face's heaviest weight. */
   display: { font: FontName; upper: boolean };
+  /** The Introduction's large sentences, in the text face's lightest weight. */
+  statement: FontName;
   brand: string;
+  /** The first frame, before any section: the edition over the cover's mark. */
+  cover: { name: string; edition: string; svg: string };
+  intro: BundleIntro;
   palette: { cards: SwatchCard[]; note?: string };
   faces: FaceCard[];
   scale: ScaleRow[];
@@ -153,6 +158,7 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
   const heaviest = (face: string) => fonts.filter((f) => f.face === face).sort((a, b) => b.weight - a.weight)[0];
   const upper = (face: string) => textStyles.filter((t) => t.face === face).every((t) => t.textCase === "UPPER");
   const display = heaviest("display") ?? fonts[0]!;
+  const lightest = fonts.filter((f) => f.face === "text").sort((a, b) => a.weight - b.weight)[0] ?? display;
 
   // Cards run largest share first, as the page does.
   const ordered = [...colors].sort((a, b) => b.proportion - a.proportion);
@@ -162,6 +168,7 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
   // ground that way, then the cover's mark on each ground it is approved for, one ink each, lightest first.
   const { items, variants, cover } = bundle.marks;
   const symbol = items.find((m) => m.role === "symbol") ?? items[0]!;
+  const coverSvg = (items.find((m) => m.file === cover) ?? items[0]!).svg;
   const onGround = variants.filter((v) => v.ground === ground.name);
   const symbolInk = (onGround.find((v) => v.ink === accent.name) ?? onGround[0])?.ink ?? ink.name;
   const hexOf = (name: string) => colors.find((c) => c.name === name)!.hex;
@@ -174,7 +181,14 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
   type Part = { kind: ContentFrame["kind"]; part: string; ground?: string; ink?: string };
   const device = bundle.device;
   const outline: { title: string; parts: Part[] }[] = [
-    { title: "Introduction", parts: [] },
+    {
+      title: "Introduction",
+      parts: [
+        { kind: "overview", part: "Overview" },
+        { kind: "concept", part: "Concept" },
+        ...(bundle.intro.vision ? [{ kind: "vision" as const, part: "Vision" }] : []),
+      ],
+    },
     {
       title: "Logo",
       parts: [
@@ -243,7 +257,10 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
     accent: accent.name,
     text: { heading: heading.name, body: body.name, small: small.name, label: label.name },
     display: { font: { family: display.family, style: display.style }, upper: upper("display") },
+    statement: { family: lightest.family, style: lightest.style },
     brand: bundle.name,
+    cover: { name: "Cover", edition: bundle.edition, svg: coverSvg },
+    intro: bundle.intro,
     palette: {
       cards: ordered.map((c, i) => ({
         color: c.name,
@@ -276,7 +293,7 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
     scale: textStyles.map((t) => ({ id: t.id, spec: t.spec, style: t.name, sample: t.sample })),
     logo: {
       symbol: { svg: symbol.svg, name: symbol.name, caption: symbol.meaning ?? symbol.use, ink: symbolInk },
-      lockup: (items.find((m) => m.file === cover) ?? items[0]!).svg,
+      lockup: coverSvg,
     },
     ...(bundle.device
       ? { device: { svg: bundle.device.svg, name: bundle.device.name, caption: bundle.device.construction, ink: bundle.device.ink } }

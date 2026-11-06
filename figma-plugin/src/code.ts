@@ -329,7 +329,7 @@ async function drawPage(plan: BookPlan, variables: Map<string, Variable>, styles
   };
 
   /** What a mark is, in the reading text at the bottom right. */
-  const caption = async (area: FrameNode, { name, caption: words }: Showcase, color: string) => {
+  const caption = async (area: FrameNode, { name, caption: words }: Pick<Showcase, "name" | "caption">, color: string) => {
     const row = add(area, box("Caption", "HORIZONTAL", { stretch: true }));
     row.primaryAxisAlignItems = "MAX";
     const about = add(row, box(name, "VERTICAL", { gap: 12, width: 560 }));
@@ -342,6 +342,66 @@ async function drawPage(plan: BookPlan, variables: Map<string, Variable>, styles
     const space = grow(add(area, box("Stage", "VERTICAL", { stretch: true })));
     space.primaryAxisAlignItems = space.counterAxisAlignItems = "CENTER";
     add(space, mark);
+  };
+
+  /** A sentence set large in the text face, as the Introduction's frames lead with. */
+  const statement = (words: string, color: string) => {
+    const node = glyphs(words, plan.statement, 64, { color });
+    node.lineHeight = { unit: "PERCENT", value: 118 };
+    node.resize(1400, node.height);
+    node.textAutoResize = "HEIGHT";
+    return node;
+  };
+
+  /** A label over a large sentence, with the rest of the frame left below it. */
+  const lead = async (area: FrameNode, label: string, words: string, color: string) => {
+    add(area, await text(label, role.label, quiet(color), { stretch: true }));
+    add(area, statement(words, color));
+    grow(add(area, box("Space", "VERTICAL", { stretch: true })));
+  };
+
+  /** A rounded outline around one short word. */
+  const pill = async (parent: FrameNode, words: string, color: string) => {
+    const chip = add(parent, box(words, "HORIZONTAL", { radius: 999, stroke: hairline(color) }));
+    chip.paddingLeft = chip.paddingRight = 16;
+    chip.paddingTop = chip.paddingBottom = 8;
+    add(chip, await text(words, role.label, { color }));
+  };
+
+  const overview = async (area: FrameNode, { ink }: ContentFrame) => {
+    const { positioning, mission, personality } = plan.intro;
+    await lead(area, "Positioning", positioning, ink);
+    const foot = add(area, box("About", "HORIZONTAL", { gap: 96, stretch: true }));
+    if (mission) {
+      const block = add(foot, box("Mission", "VERTICAL", { gap: 12, width: 560 }));
+      add(block, await text("Mission", role.label, quiet(ink), { stretch: true }));
+      add(block, await text(mission, role.body, { color: ink }, { stretch: true }));
+    }
+    if (personality.length) {
+      const block = add(foot, box("Personality", "VERTICAL", { gap: 12 }));
+      add(block, await text("Personality", role.label, quiet(ink)));
+      const pills = add(block, box("Traits", "HORIZONTAL", { gap: 8 }));
+      for (const trait of personality) await pill(pills, trait, ink);
+    }
+  };
+
+  const concept = async (area: FrameNode, { ink }: ContentFrame) => {
+    await lead(area, "Idea", plan.intro.idea, ink);
+    await caption(area, { name: "Source", caption: plan.intro.source }, ink);
+  };
+
+  const vision = async (area: FrameNode, { ink }: ContentFrame) => {
+    const { vision: words = "", values } = plan.intro;
+    await lead(area, "Vision", words, ink);
+    if (!values.length) return;
+    // The values as outlined cards in a row, sharing the width.
+    const row = add(area, box("Values", "HORIZONTAL", { gap: layout.gap, stretch: true }));
+    const width = Math.floor((column - layout.gap * (values.length - 1)) / values.length);
+    for (const { value, means } of values) {
+      const card = add(row, box(value, "VERTICAL", { gap: 12, pad: 32, width, radius: layout.radius, stroke: hairline(ink) }));
+      add(card, await text(value, role.label, { color: accent }, { stretch: true }));
+      add(card, await text(means, role.body, { color: ink }, { stretch: true }));
+    }
   };
 
   const symbol = async (area: FrameNode, { ink }: ContentFrame) => {
@@ -367,9 +427,16 @@ async function drawPage(plan: BookPlan, variables: Map<string, Variable>, styles
     await caption(area, graphic, ink);
   };
 
-  const draw = { palette, faces, scale, symbol, lockup, device };
-  const drawn: FrameNode[] = [];
-  for (const [row, section] of plan.sections.entries()) {
+  const draw = { overview, concept, vision, palette, faces, scale, symbol, lockup, device };
+
+  // The cover on a row of its own: the edition over the cover's mark.
+  const cover = landscape(plan.cover.name, 0, 0);
+  add(cover, await text(plan.cover.edition, role.label, { color: accent }, { stretch: true }));
+  stage(cover, vector(plan.cover.name, plan.cover.svg, ink, { width: 1400, height: 600 }));
+  const drawn: FrameNode[] = [cover];
+
+  for (const [index, section] of plan.sections.entries()) {
+    const row = index + 1;
     const { name, number, title } = section.divider;
     drawn.push(await divider(name, number, title, row));
     for (const [i, spec] of section.frames.entries()) {

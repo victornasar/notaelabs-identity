@@ -15,7 +15,7 @@ import { viewBox } from "../brand/svg";
 import { describeStep, stepSample } from "../brand/type";
 
 /** Bumped when the plugin can no longer read an older bundle. */
-export const bundleFormat = 1;
+export const bundleFormat = 2;
 
 /** A font as Figma names it: the family and the style it lists. */
 export type FontName = { family: string; style: string };
@@ -86,11 +86,23 @@ export type BundleFrame = {
   uses: { colors: string[]; textStyles: string[]; marks: string[]; device: boolean };
 };
 
+/** What the book opens with: who the company is, the idea behind the identity, and where it is going. */
+export type BundleIntro = {
+  positioning: string;
+  idea: string;
+  source: string;
+  mission?: string;
+  vision?: string;
+  personality: string[];
+  values: { value: string; means: string }[];
+};
+
 export type FigmaBundle = {
   format: typeof bundleFormat;
   slug: string;
   name: string;
   edition: string;
+  intro: BundleIntro;
   fonts: BundleFont[];
   colors: BundleColor[];
   textStyles: BundleTextStyle[];
@@ -213,7 +225,7 @@ export function buildBundle(brand: Brand, files: BundleFiles): FigmaBundle {
     };
   });
 
-  const { device, type } = brand;
+  const { device, type, story } = brand;
   const numbers = new Map(pageSections(brand).map((s) => [s.id as SectionId, s.number]));
   const values = (c: Brand["colors"][number]) => [
     { label: "Hex", value: c.hex.toUpperCase() },
@@ -228,6 +240,15 @@ export function buildBundle(brand: Brand, files: BundleFiles): FigmaBundle {
     slug: brand.slug,
     name: brand.name,
     edition: brand.edition,
+    intro: {
+      positioning: brand.positioning,
+      idea: brand.concept.idea,
+      source: brand.concept.source,
+      ...(story?.mission ? { mission: story.mission } : {}),
+      ...(story?.vision ? { vision: story.vision } : {}),
+      personality: story?.personality ?? [],
+      values: story?.values ?? [],
+    },
     fonts: files.fonts,
     colors: brand.colors.map((c) => {
       const [r, g, b] = hexToRgb(c.hex);
