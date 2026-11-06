@@ -41,3 +41,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 /brands/registry.generated.ts
+
+# font library downloads (see fonts/library.json)
+/fonts/files/

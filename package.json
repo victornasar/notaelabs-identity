@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "eslint",
     "marks": "node scripts/build-marks.mjs",
-    "brands": "node scripts/brands.mjs"
+    "brands": "node scripts/brands.mjs",
+    "fonts": "node scripts/fonts.mjs"
   },
   "dependencies": {
     "next": "16.4.5",
