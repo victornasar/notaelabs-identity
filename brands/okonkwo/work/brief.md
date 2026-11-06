@@ -51,6 +51,48 @@ Okonkwo-Marchetti is an invented client, kept to test the generator and the rend
    *Proposed:* March 2027: a new website and a printed submission for a competition to relight a city bridge.
    **Answer:** Accepted as proposed.
 
+## Round 2
+
+Added 2026-11-05, after the core grew to cover a complete brand book. Rounds 1 answers stand; this round asks only what the brand book needs and the brief lacks.
+
+1. **[Mission and vision]** What does the studio do today, and what is it working toward?
+   *Proposed:* Mission: we light buildings and streets for the people who use them after dark, with as much light as the place needs and no more. Vision: a city where the walk home at night is as good as the walk in daylight.
+   **Answer:**
+
+2. **[Values]** Three or four values, each with what it means in the work.
+   *Proposed:*
+   - **Measured:** every lux level and color temperature has a reason we can say out loud.
+   - **Darkness is designed:** we decide where light doesn't go as carefully as where it does.
+   - **Warm first:** warm white and sodium tones before anything cooler, and never color for its own sake.
+   - **There at switch-on:** we commission what we design, on site, the night it's turned on.
+   **Answer:**
+
+3. **[Competitors]** How does each competitor's identity look? Their sites could be read as text but not seen, so this proposal holds only what the text shows; correct or add what you know of how they look.
+   *Proposed:*
+   - **Speirs Major:** the name set as plain type in capitals with "light architecture" as a lowercase descriptor; a project-led, sparse site. (Text only; colors and imagery not seen.)
+   - **Arup Lighting:** a service line inside Arup's corporate brand, with Arup's red logo; full-width project photography, including night scenes, and card grids. The identity is Arup's, not the lighting team's.
+   - **L'Observatoire International:** a wordmark with a symbol, the line "Lighting the World", and offices listed by city (New York, Paris, Seoul, London). (Text only; colors and imagery not seen.)
+   **Answer:**
+
+4. **[Applications]** Which pieces must the brand book show working?
+   *Proposed:* from the deadline's deliverables: the website (home page), the printed competition board for the bridge (A1, portrait), business card and letterhead, email signature. From the category: a site hoarding around a project under construction, a social post announcing a finished project, and a credentials deck cover for architects.
+   **Answer:**
+
+5. **[Voice]** Two more lines (write this, not that) and one more rewrite, so the voice has examples beyond the stair.
+   *Proposed:*
+   - Write "The bridge is lit from the handrail, so the river stays dark and the stars stay out." Not "A stunning illuminated landmark for the city."
+   - Write "We'll be on site the night it's switched on." Not "Full project lifecycle support."
+   - Rewrite: before "Our award-winning team delivers bespoke lighting experiences." After "Six of us, all lighting designers. We've lit 40 buildings and 3 bridges."
+   **Answer:**
+
+6. **[Logo]** Rules for the marks beyond the general misuse examples.
+   *Proposed:*
+   - Never replace the beam with a typed hyphen.
+   - Never set "Architectural Lighting Studio" on the wordmark's line; it sits below or beside, in the label style.
+   - Never put the marks in Stone on Sodium (2.45:1).
+   - Never set the marks over a photograph's light; place them on a Night or Sodium field cut into the image.
+   **Answer:**
+
 ## Approval
 
 2026-11-05, the user (playing the client): "accept go". Every round 1 proposal was accepted, and the brief was approved for strategy.
