@@ -16,15 +16,16 @@ export default defineBrand({
       "We light buildings and streets for the people who use them after dark, with as much light as the place needs and no more.",
     vision: "A city where the walk home at night is as good as the walk in daylight.",
     values: [
-      { value: "Measured", means: "Every lux level and color temperature has a reason we can say out loud." },
-      { value: "Darkness is designed", means: "We decide where light doesn’t go as carefully as where it does." },
-      { value: "Warm first", means: "Warm white and sodium tones before anything cooler, and never color for its own sake." },
+      { value: "Measured", means: "Every lux level has a reason we can say out loud. The stair glows at 2700 K so nobody squints on the way down." },
+      { value: "Darkness is designed", means: "We decide where light doesn’t go. The bridge is lit from the handrail, so the river stays dark." },
+      { value: "Warm first", means: "Warm white and sodium tones before anything cooler. Light stays put; it never changes color for show." },
       { value: "There at switch-on", means: "We commission what we design, on site, the night it’s turned on." },
     ],
     audience:
       "Architects and developers who already have the building and need the hours after sunset to be as considered as the hours before. Planning committees and the public see the work afterward, mostly at night and in photographs.",
     personality: ["Warm", "Exacting", "Nocturnal", "Generous"],
-    refuses: "Spectacle: facades that change color every few seconds. Spec sheets with a logo on them. Darkness treated as a failure.",
+    refuses:
+      "Facades that change color every few seconds, so the building disappears behind the show. Spec sheets with a logo on them, selling fittings when clients are buying judgment. Darkness treated as a failure, so every surface is lit and nothing stands out.",
   },
   voice: {
     traits: [

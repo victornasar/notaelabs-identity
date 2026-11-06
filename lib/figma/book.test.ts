@@ -118,9 +118,9 @@ describe("bookPlan", () => {
     assert.equal(plan.cover.edition, "Brand guidelines · Edition 2 · November 2026");
     assert.deepEqual(plan.statement, { family: "Chivo", style: "Regular" });
     assert.deepEqual(plan.intro.refuses, [
-      "Spectacle: facades that change color every few seconds.",
-      "Spec sheets with a logo on them.",
-      "Darkness treated as a failure.",
+      "Facades that change color every few seconds, so the building disappears behind the show.",
+      "Spec sheets with a logo on them, selling fittings when clients are buying judgment.",
+      "Darkness treated as a failure, so every surface is lit and nothing stands out.",
     ]);
     assert.match(plan.intro.idea, /^Good night light comes in measured pools/);
   });
