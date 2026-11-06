@@ -157,7 +157,7 @@ function specimen() {
     const steps = lo === hi ? [lo] : [...new Set([lo, 400, Math.min(hi, 700), hi].filter((w) => w >= lo && w <= hi))].sort((a, b) => a - b);
     const ff = `font-family:'lib-${family.id}'`;
     rows.push(`
-<article class="family" data-id="${family.id}" data-category="${family.category}" style="--ff:'lib-${family.id}'">
+<article class="family" data-id="${family.id}" data-category="${family.category}" data-status="${family.status}" style="--ff:'lib-${family.id}'">
   <header class="meta">
     <h2>${escape(family.family)}</h2>
     <p class="tags">${escape(family.category)} · ${family.roles.map(escape).join(", ")} · ${lo === hi ? lo : `${lo}–${hi}`}${info.italic ? " · italics" : ""}${info.axes.length ? ` · axes ${escape(info.axes.join(" "))}` : ""}</p>
@@ -245,6 +245,8 @@ const KEY = "font-library-decisions";
 let decisions = {};
 try { decisions = JSON.parse(localStorage.getItem(KEY)) || {}; } catch {}
 const families = [...document.querySelectorAll(".family")];
+// Decisions already recorded in library.json show until the viewer changes them.
+for (const el of families) if (!(el.dataset.id in decisions) && el.dataset.status !== "candidate") decisions[el.dataset.id] = el.dataset.status;
 function save() { try { localStorage.setItem(KEY, JSON.stringify(decisions)); } catch {} }
 function paint() {
   let a = 0, r = 0;

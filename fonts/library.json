@@ -1,385 +1,1146 @@
 {
   "about": "Curated typefaces the brand generator may use. Every family is OFL or Apache, fetched from its source with its license file, so it can ship in client downloads. `character`, `why` and `caution` are editorial judgments, not facts. Run `pnpm fonts fetch` to download and verify, `pnpm fonts specimen` to review.",
   "rules": {
-    "licenses": ["OFL-1.1", "Apache-2.0"],
+    "licenses": [
+      "OFL-1.1",
+      "Apache-2.0"
+    ],
     "status": "candidate = awaiting review; approved = generator may use; rejected = kept here so it isn't re-proposed",
     "override": "An excluded or rejected family needs an explicit, written override from the user in the brand's strategy.md"
   },
   "excluded": [
-    { "family": "Inter", "reason": "The default UI face of the decade; reads as no decision" },
-    { "family": "Roboto (all)", "reason": "Android system face; reads as default" },
-    { "family": "Open Sans", "reason": "Generic web default" },
-    { "family": "Lato", "reason": "Generic web default" },
-    { "family": "Montserrat", "reason": "Template and AI-site default" },
-    { "family": "Poppins", "reason": "Template and AI-site default" },
-    { "family": "Raleway", "reason": "Template default" },
-    { "family": "Nunito", "reason": "Template default" },
-    { "family": "DM Sans / DM Serif / DM Mono", "reason": "AI-generated landing page default" },
-    { "family": "Space Grotesk / Space Mono", "reason": "AI and crypto landing page default" },
-    { "family": "Manrope", "reason": "AI SaaS default" },
-    { "family": "Plus Jakarta Sans", "reason": "AI SaaS default" },
-    { "family": "Outfit", "reason": "AI SaaS default" },
-    { "family": "Sora", "reason": "AI SaaS default" },
-    { "family": "Urbanist", "reason": "AI SaaS default" },
-    { "family": "Lexend", "reason": "AI SaaS default" },
-    { "family": "Work Sans", "reason": "Overused template face" },
-    { "family": "Rubik", "reason": "Overused template face" },
-    { "family": "Playfair Display", "reason": "The 'elegant' template serif" },
-    { "family": "Cormorant", "reason": "The 'luxury' template serif" },
-    { "family": "Lora", "reason": "Overused blog serif" },
-    { "family": "Merriweather", "reason": "Overused blog serif" },
-    { "family": "Instrument Serif", "reason": "The 2024-25 'tasteful AI startup' serif; now a cliche" },
-    { "family": "JetBrains Mono", "reason": "Every dev tool's default mono" },
-    { "family": "Geist / Geist Mono", "reason": "Vercel's own identity" },
-    { "family": "Mona Sans / Hubot Sans", "reason": "GitHub's own identity" }
+    {
+      "family": "Inter",
+      "reason": "The default UI face of the decade; reads as no decision"
+    },
+    {
+      "family": "Roboto (all)",
+      "reason": "Android system face; reads as default"
+    },
+    {
+      "family": "Open Sans",
+      "reason": "Generic web default"
+    },
+    {
+      "family": "Lato",
+      "reason": "Generic web default"
+    },
+    {
+      "family": "Montserrat",
+      "reason": "Template and AI-site default"
+    },
+    {
+      "family": "Poppins",
+      "reason": "Template and AI-site default"
+    },
+    {
+      "family": "Raleway",
+      "reason": "Template default"
+    },
+    {
+      "family": "Nunito",
+      "reason": "Template default"
+    },
+    {
+      "family": "DM Sans / DM Serif / DM Mono",
+      "reason": "AI-generated landing page default"
+    },
+    {
+      "family": "Space Grotesk / Space Mono",
+      "reason": "AI and crypto landing page default"
+    },
+    {
+      "family": "Manrope",
+      "reason": "AI SaaS default"
+    },
+    {
+      "family": "Plus Jakarta Sans",
+      "reason": "AI SaaS default"
+    },
+    {
+      "family": "Outfit",
+      "reason": "AI SaaS default"
+    },
+    {
+      "family": "Sora",
+      "reason": "AI SaaS default"
+    },
+    {
+      "family": "Urbanist",
+      "reason": "AI SaaS default"
+    },
+    {
+      "family": "Lexend",
+      "reason": "AI SaaS default"
+    },
+    {
+      "family": "Work Sans",
+      "reason": "Overused template face"
+    },
+    {
+      "family": "Rubik",
+      "reason": "Overused template face"
+    },
+    {
+      "family": "Playfair Display",
+      "reason": "The 'elegant' template serif"
+    },
+    {
+      "family": "Cormorant",
+      "reason": "The 'luxury' template serif"
+    },
+    {
+      "family": "Lora",
+      "reason": "Overused blog serif"
+    },
+    {
+      "family": "Merriweather",
+      "reason": "Overused blog serif"
+    },
+    {
+      "family": "Instrument Serif",
+      "reason": "The 2024-25 'tasteful AI startup' serif; now a cliche"
+    },
+    {
+      "family": "JetBrains Mono",
+      "reason": "Every dev tool's default mono"
+    },
+    {
+      "family": "Geist / Geist Mono",
+      "reason": "Vercel's own identity"
+    },
+    {
+      "family": "Mona Sans / Hubot Sans",
+      "reason": "GitHub's own identity"
+    }
   ],
   "families": [
     {
-      "id": "schibsted-grotesk", "family": "Schibsted Grotesk", "category": "sans", "roles": ["display", "text", "ui"],
-      "source": { "kind": "google", "dir": "ofl/schibstedgrotesk", "files": ["SchibstedGrotesk[wght].ttf", "SchibstedGrotesk-Italic[wght].ttf", "OFL.txt"] },
+      "id": "schibsted-grotesk",
+      "family": "Schibsted Grotesk",
+      "category": "sans",
+      "roles": [
+        "display",
+        "text",
+        "ui"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/schibstedgrotesk",
+        "files": [
+          "SchibstedGrotesk[wght].ttf",
+          "SchibstedGrotesk-Italic[wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Newspaper grotesk with a slightly squarish, editorial voice",
       "why": "Made for a media group, so it carries authority without looking corporate",
-      "status": "candidate"
+      "status": "approved"
     },
     {
-      "id": "hanken-grotesk", "family": "Hanken Grotesk", "category": "sans", "roles": ["text", "ui"],
-      "source": { "kind": "google", "dir": "ofl/hankengrotesk", "files": ["HankenGrotesk[wght].ttf", "HankenGrotesk-Italic[wght].ttf", "OFL.txt"] },
+      "id": "hanken-grotesk",
+      "family": "Hanken Grotesk",
+      "category": "sans",
+      "roles": [
+        "text",
+        "ui"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/hankengrotesk",
+        "files": [
+          "HankenGrotesk[wght].ttf",
+          "HankenGrotesk-Italic[wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Quiet, open grotesk; a workhorse with a little warmth",
       "why": "A credible text face to sit under an expressive display face, without being Inter",
-      "status": "candidate"
+      "status": "approved"
     },
     {
-      "id": "familjen-grotesk", "family": "Familjen Grotesk", "category": "sans", "roles": ["display", "text"],
-      "source": { "kind": "google", "dir": "ofl/familjengrotesk", "files": ["FamiljenGrotesk[wght].ttf", "FamiljenGrotesk-Italic[wght].ttf", "OFL.txt"] },
+      "id": "familjen-grotesk",
+      "family": "Familjen Grotesk",
+      "category": "sans",
+      "roles": [
+        "display",
+        "text"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/familjengrotesk",
+        "files": [
+          "FamiljenGrotesk[wght].ttf",
+          "FamiljenGrotesk-Italic[wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Agency grotesk with idiosyncratic details at large sizes",
       "why": "Personality shows in headlines and disappears in text",
-      "status": "candidate"
+      "status": "approved"
     },
     {
-      "id": "instrument-sans", "family": "Instrument Sans", "category": "sans", "roles": ["display", "text", "ui"],
-      "source": { "kind": "google", "dir": "ofl/instrumentsans", "files": ["InstrumentSans[wdth,wght].ttf", "InstrumentSans-Italic[wdth,wght].ttf", "OFL.txt"] },
+      "id": "instrument-sans",
+      "family": "Instrument Sans",
+      "category": "sans",
+      "roles": [
+        "display",
+        "text",
+        "ui"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/instrumentsans",
+        "files": [
+          "InstrumentSans[wdth,wght].ttf",
+          "InstrumentSans-Italic[wdth,wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Neo-grotesk with a width axis, precise and slightly condensed",
       "why": "The width axis gives a brand a compressed display voice and a normal text voice from one family",
       "caution": "Its sibling Instrument Serif is excluded as a cliche; don't pair them",
-      "status": "candidate"
+      "status": "approved"
     },
     {
-      "id": "bricolage-grotesque", "family": "Bricolage Grotesque", "category": "sans", "roles": ["display"],
-      "source": { "kind": "google", "dir": "ofl/bricolagegrotesque", "files": ["BricolageGrotesque[opsz,wdth,wght].ttf", "OFL.txt"] },
+      "id": "bricolage-grotesque",
+      "family": "Bricolage Grotesque",
+      "category": "sans",
+      "roles": [
+        "display"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/bricolagegrotesque",
+        "files": [
+          "BricolageGrotesque[opsz,wdth,wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Quirky, ink-trapped grotesk with French-grotesque roots; loud at display sizes",
       "why": "Optical size axis means it can be wild at 120px and sensible at 14px",
       "caution": "Getting popular; already used in the Okonkwo fixture",
-      "status": "candidate"
+      "status": "approved"
     },
     {
-      "id": "host-grotesk", "family": "Host Grotesk", "category": "sans", "roles": ["display", "text", "ui"],
-      "source": { "kind": "google", "dir": "ofl/hostgrotesk", "files": ["HostGrotesk[wght].ttf", "HostGrotesk-Italic[wght].ttf", "OFL.txt"] },
+      "id": "host-grotesk",
+      "family": "Host Grotesk",
+      "category": "sans",
+      "roles": [
+        "display",
+        "text",
+        "ui"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/hostgrotesk",
+        "files": [
+          "HostGrotesk[wght].ttf",
+          "HostGrotesk-Italic[wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Contemporary grotesk with a touch of geometric softness",
       "why": "Recent and not yet over-seen; good for clean software brands that need one family",
-      "status": "candidate"
+      "status": "approved"
     },
     {
-      "id": "funnel-display", "family": "Funnel Display", "category": "sans", "roles": ["display"],
-      "source": { "kind": "google", "dir": "ofl/funneldisplay", "files": ["FunnelDisplay[wght].ttf", "OFL.txt"] },
+      "id": "funnel-display",
+      "family": "Funnel Display",
+      "category": "sans",
+      "roles": [
+        "display"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/funneldisplay",
+        "files": [
+          "FunnelDisplay[wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Display grotesk with tapered joins that pinch where strokes meet",
       "why": "A built-in signature detail, useful as the starting point for a modified wordmark",
-      "status": "candidate"
+      "status": "approved"
     },
     {
-      "id": "archivo", "family": "Archivo", "category": "sans", "roles": ["display", "text", "ui"],
-      "source": { "kind": "google", "dir": "ofl/archivo", "files": ["Archivo[wdth,wght].ttf", "Archivo-Italic[wdth,wght].ttf", "OFL.txt"] },
+      "id": "archivo",
+      "family": "Archivo",
+      "category": "sans",
+      "roles": [
+        "display",
+        "text",
+        "ui"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/archivo",
+        "files": [
+          "Archivo[wdth,wght].ttf",
+          "Archivo-Italic[wdth,wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "American-gothic grotesk with a wide width range, from condensed to expanded",
       "why": "Very wide range in one family; the expanded widths have real presence",
-      "status": "candidate"
+      "status": "approved"
     },
     {
-      "id": "public-sans", "family": "Public Sans", "category": "sans", "roles": ["text", "ui"],
-      "source": { "kind": "google", "dir": "ofl/publicsans", "files": ["PublicSans[wght].ttf", "PublicSans-Italic[wght].ttf", "OFL.txt"] },
+      "id": "public-sans",
+      "family": "Public Sans",
+      "category": "sans",
+      "roles": [
+        "text",
+        "ui"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/publicsans",
+        "files": [
+          "PublicSans[wght].ttf",
+          "PublicSans-Italic[wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Neutral, strong grotesk made for the US Web Design System",
       "why": "Civic and trustworthy; suits fintech, govtech and compliance clients",
       "caution": "Derived from Libre Franklin; don't shortlist both",
-      "status": "candidate"
+      "status": "rejected",
+      "decision": "Derived from Libre Franklin, which carries the same American-gothic idea with more heritage"
     },
     {
-      "id": "atkinson-hyperlegible-next", "family": "Atkinson Hyperlegible Next", "category": "sans", "roles": ["text", "ui"],
-      "source": { "kind": "google", "dir": "ofl/atkinsonhyperlegiblenext", "files": ["AtkinsonHyperlegibleNext[wght].ttf", "AtkinsonHyperlegibleNext-Italic[wght].ttf", "OFL.txt"] },
+      "id": "atkinson-hyperlegible-next",
+      "family": "Atkinson Hyperlegible Next",
+      "category": "sans",
+      "roles": [
+        "text",
+        "ui"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/atkinsonhyperlegiblenext",
+        "files": [
+          "AtkinsonHyperlegibleNext[wght].ttf",
+          "AtkinsonHyperlegibleNext-Italic[wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Grotesk built for low-vision legibility; distinct letter shapes with a slightly odd charm",
       "why": "Accessibility as a brand value is a real, defensible concept for health and civic clients",
-      "status": "candidate"
+      "status": "approved"
     },
     {
-      "id": "hedvig-letters-sans", "family": "Hedvig Letters Sans", "category": "sans", "roles": ["display", "text"],
-      "source": { "kind": "google", "dir": "ofl/hedvigletterssans", "files": ["HedvigLettersSans-Regular.ttf", "OFL.txt"] },
+      "id": "hedvig-letters-sans",
+      "family": "Hedvig Letters Sans",
+      "category": "sans",
+      "roles": [
+        "display",
+        "text"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/hedvigletterssans",
+        "files": [
+          "HedvigLettersSans-Regular.ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Friendly, slightly rounded humanist sans from an insurance brand",
       "why": "Warm without being cute; pairs with its serif sibling",
       "caution": "One weight only",
-      "status": "candidate"
+      "status": "rejected",
+      "decision": "Single weight; too little range for a brand system"
     },
     {
-      "id": "chivo", "family": "Chivo", "category": "sans", "roles": ["display", "text"],
-      "source": { "kind": "google", "dir": "ofl/chivo", "files": ["Chivo[wght].ttf", "Chivo-Italic[wght].ttf", "OFL.txt"] },
+      "id": "chivo",
+      "family": "Chivo",
+      "category": "sans",
+      "roles": [
+        "display",
+        "text"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/chivo",
+        "files": [
+          "Chivo[wght].ttf",
+          "Chivo-Italic[wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Sturdy grotesk whose heavy weights look like posters",
       "why": "The black weight is a genuine display voice",
-      "status": "candidate"
+      "status": "approved"
     },
     {
-      "id": "commissioner", "family": "Commissioner", "category": "sans", "roles": ["display", "text"],
-      "source": { "kind": "google", "dir": "ofl/commissioner", "files": ["Commissioner[FLAR,VOLM,slnt,wght].ttf", "OFL.txt"] },
+      "id": "commissioner",
+      "family": "Commissioner",
+      "category": "sans",
+      "roles": [
+        "display",
+        "text"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/commissioner",
+        "files": [
+          "Commissioner[FLAR,VOLM,slnt,wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Low-contrast sans with flare and volume axes that morph it toward flared serif",
       "why": "One file covers clean sans through flared display; rare range",
-      "status": "candidate"
+      "status": "approved"
     },
     {
-      "id": "ibm-plex-sans", "family": "IBM Plex Sans", "category": "sans", "roles": ["text", "ui"],
-      "source": { "kind": "google", "dir": "ofl/ibmplexsans", "files": ["IBMPlexSans[wdth,wght].ttf", "IBMPlexSans-Italic[wdth,wght].ttf", "OFL.txt"] },
+      "id": "ibm-plex-sans",
+      "family": "IBM Plex Sans",
+      "category": "sans",
+      "roles": [
+        "text",
+        "ui"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/ibmplexsans",
+        "files": [
+          "IBMPlexSans[wdth,wght].ttf",
+          "IBMPlexSans-Italic[wdth,wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Engineered grotesk with squared curves; corporate-technical",
       "why": "A complete system with a matching mono; reliable for technical text",
       "caution": "Strongly associated with IBM and widely used in dev tooling. Currently Notae's text face, which doesn't earn it a place",
-      "status": "candidate"
+      "status": "rejected",
+      "decision": "Reads as IBM and as default dev tooling"
     },
     {
-      "id": "radio-canada-big", "family": "Radio Canada Big", "category": "sans", "roles": ["display", "text"],
-      "source": { "kind": "google", "dir": "ofl/radiocanadabig", "files": ["RadioCanadaBig[wght].ttf", "RadioCanadaBig-Italic[wght].ttf", "OFL.txt"] },
+      "id": "radio-canada-big",
+      "family": "Radio Canada Big",
+      "category": "sans",
+      "roles": [
+        "display",
+        "text"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/radiocanadabig",
+        "files": [
+          "RadioCanadaBig[wght].ttf",
+          "RadioCanadaBig-Italic[wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Humanist-leaning grotesk with a broadcast clarity",
       "why": "Big x-height and friendly shapes without being rounded",
-      "status": "candidate"
+      "status": "rejected",
+      "decision": "Friendly but anonymous; Hanken and Host cover it"
     },
     {
-      "id": "libre-franklin", "family": "Libre Franklin", "category": "sans", "roles": ["display", "text"],
-      "source": { "kind": "google", "dir": "ofl/librefranklin", "files": ["LibreFranklin[wght].ttf", "LibreFranklin-Italic[wght].ttf", "OFL.txt"] },
+      "id": "libre-franklin",
+      "family": "Libre Franklin",
+      "category": "sans",
+      "roles": [
+        "display",
+        "text"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/librefranklin",
+        "files": [
+          "LibreFranklin[wght].ttf",
+          "LibreFranklin-Italic[wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Revival of Franklin Gothic, the classic American newspaper gothic",
       "why": "American heritage in one face; heavy weights feel like headlines",
-      "status": "candidate"
+      "status": "approved"
     },
     {
-      "id": "overused-grotesk", "family": "Overused Grotesk", "category": "sans", "roles": ["display", "text"],
-      "source": { "kind": "zip", "url": "https://github.com/RandomMaerks/Overused-Grotesk/releases/download/v0.5-alpha.2/OverusedGrotesk-v0.5-alpha.2.zip", "files": { "variable/OverusedGroteskRoman-VF.ttf": "OverusedGrotesk[wght].ttf", "LICENSE.txt": "OFL.txt" } },
+      "id": "overused-grotesk",
+      "family": "Overused Grotesk",
+      "category": "sans",
+      "roles": [
+        "display",
+        "text"
+      ],
+      "source": {
+        "kind": "zip",
+        "url": "https://github.com/RandomMaerks/Overused-Grotesk/releases/download/v0.5-alpha.2/OverusedGrotesk-v0.5-alpha.2.zip",
+        "files": {
+          "variable/OverusedGroteskRoman-VF.ttf": "OverusedGrotesk[wght].ttf",
+          "LICENSE.txt": "OFL.txt"
+        }
+      },
       "character": "Independent take on the classic premium grotesk look (Söhne/Neue Haas territory)",
       "why": "Closest free approach to the premium retail grotesks the research found at the top tier",
       "caution": "Alpha release (v0.5); roman only, no italics",
-      "status": "candidate"
+      "status": "approved"
     },
     {
-      "id": "epilogue", "family": "Epilogue", "category": "sans", "roles": ["display", "text"],
-      "source": { "kind": "google", "dir": "ofl/epilogue", "files": ["Epilogue[wght].ttf", "Epilogue-Italic[wght].ttf", "OFL.txt"] },
+      "id": "epilogue",
+      "family": "Epilogue",
+      "category": "sans",
+      "roles": [
+        "display",
+        "text"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/epilogue",
+        "files": [
+          "Epilogue[wght].ttf",
+          "Epilogue-Italic[wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Grotesk with sharp, slightly flared details and strong heavy weights",
       "why": "Has edge at display sizes without being a novelty face",
-      "status": "candidate"
+      "status": "approved"
     },
     {
-      "id": "anybody", "family": "Anybody", "category": "sans", "roles": ["display"],
-      "source": { "kind": "google", "dir": "ofl/anybody", "files": ["Anybody[wdth,wght].ttf", "Anybody-Italic[wdth,wght].ttf", "OFL.txt"] },
+      "id": "anybody",
+      "family": "Anybody",
+      "category": "sans",
+      "roles": [
+        "display"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/anybody",
+        "files": [
+          "Anybody[wdth,wght].ttf",
+          "Anybody-Italic[wdth,wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Extreme width axis from ultra-condensed to ultra-expanded",
       "why": "Width as an expressive or motion device; good for systems where type stretches",
-      "status": "candidate"
+      "status": "approved"
     },
     {
-      "id": "spline-sans", "family": "Spline Sans", "category": "sans", "roles": ["display", "text", "ui"],
-      "source": { "kind": "google", "dir": "ofl/splinesans", "files": ["SplineSans[wght].ttf", "OFL.txt"] },
+      "id": "spline-sans",
+      "family": "Spline Sans",
+      "category": "sans",
+      "roles": [
+        "display",
+        "text",
+        "ui"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/splinesans",
+        "files": [
+          "SplineSans[wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Grotesk with gently squarish curves; technical but soft",
       "why": "Has a matching mono, so a brand gets text and code faces from one family",
-      "status": "candidate"
+      "status": "rejected",
+      "decision": "Pleasant but generic; nothing a brand could own"
     },
     {
-      "id": "recursive", "family": "Recursive", "category": "sans", "roles": ["display", "text", "mono"],
-      "source": { "kind": "google", "dir": "ofl/recursive", "files": ["Recursive[CASL,CRSV,MONO,slnt,wght].ttf", "OFL.txt"] },
+      "id": "recursive",
+      "family": "Recursive",
+      "category": "sans",
+      "roles": [
+        "display",
+        "text",
+        "mono"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/recursive",
+        "files": [
+          "Recursive[CASL,CRSV,MONO,slnt,wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "One file from linear sans to casual brush-like, proportional to mono",
       "why": "The casual and mono axes can carry a dev-tool brand's personality inside one family",
-      "status": "candidate"
+      "status": "approved"
     },
     {
-      "id": "big-shoulders", "family": "Big Shoulders", "category": "display", "roles": ["display"],
-      "source": { "kind": "google", "dir": "ofl/bigshoulders", "files": ["BigShoulders[opsz,wght].ttf", "OFL.txt"] },
+      "id": "big-shoulders",
+      "family": "Big Shoulders",
+      "category": "display",
+      "roles": [
+        "display"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/bigshoulders",
+        "files": [
+          "BigShoulders[opsz,wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Condensed industrial gothic inspired by Chicago",
       "why": "Strong American civic and industrial character; tall headlines in narrow space",
-      "status": "candidate"
+      "status": "approved"
     },
     {
-      "id": "gloock", "family": "Gloock", "category": "serif", "roles": ["display"],
-      "source": { "kind": "google", "dir": "ofl/gloock", "files": ["Gloock-Regular.ttf", "OFL.txt"] },
+      "id": "gloock",
+      "family": "Gloock",
+      "category": "serif",
+      "roles": [
+        "display"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/gloock",
+        "files": [
+          "Gloock-Regular.ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "High-contrast display serif with dense, dramatic letter shapes",
       "why": "A serif with weight and drama, not the thin 'luxury' look",
       "caution": "One weight only",
-      "status": "candidate"
+      "status": "approved"
     },
     {
-      "id": "young-serif", "family": "Young Serif", "category": "serif", "roles": ["display"],
-      "source": { "kind": "google", "dir": "ofl/youngserif", "files": ["YoungSerif-Regular.ttf", "OFL.txt"] },
+      "id": "young-serif",
+      "family": "Young Serif",
+      "category": "serif",
+      "roles": [
+        "display"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/youngserif",
+        "files": [
+          "YoungSerif-Regular.ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Heavy old-style serif with soft, chunky shapes",
       "why": "In the same warm, unfashionable spirit as Mailchimp's Cooper",
       "caution": "One weight only",
-      "status": "candidate"
+      "status": "approved"
     },
     {
-      "id": "newsreader", "family": "Newsreader", "category": "serif", "roles": ["display", "text"],
-      "source": { "kind": "google", "dir": "ofl/newsreader", "files": ["Newsreader[opsz,wght].ttf", "Newsreader-Italic[opsz,wght].ttf", "OFL.txt"] },
+      "id": "newsreader",
+      "family": "Newsreader",
+      "category": "serif",
+      "roles": [
+        "display",
+        "text"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/newsreader",
+        "files": [
+          "Newsreader[opsz,wght].ttf",
+          "Newsreader-Italic[opsz,wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Editorial serif from Production Type with a real optical size axis",
       "why": "The closest free approach to Tiempos-style editorial warmth",
-      "status": "candidate"
+      "status": "approved"
     },
     {
-      "id": "source-serif-4", "family": "Source Serif 4", "category": "serif", "roles": ["display", "text"],
-      "source": { "kind": "google", "dir": "ofl/sourceserif4", "files": ["SourceSerif4[opsz,wght].ttf", "SourceSerif4-Italic[opsz,wght].ttf", "OFL.txt"] },
+      "id": "source-serif-4",
+      "family": "Source Serif 4",
+      "category": "serif",
+      "roles": [
+        "display",
+        "text"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/sourceserif4",
+        "files": [
+          "SourceSerif4[opsz,wght].ttf",
+          "SourceSerif4-Italic[opsz,wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Transitional serif with optical sizes; sober, literate",
       "why": "A dependable reading face",
       "caution": "Currently Notae's display face, which doesn't earn it a place; reads a bit academic",
-      "status": "candidate"
+      "status": "rejected",
+      "decision": "Sober to the point of academic; Newsreader and Literata cover this ground with more warmth"
     },
     {
-      "id": "literata", "family": "Literata", "category": "serif", "roles": ["text"],
-      "source": { "kind": "google", "dir": "ofl/literata", "files": ["Literata[opsz,wght].ttf", "Literata-Italic[opsz,wght].ttf", "OFL.txt"] },
+      "id": "literata",
+      "family": "Literata",
+      "category": "serif",
+      "roles": [
+        "text"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/literata",
+        "files": [
+          "Literata[opsz,wght].ttf",
+          "Literata-Italic[opsz,wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Book serif designed for Google Play Books; sturdy on screens",
       "why": "Comfortable long reading; good for docs-heavy brands",
       "caution": "Currently the base of Notae's wordmark",
-      "status": "candidate"
+      "status": "approved"
     },
     {
-      "id": "spectral", "family": "Spectral", "category": "serif", "roles": ["display", "text"],
-      "source": { "kind": "google", "dir": "ofl/spectral", "files": ["Spectral-ExtraLight.ttf", "Spectral-ExtraLightItalic.ttf", "Spectral-Light.ttf", "Spectral-LightItalic.ttf", "Spectral-Regular.ttf", "Spectral-Italic.ttf", "Spectral-Medium.ttf", "Spectral-MediumItalic.ttf", "Spectral-SemiBold.ttf", "Spectral-SemiBoldItalic.ttf", "Spectral-Bold.ttf", "Spectral-BoldItalic.ttf", "Spectral-ExtraBold.ttf", "Spectral-ExtraBoldItalic.ttf", "OFL.txt"] },
+      "id": "spectral",
+      "family": "Spectral",
+      "category": "serif",
+      "roles": [
+        "display",
+        "text"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/spectral",
+        "files": [
+          "Spectral-ExtraLight.ttf",
+          "Spectral-ExtraLightItalic.ttf",
+          "Spectral-Light.ttf",
+          "Spectral-LightItalic.ttf",
+          "Spectral-Regular.ttf",
+          "Spectral-Italic.ttf",
+          "Spectral-Medium.ttf",
+          "Spectral-MediumItalic.ttf",
+          "Spectral-SemiBold.ttf",
+          "Spectral-SemiBoldItalic.ttf",
+          "Spectral-Bold.ttf",
+          "Spectral-BoldItalic.ttf",
+          "Spectral-ExtraBold.ttf",
+          "Spectral-ExtraBoldItalic.ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Sharp, narrow screen-first serif from Production Type",
       "why": "Crisp and cool, a serif that feels technical",
-      "status": "candidate"
+      "status": "approved"
     },
     {
-      "id": "fraunces", "family": "Fraunces", "category": "serif", "roles": ["display"],
-      "source": { "kind": "google", "dir": "ofl/fraunces", "files": ["Fraunces[SOFT,WONK,opsz,wght].ttf", "Fraunces-Italic[SOFT,WONK,opsz,wght].ttf", "OFL.txt"] },
+      "id": "fraunces",
+      "family": "Fraunces",
+      "category": "serif",
+      "roles": [
+        "display"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/fraunces",
+        "files": [
+          "Fraunces[SOFT,WONK,opsz,wght].ttf",
+          "Fraunces-Italic[SOFT,WONK,opsz,wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Soft 'old style' display serif with softness and wonk axes",
       "why": "The axes allow built-in imperfection, the OpenAI-style 'engineered imperfection' idea",
       "caution": "Heading toward overuse in tasteful-startup land; use the axes or don't use it",
-      "status": "candidate"
+      "status": "approved"
     },
     {
-      "id": "hedvig-letters-serif", "family": "Hedvig Letters Serif", "category": "serif", "roles": ["display", "text"],
-      "source": { "kind": "google", "dir": "ofl/hedviglettersserif", "files": ["HedvigLettersSerif[opsz].ttf", "OFL.txt"] },
+      "id": "hedvig-letters-serif",
+      "family": "Hedvig Letters Serif",
+      "category": "serif",
+      "roles": [
+        "display",
+        "text"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/hedviglettersserif",
+        "files": [
+          "HedvigLettersSerif[opsz].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Warm, slightly quirky serif from an insurance brand",
       "why": "Friendly serif for consumer fintech and insurance clients",
       "caution": "One weight only (optical size axis)",
-      "status": "candidate"
+      "status": "approved"
     },
     {
-      "id": "zilla-slab", "family": "Zilla Slab", "category": "slab", "roles": ["display", "text"],
-      "source": { "kind": "google", "dir": "ofl/zillaslab", "files": ["ZillaSlab-Light.ttf", "ZillaSlab-LightItalic.ttf", "ZillaSlab-Regular.ttf", "ZillaSlab-Italic.ttf", "ZillaSlab-Medium.ttf", "ZillaSlab-MediumItalic.ttf", "ZillaSlab-SemiBold.ttf", "ZillaSlab-SemiBoldItalic.ttf", "ZillaSlab-Bold.ttf", "ZillaSlab-BoldItalic.ttf", "OFL.txt"] },
+      "id": "zilla-slab",
+      "family": "Zilla Slab",
+      "category": "slab",
+      "roles": [
+        "display",
+        "text"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/zillaslab",
+        "files": [
+          "ZillaSlab-Light.ttf",
+          "ZillaSlab-LightItalic.ttf",
+          "ZillaSlab-Regular.ttf",
+          "ZillaSlab-Italic.ttf",
+          "ZillaSlab-Medium.ttf",
+          "ZillaSlab-MediumItalic.ttf",
+          "ZillaSlab-SemiBold.ttf",
+          "ZillaSlab-SemiBoldItalic.ttf",
+          "ZillaSlab-Bold.ttf",
+          "ZillaSlab-BoldItalic.ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Contemporary slab with angular details",
       "why": "A slab is a rare, technical-but-warm choice",
       "caution": "Mozilla's brand face; reads as Mozilla to people who know it",
-      "status": "candidate"
+      "status": "approved"
     },
     {
-      "id": "besley", "family": "Besley", "category": "serif", "roles": ["display", "text"],
-      "source": { "kind": "google", "dir": "ofl/besley", "files": ["Besley[wght].ttf", "Besley-Italic[wght].ttf", "OFL.txt"] },
+      "id": "besley",
+      "family": "Besley",
+      "category": "serif",
+      "roles": [
+        "display",
+        "text"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/besley",
+        "files": [
+          "Besley[wght].ttf",
+          "Besley-Italic[wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Clarendon-style serif with bracketed, chunky serifs",
       "why": "Victorian-American printing character; confident, rare in software",
-      "status": "candidate"
+      "status": "approved"
     },
     {
-      "id": "brygada-1918", "family": "Brygada 1918", "category": "serif", "roles": ["display", "text"],
-      "source": { "kind": "google", "dir": "ofl/brygada1918", "files": ["Brygada1918[wght].ttf", "Brygada1918-Italic[wght].ttf", "OFL.txt"] },
+      "id": "brygada-1918",
+      "family": "Brygada 1918",
+      "category": "serif",
+      "roles": [
+        "display",
+        "text"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/brygada1918",
+        "files": [
+          "Brygada1918[wght].ttf",
+          "Brygada1918-Italic[wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Revival of a 1918 Polish typeface with sharp, idiosyncratic details",
       "why": "Historic character that nobody else in software is using",
-      "status": "candidate"
+      "status": "approved"
     },
     {
-      "id": "petrona", "family": "Petrona", "category": "serif", "roles": ["display", "text"],
-      "source": { "kind": "google", "dir": "ofl/petrona", "files": ["Petrona[wght].ttf", "Petrona-Italic[wght].ttf", "OFL.txt"] },
+      "id": "petrona",
+      "family": "Petrona",
+      "category": "serif",
+      "roles": [
+        "display",
+        "text"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/petrona",
+        "files": [
+          "Petrona[wght].ttf",
+          "Petrona-Italic[wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Calligraphic serif with a large weight range, from thin to black",
       "why": "The black weight is a distinctive display voice for a serif",
-      "status": "candidate"
+      "status": "approved"
     },
     {
-      "id": "libre-caslon-text", "family": "Libre Caslon Text", "category": "serif", "roles": ["text"],
-      "source": { "kind": "google", "dir": "ofl/librecaslontext", "files": ["LibreCaslonText[wght].ttf", "LibreCaslonText-Italic[wght].ttf", "OFL.txt"] },
+      "id": "libre-caslon-text",
+      "family": "Libre Caslon Text",
+      "category": "serif",
+      "roles": [
+        "text"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/librecaslontext",
+        "files": [
+          "LibreCaslonText[wght].ttf",
+          "LibreCaslonText-Italic[wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Caslon for screens; the typeface of the US founding documents",
       "why": "Deep American heritage; serious and old-world for legal and finance clients",
-      "status": "candidate"
+      "status": "approved"
     },
     {
-      "id": "libre-caslon-display", "family": "Libre Caslon Display", "category": "serif", "roles": ["display"],
-      "source": { "kind": "google", "dir": "ofl/librecaslondisplay", "files": ["LibreCaslonDisplay-Regular.ttf", "OFL.txt"] },
+      "id": "libre-caslon-display",
+      "family": "Libre Caslon Display",
+      "category": "serif",
+      "roles": [
+        "display"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/librecaslondisplay",
+        "files": [
+          "LibreCaslonDisplay-Regular.ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "High-contrast Caslon cut for large sizes",
       "why": "Pairs with Libre Caslon Text for headlines",
       "caution": "One weight only",
-      "status": "candidate"
+      "status": "rejected",
+      "decision": "Single weight; Libre Caslon Text at large sizes covers it"
     },
     {
-      "id": "bodoni-moda", "family": "Bodoni Moda", "category": "serif", "roles": ["display"],
-      "source": { "kind": "google", "dir": "ofl/bodonimoda", "files": ["BodoniModa[opsz,wght].ttf", "BodoniModa-Italic[opsz,wght].ttf", "OFL.txt"] },
+      "id": "bodoni-moda",
+      "family": "Bodoni Moda",
+      "category": "serif",
+      "roles": [
+        "display"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/bodonimoda",
+        "files": [
+          "BodoniModa[opsz,wght].ttf",
+          "BodoniModa-Italic[opsz,wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Didone with real optical sizes; fashion contrast",
       "why": "When a software brand genuinely needs fashion-level contrast, this one is built properly",
       "caution": "Easily reads as 'luxury template'; needs a strong reason",
-      "status": "candidate"
+      "status": "rejected",
+      "decision": "Didone contrast reads as luxury template in software"
     },
     {
-      "id": "piazzolla", "family": "Piazzolla", "category": "serif", "roles": ["display", "text"],
-      "source": { "kind": "google", "dir": "ofl/piazzolla", "files": ["Piazzolla[opsz,wght].ttf", "Piazzolla-Italic[opsz,wght].ttf", "OFL.txt"] },
+      "id": "piazzolla",
+      "family": "Piazzolla",
+      "category": "serif",
+      "roles": [
+        "display",
+        "text"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/piazzolla",
+        "files": [
+          "Piazzolla[opsz,wght].ttf",
+          "Piazzolla-Italic[opsz,wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Compact, sturdy serif with sharp wedge serifs and optical sizes",
       "why": "Energetic and space-efficient; good for dense product copy",
-      "status": "candidate"
+      "status": "approved"
     },
     {
-      "id": "alegreya", "family": "Alegreya", "category": "serif", "roles": ["text"],
-      "source": { "kind": "google", "dir": "ofl/alegreya", "files": ["Alegreya[wght].ttf", "Alegreya-Italic[wght].ttf", "OFL.txt"] },
+      "id": "alegreya",
+      "family": "Alegreya",
+      "category": "serif",
+      "roles": [
+        "text"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/alegreya",
+        "files": [
+          "Alegreya[wght].ttf",
+          "Alegreya-Italic[wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Calligraphic book serif with rhythm and movement",
       "why": "Literary warmth for long-form writing",
-      "status": "candidate"
+      "status": "rejected",
+      "decision": "Literary book face with no clear software use"
     },
     {
-      "id": "ibm-plex-mono", "family": "IBM Plex Mono", "category": "mono", "roles": ["mono", "ui"],
-      "source": { "kind": "google", "dir": "ofl/ibmplexmono", "files": ["IBMPlexMono-Thin.ttf", "IBMPlexMono-ThinItalic.ttf", "IBMPlexMono-ExtraLight.ttf", "IBMPlexMono-ExtraLightItalic.ttf", "IBMPlexMono-Light.ttf", "IBMPlexMono-LightItalic.ttf", "IBMPlexMono-Regular.ttf", "IBMPlexMono-Italic.ttf", "IBMPlexMono-Medium.ttf", "IBMPlexMono-MediumItalic.ttf", "IBMPlexMono-SemiBold.ttf", "IBMPlexMono-SemiBoldItalic.ttf", "IBMPlexMono-Bold.ttf", "IBMPlexMono-BoldItalic.ttf", "OFL.txt"] },
+      "id": "ibm-plex-mono",
+      "family": "IBM Plex Mono",
+      "category": "mono",
+      "roles": [
+        "mono",
+        "ui"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/ibmplexmono",
+        "files": [
+          "IBMPlexMono-Thin.ttf",
+          "IBMPlexMono-ThinItalic.ttf",
+          "IBMPlexMono-ExtraLight.ttf",
+          "IBMPlexMono-ExtraLightItalic.ttf",
+          "IBMPlexMono-Light.ttf",
+          "IBMPlexMono-LightItalic.ttf",
+          "IBMPlexMono-Regular.ttf",
+          "IBMPlexMono-Italic.ttf",
+          "IBMPlexMono-Medium.ttf",
+          "IBMPlexMono-MediumItalic.ttf",
+          "IBMPlexMono-SemiBold.ttf",
+          "IBMPlexMono-SemiBoldItalic.ttf",
+          "IBMPlexMono-Bold.ttf",
+          "IBMPlexMono-BoldItalic.ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Engineered mono with a typewriter's slab serifs",
       "why": "A mono with real character and a full weight range",
       "caution": "Very common in dev tooling",
-      "status": "candidate"
+      "status": "rejected",
+      "decision": "Reads as IBM and as default dev tooling"
     },
     {
-      "id": "fragment-mono", "family": "Fragment Mono", "category": "mono", "roles": ["mono", "ui"],
-      "source": { "kind": "google", "dir": "ofl/fragmentmono", "files": ["FragmentMono-Regular.ttf", "FragmentMono-Italic.ttf", "OFL.txt"] },
+      "id": "fragment-mono",
+      "family": "Fragment Mono",
+      "category": "mono",
+      "roles": [
+        "mono",
+        "ui"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/fragmentmono",
+        "files": [
+          "FragmentMono-Regular.ttf",
+          "FragmentMono-Italic.ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Mono with the shapes of a classic grotesk (Helvetica-derived)",
       "why": "Studio Lin's FRAGMENT identity from the research; a mono that sits well next to grotesks",
       "caution": "One weight only",
-      "status": "candidate"
+      "status": "approved"
     },
     {
-      "id": "martian-mono", "family": "Martian Mono", "category": "mono", "roles": ["mono", "display"],
-      "source": { "kind": "google", "dir": "ofl/martianmono", "files": ["MartianMono[wdth,wght].ttf", "OFL.txt"] },
+      "id": "martian-mono",
+      "family": "Martian Mono",
+      "category": "mono",
+      "roles": [
+        "mono",
+        "display"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/martianmono",
+        "files": [
+          "MartianMono[wdth,wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Wide, squarish mono with width and weight axes; works as display type",
       "why": "A mono that can carry headlines, for dev-tool brands where code is the identity",
-      "status": "candidate"
+      "status": "approved"
     },
     {
-      "id": "spline-sans-mono", "family": "Spline Sans Mono", "category": "mono", "roles": ["mono"],
-      "source": { "kind": "google", "dir": "ofl/splinesansmono", "files": ["SplineSansMono[wght].ttf", "SplineSansMono-Italic[wght].ttf", "OFL.txt"] },
+      "id": "spline-sans-mono",
+      "family": "Spline Sans Mono",
+      "category": "mono",
+      "roles": [
+        "mono"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/splinesansmono",
+        "files": [
+          "SplineSansMono[wght].ttf",
+          "SplineSansMono-Italic[wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Soft-squared mono matching Spline Sans",
       "why": "Pairs with Spline Sans as a family",
-      "status": "candidate"
+      "status": "rejected",
+      "decision": "Only earns a place as Spline Sans's partner"
     },
     {
-      "id": "azeret-mono", "family": "Azeret Mono", "category": "mono", "roles": ["mono"],
-      "source": { "kind": "google", "dir": "ofl/azeretmono", "files": ["AzeretMono[wght].ttf", "AzeretMono-Italic[wght].ttf", "OFL.txt"] },
+      "id": "azeret-mono",
+      "family": "Azeret Mono",
+      "category": "mono",
+      "roles": [
+        "mono"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/azeretmono",
+        "files": [
+          "AzeretMono[wght].ttf",
+          "AzeretMono-Italic[wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Neutral grotesk mono with a wide weight range",
       "why": "Clean code face that steps back behind an expressive display face",
-      "status": "candidate"
+      "status": "rejected",
+      "decision": "Commit Mono is the better neutral mono"
     },
     {
-      "id": "sometype-mono", "family": "Sometype Mono", "category": "mono", "roles": ["mono"],
-      "source": { "kind": "google", "dir": "ofl/sometypemono", "files": ["SometypeMono[wght].ttf", "SometypeMono-Italic[wght].ttf", "OFL.txt"] },
+      "id": "sometype-mono",
+      "family": "Sometype Mono",
+      "category": "mono",
+      "roles": [
+        "mono"
+      ],
+      "source": {
+        "kind": "google",
+        "dir": "ofl/sometypemono",
+        "files": [
+          "SometypeMono[wght].ttf",
+          "SometypeMono-Italic[wght].ttf",
+          "OFL.txt"
+        ]
+      },
       "character": "Typewriter-flavoured mono with a slightly retro bite",
       "why": "Analog character for brands using the physical-world metaphors the research found in AI brands",
-      "status": "candidate"
+      "status": "approved"
     },
     {
-      "id": "commit-mono", "family": "Commit Mono", "category": "mono", "roles": ["mono"],
-      "source": { "kind": "zip", "url": "https://github.com/eigilnikolajsen/commit-mono/releases/download/v1.143/CommitMono-1.143.zip", "files": { "CommitMono-1.143/ttfautohint/CommitMono-400-Regular.ttf": "CommitMono-400-Regular.ttf", "CommitMono-1.143/ttfautohint/CommitMono-400-Italic.ttf": "CommitMono-400-Italic.ttf", "CommitMono-1.143/ttfautohint/CommitMono-700-Regular.ttf": "CommitMono-700-Regular.ttf", "CommitMono-1.143/ttfautohint/CommitMono-700-Italic.ttf": "CommitMono-700-Italic.ttf", "CommitMono-1.143/license.txt": "OFL.txt" } },
+      "id": "commit-mono",
+      "family": "Commit Mono",
+      "category": "mono",
+      "roles": [
+        "mono"
+      ],
+      "source": {
+        "kind": "zip",
+        "url": "https://github.com/eigilnikolajsen/commit-mono/releases/download/v1.143/CommitMono-1.143.zip",
+        "files": {
+          "CommitMono-1.143/ttfautohint/CommitMono-400-Regular.ttf": "CommitMono-400-Regular.ttf",
+          "CommitMono-1.143/ttfautohint/CommitMono-400-Italic.ttf": "CommitMono-400-Italic.ttf",
+          "CommitMono-1.143/ttfautohint/CommitMono-700-Regular.ttf": "CommitMono-700-Regular.ttf",
+          "CommitMono-1.143/ttfautohint/CommitMono-700-Italic.ttf": "CommitMono-700-Italic.ttf",
+          "CommitMono-1.143/license.txt": "OFL.txt"
+        }
+      },
       "character": "Neutral, carefully spaced coding mono with smart kerning",
       "why": "Designed to disappear in code; a good default that isn't JetBrains Mono",
-      "status": "candidate"
+      "status": "approved"
     },
     {
-      "id": "departure-mono", "family": "Departure Mono", "category": "mono", "roles": ["mono", "display"],
-      "source": { "kind": "zip", "url": "https://github.com/rektdeckard/departure-mono/releases/download/v1.500/DepartureMono-1.500.zip", "files": { "DepartureMono-1.500/DepartureMono-Regular.otf": "DepartureMono-Regular.otf", "DepartureMono-1.500/LICENSE": "OFL.txt" } },
+      "id": "departure-mono",
+      "family": "Departure Mono",
+      "category": "mono",
+      "roles": [
+        "mono",
+        "display"
+      ],
+      "source": {
+        "kind": "zip",
+        "url": "https://github.com/rektdeckard/departure-mono/releases/download/v1.500/DepartureMono-1.500.zip",
+        "files": {
+          "DepartureMono-1.500/DepartureMono-Regular.otf": "DepartureMono-Regular.otf",
+          "DepartureMono-1.500/LICENSE": "OFL.txt"
+        }
+      },
       "character": "Pixel mono, retro-futurist and low resolution",
       "why": "The research's Mistral pattern: low resolution as a deliberate premium choice that also works at small sizes",
       "caution": "One weight only; a strong flavour",
-      "status": "candidate"
+      "status": "approved"
     }
   ]
 }
