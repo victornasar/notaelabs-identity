@@ -6,7 +6,8 @@
 import { contrast, oklchToHex, wcagLevel } from "../lib/brand/color";
 
 const colors = process.argv.slice(2).map((arg, i) => {
-  const [name, value] = arg.includes("=") ? arg.split("=") : [`c${i + 1}`, arg];
+  const at = arg.indexOf("=");
+  const [name, value] = at >= 0 ? [arg.slice(0, at), arg.slice(at + 1)] : [`c${i + 1}`, arg];
   return { name, value, ...oklchToHex(value) };
 });
 for (const c of colors) console.log(`${c.name.padEnd(12)} oklch(${c.value})  ${c.hex}${c.inGamut ? "" : "  OUT OF sRGB GAMUT: lower the chroma"}`);

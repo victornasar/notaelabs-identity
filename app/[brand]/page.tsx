@@ -1,3 +1,4 @@
+import { Imagery } from "@/components/guide/imagery";
 import { Nav, type Section } from "@/components/guide/nav";
 import { Band, Closing, Colors, Hero, Marks, Type, Voice } from "@/components/guide/sections";
 import { Mark } from "@/components/shell/mark";
@@ -11,6 +12,7 @@ export default async function BrandPage({ params }: PageProps<"/[brand]">) {
     { id: "marks", label: "Marks" },
     { id: "color", label: "Color" },
     { id: "type", label: "Type" },
+    ...(brand.device?.applications.length ? [{ id: "imagery", label: "Imagery" }] : []),
     ...(brand.voice ? [{ id: "voice", label: "Voice" }] : []),
   ];
 
@@ -27,6 +29,7 @@ export default async function BrandPage({ params }: PageProps<"/[brand]">) {
         <Marks active={active} />
         <Colors active={active} />
         <Type active={active} />
+        <Imagery active={active} number="04" />
         <Voice active={active} />
       </main>
       <Closing active={active} />

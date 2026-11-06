@@ -43,12 +43,16 @@ The generator runs from chat. In Claude Code, type `/brand <slug>`; in Cursor, a
 - `pnpm oklch "Name=L% C H" ...` turns OKLCH picks into hex and lists every contrast pair.
 - `pnpm render-marks <route folder>` renders marks to PNG, with a review sheet.
 - `pnpm check-route <slug>` lists everything that sends a route back.
-- `pnpm check-brand <slug>` checks the brand against the book's eight sections (intro, wordmark, logo mark, graphic device, mockup, colors, typography, closing) and lists what each lacks.
+- `pnpm check-brand <slug>` checks the brand against the book's sections (intro, wordmark, logo mark, graphic device, colors, typography, closing) and lists what each lacks.
 - `/routes/<slug>` (dev only) shows the three routes side by side. Run `pnpm brands` after adding a route.
+
+## Checks
+
+`pnpm check` is the one gate, and CI runs the same command on every push and pull request. It runs route types, TypeScript, ESLint, `check-route` for every route, `check-brand` for every brand, and a production build per brand, and it stops at the first failure.
 
 ## How it works
 
-- `scripts/brands.mjs` writes `brands/registry.generated.ts` before `dev` and `build`. In dev it includes every brand. With `--production` it includes only `BRAND`. The file is not committed.
+- `scripts/brands.ts` writes `brands/registry.generated.ts` before `dev` and `build`. In dev it includes every brand. With `--production` it includes only `BRAND`. The file is not committed.
 - `app/[brand]/` renders one long page. `next.config.ts` serves the selected brand at `/`.
 - `components/shell/` holds the sections. Brand colors arrive as CSS variables by role: `--ground`, `--ink`, `--accent`, and `--support`.
 - `lib/brand/color.ts` works out OKLCH, RGB, and WCAG contrast from each hex value, so contrast figures cannot go stale.
@@ -58,8 +62,6 @@ The generator runs from chat. In Claude Code, type `/brand <slug>`; in Cursor, a
 Built so far: the opening Reveal and the Color section.
 
 Still to build: Story, Voice, Logo, Type, Applications, and Downloads. Downloads will generate PNGs, favicons, a zip of every file, `brand.css`, `tokens.json`, and a `BRAND.md` for agents. After that come private hosted links for each client.
-
-`public/marks/` and `scripts/build-marks.mjs` belong to the old Notae-only site. They stay until the Downloads pipeline replaces them.
 
 ## License
 

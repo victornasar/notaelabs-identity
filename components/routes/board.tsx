@@ -256,7 +256,9 @@ function Hero({ r }: { r: BoardRoute }) {
   const { hero } = r.route.applications;
   const steps = r.route.type.scale.steps;
   const head = steps.find((s) => s.face === "display") ?? steps[0];
-  const body = steps.find((s) => s.face === "text") ?? steps.at(-1)!;
+  const body = steps.find((s) => s.face === "text") ?? steps.at(-1);
+  // A route with no type scale fails check-route; there is nothing to set the hero in.
+  if (!head || !body) return null;
   // The hero is a 1280px-wide page scaled to the column; sizes are in that page's px.
   const px = (size: number) => `calc(${size} / 1280 * 100cqi)`;
   return (

@@ -7,7 +7,7 @@
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { toOklch } from "./color";
+import { oklch } from "./color";
 import type { Route } from "./route";
 import { problems, type BrandColor, type Face, type Strategy, type WordmarkSource } from "./schema";
 
@@ -71,20 +71,15 @@ export function fontProblems(slug: string, strategy: Strategy, faces: (Face | Wo
   return out;
 }
 
-/** OKLCH lightness, chroma and hue, as numbers. */
-export function lch(hex: string) {
-  const [l, c, h] = toOklch(hex).match(/[\d.]+/g)!.map(Number);
-  return { l: l / 100, c, h };
-}
 
-const isOffWhite = (hex: string) => lch(hex).l > 0.93 && lch(hex).c < 0.03;
-const isNearBlack = (hex: string) => lch(hex).l < 0.28 && lch(hex).c < 0.03;
+const isOffWhite = (hex: string) => oklch(hex).l > 0.93 && oklch(hex).c < 0.03;
+const isNearBlack = (hex: string) => oklch(hex).l < 0.28 && oklch(hex).c < 0.03;
 const isSaturatedBlue = (hex: string) => {
-  const { c, h } = lch(hex);
+  const { c, h } = oklch(hex);
   return c > 0.1 && h >= 235 && h <= 285;
 };
 const isBluePurple = (hex: string) => {
-  const { c, h } = lch(hex);
+  const { c, h } = oklch(hex);
   return c > 0.06 && h >= 235 && h <= 330;
 };
 
@@ -102,7 +97,7 @@ export function banProblems(strategy: Strategy, colors: BrandColor[], svgs: stri
   }
   for (const svg of svgs) {
     for (const gradient of svg.match(/<(linear|radial)Gradient[\s\S]*?<\/\1Gradient>/g) ?? []) {
-      const stops = [...gradient.matchAll(/stop-color[=:]\s*"?(#[0-9a-f]{3,6})/gi)].map((m) => m[1]);
+      const stops = [...gradient.matchAll(/stop-color[=:]\s*"?(#[0-9a-f]{3,6})/gi)].flatMap((m) => (m[1] ? [m[1]] : []));
       if (stops.filter(isBluePurple).length > 0 && !overridden(strategy, "gradient-ban")) {
         out.push(`A blue-purple gradient (${stops.join(" → ")}): banned.`);
       }

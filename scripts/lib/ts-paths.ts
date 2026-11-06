@@ -1,5 +1,5 @@
 /**
- * Lets Node run the app's TypeScript directly: `node --import ./scripts/lib/ts-paths.mjs x.ts`.
+ * Lets Node run the app's TypeScript directly: `node --import ./scripts/lib/ts-paths.ts x.ts`.
  * Node strips the types itself; this only resolves `@/` and extensionless imports the way
  * tsconfig.json does.
  */
@@ -11,11 +11,12 @@ const root = new URL("../../", import.meta.url);
 
 registerHooks({
   resolve(specifier, context, next) {
-    const url = specifier.startsWith("@/")
-      ? new URL(specifier.slice(2), root)
-      : /^\.\.?\//.test(specifier) && context.parentURL?.startsWith("file:")
+    const alias = specifier.startsWith("@/") ? new URL(specifier.slice(2), root) : null;
+    const url =
+      alias ??
+      (/^\.\.?\//.test(specifier) && context.parentURL?.startsWith("file:")
         ? new URL(specifier, context.parentURL)
-        : null;
+        : null);
     if (url && !existsSync(fileURLToPath(url))) {
       for (const suffix of [".ts", ".tsx", "/index.ts"]) {
         const candidate = new URL(url.href + suffix);
@@ -23,6 +24,6 @@ registerHooks({
       }
     }
     // Relative imports that already resolve go through untouched, so CommonJS requires keep working.
-    return next(specifier.startsWith("@/") ? url.href : specifier, context);
+    return next(alias ? alias.href : specifier, context);
   },
 });

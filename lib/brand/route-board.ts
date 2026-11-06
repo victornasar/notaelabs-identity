@@ -16,7 +16,7 @@ const brandsDir = join(process.cwd(), "brands");
 
 export const boardSlugs = Object.keys(routeSets);
 
-// Single-color marks take their color from CSS, as in scripts/brands.mjs.
+// Single-color marks take their color from CSS, as in scripts/brands.ts.
 function inlineSvg(path: string) {
   if (!existsSync(path)) return null;
   return readFileSync(path, "utf8")
@@ -55,11 +55,13 @@ function scoresFor(markdown: string, letter: string) {
   const rows: Score[] = section
     .split("\n")
     .filter((line) => /^\|/.test(line) && !/^\|\s*-/.test(line) && !/^\|\s*Criterion/i.test(line))
-    .map((line) => {
+    .flatMap((line) => {
       const [criterion, score, evidence] = line.split("|").slice(1, -1).map((cell) => cell.trim());
-      return { criterion, score: /^\d$/.test(score) ? Number(score) : null, evidence };
+      // A row the brand-score skill didn't write in full is not a score.
+      if (criterion === undefined || score === undefined || evidence === undefined) return [];
+      return [{ criterion, score: /^\d$/.test(score) ? Number(score) : null, evidence }];
     });
-  const pick = (label: string) => section.match(new RegExp(`\\*\\*${label}:\\*\\*\\s*([^*]+)`))?.[1].trim();
+  const pick = (label: string) => section.match(new RegExp(`\\*\\*${label}:\\*\\*\\s*([^*]+)`))?.[1]?.trim();
   return { rows, strongest: pick("Strongest"), weakest: pick("Weakest") };
 }
 

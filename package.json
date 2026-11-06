@@ -2,19 +2,20 @@
   "name": "notaelabs-identity",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "packageManager": "pnpm@12.16.1",
   "scripts": {
-    "dev": "node scripts/brands.mjs && next dev",
-    "build": "node scripts/brands.mjs --production && next build",
+    "dev": "node --no-warnings --import ./scripts/lib/ts-paths.ts scripts/brands.ts && next dev",
+    "build": "node --no-warnings --import ./scripts/lib/ts-paths.ts scripts/brands.ts --production && next build",
     "start": "next start",
     "lint": "eslint",
-    "marks": "node scripts/build-marks.mjs",
-    "brands": "node scripts/brands.mjs",
-    "fonts": "node scripts/fonts.mjs",
-    "render-marks": "node scripts/render-marks.mjs",
-    "check-route": "node --no-warnings --import ./scripts/lib/ts-paths.mjs scripts/check-route.ts",
-    "check-brand": "node --no-warnings --import ./scripts/lib/ts-paths.mjs scripts/check-brand.ts",
-    "oklch": "node --no-warnings --import ./scripts/lib/ts-paths.mjs scripts/oklch.ts"
+    "check": "node --no-warnings --import ./scripts/lib/ts-paths.ts scripts/check.ts",
+    "brands": "node --no-warnings --import ./scripts/lib/ts-paths.ts scripts/brands.ts",
+    "fonts": "node --no-warnings --import ./scripts/lib/ts-paths.ts scripts/fonts.ts",
+    "render-marks": "node --no-warnings --import ./scripts/lib/ts-paths.ts scripts/render-marks.ts",
+    "check-route": "node --no-warnings --import ./scripts/lib/ts-paths.ts scripts/check-route.ts",
+    "check-brand": "node --no-warnings --import ./scripts/lib/ts-paths.ts scripts/check-brand.ts",
+    "oklch": "node --no-warnings --import ./scripts/lib/ts-paths.ts scripts/oklch.ts"
   },
   "dependencies": {
     "next": "16.4.5",
@@ -23,7 +24,7 @@
   },
   "devDependencies": {
     "@resvg/resvg-js": "^2.6.2",
-    "@types/node": "^20",
+    "@types/node": "^24.19.2",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",

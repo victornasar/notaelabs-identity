@@ -3,8 +3,8 @@
  * brand uses a family, and every download is pinned, so the same command always yields the
  * same bytes.
  *
- *   node scripts/fonts.mjs add <family-id> <brand-slug>   copy a family into brands/<slug>/fonts/<id>/
- *   node scripts/fonts.mjs lock                            pin hashes and read facts for every approved family
+ *   pnpm fonts add <family-id> <brand-slug>   copy a family into brands/<slug>/fonts/<id>/
+ *   pnpm fonts lock                            pin hashes and read facts for every approved family
  *
  * Google families are read from google/fonts at the commit in library.json; other families
  * come from a fixed release archive. `add` refuses any file whose sha256 differs from the
@@ -18,25 +18,46 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parse } from "opentype.js/dist/opentype.mjs";
 
+type Source =
+  | { kind: "google"; dir: string; files: string[] }
+  | { kind: "zip"; url: string; files: Record<string, string> };
+
+type Family = {
+  id: string;
+  status: "approved" | "rejected" | string;
+  decision?: string;
+  source: Source;
+  sha256?: Record<string, string>;
+  license?: string;
+  designer?: string | null;
+  weights?: [number, number];
+  axes?: string[];
+  italic?: boolean;
+};
+
+type Library = { google: { repo: string; commit: string }; families: Family[] };
+
+type Files = Record<string, Buffer>;
+
 const libraryPath = new URL("../fonts/library.json", import.meta.url);
-const library = JSON.parse(readFileSync(libraryPath, "utf8"));
+const library: Library = JSON.parse(readFileSync(libraryPath, "utf8"));
 
 const LICENSES = [
   { id: "OFL-1.1", test: /SIL Open Font License,? Version 1\.1|SIL OPEN FONT LICENSE Version 1\.1/i },
   { id: "Apache-2.0", test: /Apache License,? Version 2\.0/i },
 ];
 
-const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
-const isFont = (file) => /\.(ttf|otf)$/i.test(file);
+const sha256 = (bytes: Buffer) => createHash("sha256").update(bytes).digest("hex");
+const isFont = (file: string) => /\.(ttf|otf)$/i.test(file);
 
-async function download(url) {
+async function download(url: string) {
   const response = await fetch(url);
   if (!response.ok) throw new Error(`${response.status} for ${url}`);
   return Buffer.from(await response.arrayBuffer());
 }
 
 // Returns { [fileName]: bytes } for a family, straight from its pinned source.
-async function fetchFiles(family) {
+async function fetchFiles(family: Family): Promise<Files> {
   const { source } = family;
   if (source.kind === "google") {
     const entries = await Promise.all(
@@ -61,21 +82,20 @@ async function fetchFiles(family) {
       rmSync(scratch, { recursive: true, force: true });
     }
   }
-  throw new Error(`${family.id}: unknown source kind "${source.kind}"`);
+  throw new Error(`${family.id}: unknown source kind "${(source as { kind: string }).kind}"`);
 }
 
 // Reads what the files themselves say: license, designer, weight range, axes.
-function inspect(family, files) {
-  const licenseFile = Object.keys(files).find((file) => /^(OFL|LICENSE)/i.test(file));
+function inspect(family: Family, files: Files) {
+  const licenseFile = Object.entries(files).find(([file]) => /^(OFL|LICENSE)/i.test(file));
   if (!licenseFile) throw new Error(`${family.id}: no license file`);
-  const license = LICENSES.find((candidate) => candidate.test.test(files[licenseFile].toString("utf8")));
-  if (!license) throw new Error(`${family.id}: ${licenseFile} is not OFL 1.1 or Apache 2.0`);
+  const license = LICENSES.find((candidate) => candidate.test.test(licenseFile[1].toString("utf8")));
+  if (!license) throw new Error(`${family.id}: ${licenseFile[0]} is not OFL 1.1 or Apache 2.0`);
 
-  const fonts = Object.keys(files)
-    .filter(isFont)
-    .map((file) => {
-      const bytes = files[file];
-      const font = parse(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength));
+  const fonts = Object.entries(files)
+    .filter(([file]) => isFont(file))
+    .map(([file, bytes]) => {
+      const font = parse(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer);
       const names = font.names.windows ?? font.names;
       return {
         italic: /italic/i.test(file),
@@ -91,9 +111,9 @@ function inspect(family, files) {
   return {
     license: license.id,
     designer: fonts.find((font) => font.designer)?.designer ?? null,
-    weights: wght
+    weights: (wght
       ? [wght.min, wght.max]
-      : [Math.min(...upright.map((font) => font.weight)), Math.max(...upright.map((font) => font.weight))],
+      : [Math.min(...upright.map((font) => font.weight)), Math.max(...upright.map((font) => font.weight))]) as [number, number],
     axes: [...new Set(fonts.flatMap((font) => font.axes.map((axis) => axis.tag)))],
     italic: fonts.some((font) => font.italic),
   };
@@ -107,17 +127,17 @@ async function lock() {
       Object.assign(family, inspect(family, files), {
         sha256: Object.fromEntries(Object.entries(files).map(([name, bytes]) => [name, sha256(bytes)])),
       });
-      console.log(`ok   ${family.id.padEnd(28)} ${family.license}  ${family.weights.join("-")}  ${family.axes.join(",")}`);
+      console.log(`ok   ${family.id.padEnd(28)} ${family.license}  ${family.weights?.join("-")}  ${family.axes?.join(",")}`);
     } catch (error) {
       failed += 1;
-      console.error(`FAIL ${family.id.padEnd(28)} ${error.message}`);
+      console.error(`FAIL ${family.id.padEnd(28)} ${error instanceof Error ? error.message : error}`);
     }
   }
   writeFileSync(libraryPath, JSON.stringify(library, null, 2) + "\n");
   if (failed) process.exitCode = 1;
 }
 
-async function add(id, slug) {
+async function add(id: string, slug: string) {
   const family = library.families.find((candidate) => candidate.id === id);
   if (!family) throw new Error(`No family "${id}" in fonts/library.json`);
   if (family.status !== "approved") throw new Error(`${id} is ${family.status}: ${family.decision ?? "not approved"}`);
@@ -132,19 +152,21 @@ async function add(id, slug) {
   if (present) return console.log(`${id} already in brands/${slug}/fonts/${id}/`);
 
   const files = await fetchFiles(family);
-  for (const [name, hash] of Object.entries(family.sha256)) {
-    if (!files[name]) throw new Error(`${id}: source no longer has ${name}`);
-    if (sha256(files[name]) !== hash) throw new Error(`${id}: ${name} does not match its locked hash`);
-  }
+  const locked = Object.entries(family.sha256).map(([name, hash]) => {
+    const bytes = files[name];
+    if (!bytes) throw new Error(`${id}: source no longer has ${name}`);
+    if (sha256(bytes) !== hash) throw new Error(`${id}: ${name} does not match its locked hash`);
+    return [name, bytes] as const;
+  });
   mkdirSync(dir, { recursive: true });
-  for (const name of Object.keys(family.sha256)) writeFileSync(join(dir, name), files[name]);
+  for (const [name, bytes] of locked) writeFileSync(join(dir, name), bytes);
   console.log(`added ${id} to brands/${slug}/fonts/${id}/`);
 }
 
 const [command, ...args] = process.argv.slice(2);
 if (command === "lock") await lock();
-else if (command === "add" && args.length === 2) await add(...args);
+else if (command === "add" && args[0] && args[1]) await add(args[0], args[1]);
 else {
-  console.error("usage: node scripts/fonts.mjs add <family-id> <brand-slug> | lock");
+  console.error("usage: pnpm fonts add <family-id> <brand-slug> | lock");
   process.exitCode = 1;
 }

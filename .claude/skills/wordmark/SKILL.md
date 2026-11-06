@@ -10,7 +10,7 @@ A wordmark starts as the name set in one approved font from `fonts/library.json`
 ## Steps
 
 1. **Choose the source font.** An approved family the brand already has in `brands/<slug>/fonts/<id>/` (add it with `pnpm fonts add <id> <slug>`). It need not be the display face, but say why in `type.wordmark.cites`. Try the name in two or three candidates and settings before committing to one; set them side by side in a scratch render.
-2. **Write `build.mjs`** in the route folder. Use `scripts/lib/outline.mjs`: `loadFont(path, { wght, opsz, ... })`, `setText(font, name, { size: 1000, tracking })`, then edit `run.glyphs[i].commands` with `moveBy` or `mapPoints`, and write `marks/wordmark.svg` with `toSvg(run)`. Each change is one commented block in the script.
+2. **Write `build.mjs`** in the route folder. Use `scripts/lib/outline.ts`: `loadFont(path, { wght, opsz, ... })`, `setText(font, name, { size: 1000, tracking })`, then edit `run.glyphs[i].commands` with `moveBy` or `mapPoints`, and write `marks/wordmark.svg` with `toSvg(run)`. Each change is one commented block in the script.
 3. **Make the changes.** Each one must come from a primitive or decision in the strategy, and is recorded in `type.wordmark.changes` as a phrase someone could check: "a–e spacing tightened 18 units", "dot of the i replaced by the `seed` primitive, 1.2× stem width". Good sources of change:
    - spacing: overall tracking for the size the mark lives at (wordmarks usually tighten), then pair by pair until the gaps look even, which is optical, not metric;
    - weight and width: an axis setting between named weights, so the mark is its own;

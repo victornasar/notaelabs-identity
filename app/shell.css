@@ -14,6 +14,7 @@
   --raised-solid: color-mix(in oklch, var(--ink) 4%, var(--ground));
   --quiet: color-mix(in oklch, var(--ink) 62%, var(--ground));
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --display: var(--brand-display), Georgia, serif;
   --text: var(--brand-text), system-ui, sans-serif;
   --mono: var(--shell), ui-monospace, monospace;
