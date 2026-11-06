@@ -279,6 +279,36 @@ async function drawPage(plan: BookPlan, variables: Map<string, Variable>, styles
     if (plan.palette.note) add(area, await text(plan.palette.note, role.small, quiet(ink), { stretch: true }));
   };
 
+  const roles = async (area: FrameNode, { ink }: ContentFrame) => {
+    // The accent as a flat field cut by one hard edge, beside the accent as the device's light.
+    const { color, asColor, asLight } = plan.palette.roles!;
+    const pair = grow(add(area, box("Roles", "HORIZONTAL", { gap: layout.gap, stretch: true })));
+    const half = Math.floor((column - layout.gap) / 2);
+    const side = async (name: string, words: string) => {
+      const cell = fullHeight(add(pair, box(name, "VERTICAL", { gap: 16, width: half })));
+      const panel = grow(add(cell, box("Panel", "VERTICAL", { stretch: true, radius: layout.radius, stroke: hairline(ink) })));
+      const about = add(cell, box("About", "VERTICAL", { gap: 8, stretch: true }));
+      add(about, await text(name, role.label, quiet(ink), { stretch: true }));
+      add(about, await text(words, role.body, quiet(ink), { stretch: true }));
+      return panel;
+    };
+    const field = await side(`${color} as color`, asColor);
+    field.primaryAxisAlignItems = "MAX";
+    add(field, box(color, "VERTICAL", { stretch: true, height: 240, fill: { color } }));
+    const light = await side(`${color} as light`, asLight);
+    light.primaryAxisAlignItems = light.counterAxisAlignItems = "CENTER";
+    add(light, broken(null, half));
+
+    // How much of each, in one bar.
+    const bar = add(area, box("Proportion", "HORIZONTAL", { stretch: true, height: 88, radius: layout.radius, stroke: hairline(ink) }));
+    for (const part of plan.palette.bar) {
+      const share = fullHeight(add(bar, box(part.color, "VERTICAL", { width: part.width, fill: { color: part.color } })));
+      share.paddingLeft = 24;
+      share.primaryAxisAlignItems = "CENTER";
+      add(share, await text(part.label, role.label, { color: part.ink }));
+    }
+  };
+
   const inUse = async (area: FrameNode, { ink }: ContentFrame) => {
     // One sheet of real copy, each line tagged with its style, closed by a rule and the symbol.
     const sheet = grow(add(area, box("Sheet", "VERTICAL", { stretch: true, radius: layout.radius, stroke: hairline(ink) })));
@@ -643,7 +673,7 @@ async function drawPage(plan: BookPlan, variables: Map<string, Variable>, styles
     await caption(area, graphic, ink);
   };
 
-  const draw = { overview, refuses, idea, palette, pairs, faces, scale, inUse, symbol, lockup, misuse, device, rhythm };
+  const draw = { overview, refuses, idea, palette, pairs, roles, faces, scale, inUse, symbol, lockup, misuse, device, rhythm };
 
   /** The edition over the cover's mark, in place of the first section's divider. */
   const cover = async (name: string, row: number) => {

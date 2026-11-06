@@ -88,6 +88,16 @@ describe("bookPlan", () => {
     assert.match(plan.palette.pairs[0]!.ratio, /^\d+\.\d\d:1$/);
   });
 
+  it("sets the accent as color beside the accent as light, over one bar of proportions", () => {
+    assert.deepEqual(plan.palette.roles, {
+      color: "Sodium",
+      asColor: brand.colors.find((c) => c.name === "Sodium")!.use,
+      asLight: brand.device!.construction,
+    });
+    assert.deepEqual(plan.palette.bar.map((b) => [b.label, b.ink]), [["Night 56%", "Stone"], ["Sodium 28%", "Night"], ["Stone 16%", "Night"]]);
+    assert.equal(plan.palette.bar.reduce((sum, b) => sum + b.width, 0) <= column, true);
+  });
+
   it("leads the faces with an accent card set in the face's heaviest weight", () => {
     const [display, text] = plan.faces;
     assert.deepEqual([display?.glyphs, display?.family, display?.fill, display?.ink], ["AG", "BIG SHOULDERS", "Sodium", "Night"]);
@@ -100,13 +110,13 @@ describe("bookPlan", () => {
     assert.deepEqual(names, [
       ["Cover", "01.1 Introduction · Overview", "01.2 Introduction · What we refuse", "01.3 Introduction · The idea"],
       ["02 Logo", "02.1 Logo · Logo mark", "02.2 Logo · On Stone", "02.3 Logo · On Sodium", "02.4 Logo · On Night", "02.5 Logo · Misuse"],
-      ["03 Color", "03.1 Color · Palette", "03.2 Color · Pairs"],
+      ["03 Color", "03.1 Color · Palette", "03.2 Color · Pairs", "03.3 Color · Sodium"],
       ["04 Typography", "04.1 Typography · Typefaces", "04.2 Typography · Scale", "04.3 Typography · In use"],
       ["05 Visual Language", "05.1 Visual Language · Pool row", "05.2 Visual Language · Rules"],
     ]);
     assert.deepEqual(
       plan.sections.flatMap((s) => s.frames.map((f) => f.page)),
-      ["02", "03", "04", "06", "07", "08", "09", "10", "12", "13", "15", "16", "17", "19", "20"],
+      ["02", "03", "04", "06", "07", "08", "09", "10", "12", "13", "14", "16", "17", "18", "20", "21"],
     );
     assert.equal(plan.sections[2]?.frames[0]?.eyebrow, "03 · Color · Palette");
     assert.deepEqual(plan.display, { font: { family: "Big Shoulders", style: "ExtraBold" }, upper: true });

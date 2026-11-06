@@ -38,6 +38,12 @@ export type SwatchCard = {
   pills: { label: string; value: string }[];
 };
 
+/** The accent's two jobs side by side, when the device is drawn in it: a flat field, and the device's light. */
+export type AccentRoles = { color: string; asColor: string; asLight: string };
+
+/** One color's share of the bar, as wide as its proportion. */
+export type BarPart = { color: string; ink: string; width: number; label: string; edge: boolean };
+
 /** A color on a ground it is approved on: what for, and how far apart they are. */
 export type PairCard = { ink: string; ground: string; use: string; ratio: string; level: string };
 
@@ -68,7 +74,7 @@ export type Divider = { name: string; number: string; title: string; cover: bool
  */
 export type ContentFrame = {
   name: string;
-  kind: "overview" | "refuses" | "idea" | "palette" | "pairs" | "faces" | "scale" | "inUse" | "symbol" | "lockup" | "misuse" | "device" | "rhythm";
+  kind: "overview" | "refuses" | "idea" | "palette" | "pairs" | "roles" | "faces" | "scale" | "inUse" | "symbol" | "lockup" | "misuse" | "device" | "rhythm";
   eyebrow: string;
   page: string;
   ground: string;
@@ -111,7 +117,7 @@ export type BookPlan = {
   cover: { edition: string; svg: string };
   /** `refuses` as its separate sentences, one line each. */
   intro: Omit<BundleIntro, "refuses"> & { refuses: string[] };
-  palette: { cards: SwatchCard[]; note?: string; pairs: PairCard[] };
+  palette: { cards: SwatchCard[]; note?: string; pairs: PairCard[]; roles?: AccentRoles; bar: BarPart[] };
   faces: FaceCard[];
   scale: ScaleRow[];
   inUse: InUse;
@@ -205,6 +211,18 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
       return { ink: c.name, ground: p.on, use: uses[p.as], ratio: `${ratio.toFixed(2)}:1`, level: wcagLevel(ratio) ?? "Below AA" };
     }),
   );
+  const roles: AccentRoles | undefined =
+    bundle.device && bundle.device.ink === accent.name && accent !== ink
+      ? { color: accent.name, asColor: accent.use, asLight: bundle.device.construction }
+      : undefined;
+  const barWidths = shareWidths(ordered.map((c) => c.proportion), column, 0, 0);
+  const bar = ordered.map((c, i): BarPart => ({
+    color: c.name,
+    ink: nameOf(bestOn(c.hex, hexes)),
+    width: barWidths[i]!,
+    label: `${c.name} ${c.proportion}%`,
+    edge: c.name === ground.name,
+  }));
   const widths = shareWidths(ordered.map((c) => c.proportion), column, layout.gap, layout.minSwatch);
 
   // The marks: the symbol (or the primary mark, when there is none) in the accent if it may sit on the
@@ -246,7 +264,14 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
         ...(misuse.length ? [{ kind: "misuse" as const, part: "Misuse" }] : []),
       ],
     },
-    { title: "Color", parts: [{ kind: "palette", part: "Palette" }, ...(pairs.length ? [{ kind: "pairs" as const, part: "Pairs" }] : [])] },
+    {
+      title: "Color",
+      parts: [
+        { kind: "palette", part: "Palette" },
+        ...(pairs.length ? [{ kind: "pairs" as const, part: "Pairs" }] : []),
+        ...(roles ? [{ kind: "roles" as const, part: roles.color }] : []),
+      ],
+    },
     {
       title: "Typography",
       parts: [
@@ -330,6 +355,8 @@ export function bookPlan(bundle: FigmaBundle): BookPlan {
       // The full caveat is in each variable's description; the frame keeps one line.
       ...(bundle.printNote ? { note: "CMYK and Pantone are approximate. Proof before print." } : {}),
       pairs,
+      ...(roles ? { roles } : {}),
+      bar,
     },
     faces: bundle.type.faces.flatMap((face, i) => {
       const font = heaviest(face.face);
